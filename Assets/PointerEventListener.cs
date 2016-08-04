@@ -20,6 +20,7 @@ public class PointerEventListener : MonoBehaviour {
 
     GameObject selection = null;
 
+
     /// <summary>
     /// Prevents the selected object from being changed
     /// </summary>
@@ -28,18 +29,15 @@ public class PointerEventListener : MonoBehaviour {
     /// <summary>
     /// Indicates whether the position of the selected object should be fixed
     /// </summary>
-    bool fixPosition = false;
+    bool rotationOnly = false;
+    Vector3 selectionPosition;
+    Vector3 initialRotationEulerAngles;
+    Vector3 initialRotationDiff;
 
     /// <summary>
     /// The original position vector
     /// </summary>
     Vector3 originalPostion;
-    /// <summary>
-    /// The differential rotation vector
-    /// </summary>
-    Quaternion diffRotation;
-    Vector3 eulerRotation;
-
 
     private void Start()
     {
@@ -68,13 +66,9 @@ public class PointerEventListener : MonoBehaviour {
     private void Update()
     {
         //adapt rotation of the selection to track the parent
-        if(fixPosition)
+        if(rotationOnly)
         {
-            selection.transform.position = originalPostion;
-            //apply the differential rotation
-            Vector3 rotation = selection.transform.rotation.eulerAngles;
-            rotation.y += gameObject.transform.rotation.eulerAngles.y - eulerRotation.y;
-            selection.transform.rotation = Quaternion.Euler(rotation);
+            selection.transform.rotation = Quaternion.FromToRotation(initialRotationDiff,selection.transform.position-gameObject.transform.position)*Quaternion.Euler(initialRotationEulerAngles);
         }
     }
 
@@ -86,6 +80,7 @@ public class PointerEventListener : MonoBehaviour {
 
     private void selectObject(object sender, DestinationMarkerEventArgs e)
     {
+
         if (fixSelection)
         {
             return;
@@ -97,6 +92,7 @@ public class PointerEventListener : MonoBehaviour {
             return;
         }
         selection = e.target.gameObject;
+        selectionPosition = e.destinationPosition;
 
     }
 
@@ -187,7 +183,7 @@ public class PointerEventListener : MonoBehaviour {
     /// <param name="position">The world position of where to add the scatterplot</param>
     private void addScatterplot(Vector3 position)
     {
-        Instantiate(Resources.Load("Objects/Scatterplot", typeof(GameObject)),position+new Vector3(0,0.3f,0),Quaternion.identity);
+        Instantiate(Resources.Load("Objects/Scatterplot", typeof(GameObject)),position+new Vector3(0,0.7f,0),Quaternion.identity);
     }
 
     /// <summary>
@@ -230,24 +226,23 @@ public class PointerEventListener : MonoBehaviour {
     {
         if (start)
         {
-            //
-
-
             //disallow the changing of the selection while the move is progress
             fixSelection = true;
             //enable updating the rotation
-            fixPosition = true;
+            rotationOnly = true;
 
             originalPostion = scatterplot.transform.position;
-            diffRotation = Quaternion.Inverse(scatterplot.transform.rotation) * gameObject.transform.rotation;
-            eulerRotation = scatterplot.transform.rotation.eulerAngles - gameObject.transform.rotation.eulerAngles;
+
+            //set the original rotation vectors
+            initialRotationEulerAngles = scatterplot.transform.rotation.eulerAngles;
+            initialRotationDiff = scatterplot.transform.position - gameObject.transform.position;
         }
         else
         {
             //free selection again
             fixSelection = false;
             //disable updatin the roation
-            fixPosition = false;
+            rotationOnly = false;
 
         }
     }
