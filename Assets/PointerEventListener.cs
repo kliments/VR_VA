@@ -14,6 +14,7 @@ public class PointerEventListener : MonoBehaviour {
     public Color deleteColor;
     public Color moveColor;
     public Color rotateColor;
+    public Color scaleColor;
 
     VRTK_SimplePointer pointer;
     VRTK_ControllerEvents controller;
@@ -27,17 +28,18 @@ public class PointerEventListener : MonoBehaviour {
     bool fixSelection = false;
 
     /// <summary>
-    /// Indicates whether the position of the selected object should be fixed
+    /// Indicates whether the rotation of the selected object should be updated
     /// </summary>
-    bool rotationOnly = false;
-    Vector3 selectionPosition;
+    bool updateRotation = false;
     Vector3 initialRotationEulerAngles;
     Vector3 initialRotationDiff;
 
     /// <summary>
-    /// The original position vector
+    /// Indicates whether the scalingo f the selected object should be updated
     /// </summary>
-    Vector3 originalPostion;
+    bool updateScaling = false;
+    Vector3 initialPosition;
+    Vector3 initialScale;
 
     private void Start()
     {
@@ -66,9 +68,16 @@ public class PointerEventListener : MonoBehaviour {
     private void Update()
     {
         //adapt rotation of the selection to track the parent
-        if(rotationOnly)
+        if(updateRotation)
         {
             selection.transform.rotation = Quaternion.FromToRotation(initialRotationDiff,selection.transform.position-gameObject.transform.position)*Quaternion.Euler(initialRotationEulerAngles);
+        }
+
+        //adapt scaling based on the difference in height from the original starting point of the selection
+        if(updateScaling)
+        {
+            float scaleDiff = 1+(gameObject.transform.position.y-initialPosition.y)*1.2f;
+            selection.transform.localScale = initialScale*scaleDiff;
         }
     }
 
@@ -92,7 +101,6 @@ public class PointerEventListener : MonoBehaviour {
             return;
         }
         selection = e.target.gameObject;
-        selectionPosition = e.destinationPosition;
 
     }
 
@@ -147,10 +155,13 @@ public class PointerEventListener : MonoBehaviour {
         switch(menuAction)
         {
             case MENU_ACTION.MOVE:
-                moveScatterplot(selection, true);
+                moveSelection(selection, true);
                 break;
             case MENU_ACTION.ROTATE:
-                rotateScatterplot(selection, true);
+                rotateSelection(selection, true);
+                break;
+            case MENU_ACTION.SCALE:
+                scaleSelection(selection, true);
                 break;
             default:
                 break;
@@ -167,10 +178,13 @@ public class PointerEventListener : MonoBehaviour {
         switch(menuAction)
         {
             case MENU_ACTION.MOVE:
-                moveScatterplot(selection, false);
+                moveSelection(selection, false);
                 break;
             case MENU_ACTION.ROTATE:
-                rotateScatterplot(selection, false);
+                rotateSelection(selection, false);
+                break;
+            case MENU_ACTION.SCALE:
+                scaleSelection(selection, false);
                 break;
             default:
                 break;
@@ -197,52 +211,78 @@ public class PointerEventListener : MonoBehaviour {
     }
 
     /// <summary>
-    /// Starts or Ends the movement of a scatterplot by parenting it to the controller
+    /// Starts or Ends the movement of a selected object by parenting it to the controller
     /// </summary>
-    /// <param name="scatterplot"> The scatterplot to move</param>
+    /// <param name="selectedObject"> The selected object to move</param>
     /// <param name="start">if true the object is parented to the controller. if false it's unparented again</param>
-    private void moveScatterplot(GameObject scatterplot,bool start)
+    private void moveSelection(GameObject selectedObject,bool start)
     {
         if (start)
         {
-            scatterplot.transform.parent = gameObject.transform;
+            selectedObject.transform.parent = gameObject.transform;
             //disallow the changing of the selection while the move is progress
             fixSelection = true;
         }
         else
         {
-            scatterplot.transform.parent = null;
+            selectedObject.transform.parent = null;
             //free selection again
             fixSelection = false;
         }
     }
 
     /// <summary>
-    /// Starts or Ends the rotation of a scatterplot by parenting to controller but storing the 
+    /// Starts or Ends the rotation of a selected object by having it track the location of the controller
     /// </summary>
-    /// <param name="scatterplot"> The scatterplot to move</param>
-    /// <param name="start">if true the object is parented to the controller. if false it's unparented again</param>
-    private void rotateScatterplot(GameObject scatterplot, bool start)
+    /// <param name="selectedObject"> The selected object to rotate</param>
+    /// <param name="start">if true the rotation mode is started if false it's disabled</param>
+    private void rotateSelection(GameObject selectedObject, bool start)
     {
         if (start)
         {
             //disallow the changing of the selection while the move is progress
             fixSelection = true;
             //enable updating the rotation
-            rotationOnly = true;
-
-            originalPostion = scatterplot.transform.position;
+            updateRotation = true;
 
             //set the original rotation vectors
-            initialRotationEulerAngles = scatterplot.transform.rotation.eulerAngles;
-            initialRotationDiff = scatterplot.transform.position - gameObject.transform.position;
+            initialRotationEulerAngles = selectedObject.transform.rotation.eulerAngles;
+            initialRotationDiff = selectedObject.transform.position - gameObject.transform.position;
         }
         else
         {
             //free selection again
             fixSelection = false;
             //disable updatin the roation
-            rotationOnly = false;
+            updateRotation = false;
+
+        }
+    }
+
+    /// <summary>
+    /// Starts or Ends the rotation of a selected object by tracking the height comoponent of the controller
+    /// </summary>
+    /// <param name="selectedObject">The selected object to rotate</param>
+    /// <param name="start">if true the scaling mode is started if false it's disabled</param>
+    private void scaleSelection(GameObject selectedObject,bool start)
+    {
+        if(start)
+        {
+            //dissalow the changing of the selection while the scaling is in process
+            fixSelection = true;
+            //enable updating the rotation
+            updateScaling = true;
+
+            //inital position of the controller (to compare the 
+            initialPosition = gameObject.transform.position;
+            initialScale = selectedObject.transform.localScale;
+        }
+        else
+        {
+            //free selection again
+            fixSelection = false;
+            //disable scale update
+            updateScaling = false;
 
         }
     }
@@ -277,5 +317,13 @@ public class PointerEventListener : MonoBehaviour {
         GetComponent<VRTK_SimplePointer>().layersToIgnore = layersToIgnoreModify;
         pointer.pointerHitColor = rotateColor;
         pointer.pointerMissColor = new Color(rotateColor.r, rotateColor.g, rotateColor.b, 0.3f);
+    }
+
+    public void setScalingMode()
+    {
+        menuAction = MENU_ACTION.SCALE;
+        GetComponent<VRTK_SimplePointer>().layersToIgnore = layersToIgnoreModify;
+        pointer.pointerHitColor = scaleColor;
+        pointer.pointerMissColor = new Color(scaleColor.r, scaleColor.g, scaleColor.b, 0.3f);
     }
 }
