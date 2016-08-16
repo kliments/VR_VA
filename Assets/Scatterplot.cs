@@ -10,9 +10,9 @@ public class Scatterplot : MonoBehaviour {
     public Material material2;
     public Material material3;
 
-    public Material neutralMaterial;
+    public Material dataMappedMaterial;
 
-    public bool ignoreCategory = true;
+    public bool colorAsAttributes = true;
 
     private DataSpaceHandler dataSpaceHandler;
 
@@ -26,8 +26,8 @@ public class Scatterplot : MonoBehaviour {
         dataSpaceHandler.material1 = material1;
         dataSpaceHandler.material2 = material2;
         dataSpaceHandler.material3 = material3;
-        dataSpaceHandler.neutralMaterial = neutralMaterial;
-        dataSpaceHandler.ignoreCategory = ignoreCategory;
+        dataSpaceHandler.dataMappedMaterial = dataMappedMaterial;
+        dataSpaceHandler.colorAsAttributes = colorAsAttributes;
     }
 
     // Use this for initialization

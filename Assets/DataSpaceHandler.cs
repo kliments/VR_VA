@@ -13,15 +13,15 @@ public class DataSpaceHandler : MonoBehaviour {
     public Material material2;
     public Material material3;
 
-    public Material neutralMaterial;
-
     public TextAsset data;
+    public Material dataMappedMaterial;
 
     public string category1;
     public string category2;
     public string category3;
 
-    public bool ignoreCategory = false;
+
+    public bool colorAsAttributes = true;
 
     // Use this for initialization
     void Start () {
@@ -51,8 +51,10 @@ public class DataSpaceHandler : MonoBehaviour {
                 float.Parse(attributes[2], System.Globalization.CultureInfo.InvariantCulture),
                 float.Parse(attributes[3], System.Globalization.CultureInfo.InvariantCulture));
 
+
+
             //parse category
-            if (!ignoreCategory)
+            if (!colorAsAttributes)
             {
                 string cat = attributes[0].Substring(1, attributes[0].Length - 2);
                 if (cat == category1)
@@ -72,6 +74,17 @@ public class DataSpaceHandler : MonoBehaviour {
             }
             else
             {
+                //set vertex color
+                Mesh mesh = dataPoint.GetComponent<MeshFilter>().mesh;
+                Vector3[] vertices = mesh.vertices;
+                Color[] colors = new Color[vertices.Length];
+                for (int t = 0; t < vertices.Length; t++)
+                {
+                    colors[t] = new Color(float.Parse(attributes[4], System.Globalization.CultureInfo.InvariantCulture),
+                        float.Parse(attributes[5], System.Globalization.CultureInfo.InvariantCulture),
+                        float.Parse(attributes[6], System.Globalization.CultureInfo.InvariantCulture));
+                }
+                mesh.colors = colors;
                 childCat1.Add(dataPoint);
             }
 
@@ -83,7 +96,7 @@ public class DataSpaceHandler : MonoBehaviour {
 
 
         //create colored cube objects
-        if (!ignoreCategory)
+        if (!colorAsAttributes)
         {
             createTiledCube(material1, childCat1);
             createTiledCube(material2, childCat2);
@@ -91,7 +104,7 @@ public class DataSpaceHandler : MonoBehaviour {
         }
         else
         {
-            createTiledCube(neutralMaterial, childCat1);
+            createTiledCube(dataMappedMaterial, childCat1);
         }
 
         //combine children

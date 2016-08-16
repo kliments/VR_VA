@@ -5,7 +5,7 @@
 #include "UnityShaderVariables.cginc"
 #include "UnityInstancing.cginc"
 #include "UnityStandardConfig.cginc"
-#include "UnityStandardInput.cginc"
+#include "CustomStandardInput.cginc"
 #include "UnityPBSLighting.cginc"
 #include "UnityStandardUtils.cginc"
 #include "UnityStandardBRDF.cginc"
@@ -167,10 +167,10 @@ half3 PerPixelWorldNormal(float4 i_tex, half4 tangentToWorld[3])
 #define IN_LIGHTDIR_FWDADD(i) half3(i.tangentToWorldAndLightDir[0].w, i.tangentToWorldAndLightDir[1].w, i.tangentToWorldAndLightDir[2].w)
 
 #define FRAGMENT_SETUP(x) FragmentCommonData x = \
-	FragmentSetup(i.tex, i.eyeVec, IN_VIEWDIR4PARALLAX(i), i.tangentToWorldAndParallax, IN_WORLDPOS(i));
+	FragmentSetup(i.tex, i.eyeVec, IN_VIEWDIR4PARALLAX(i), i.tangentToWorldAndParallax, IN_WORLDPOS(i),i.dataColor);
 
 #define FRAGMENT_SETUP_FWDADD(x) FragmentCommonData x = \
-	FragmentSetup(i.tex, i.eyeVec, IN_VIEWDIR4PARALLAX_FWDADD(i), i.tangentToWorldAndLightDir, half3(0,0,0));
+	FragmentSetup(i.tex, i.eyeVec, IN_VIEWDIR4PARALLAX_FWDADD(i), i.tangentToWorldAndLightDir, half3(0,0,0),i.dataColor);
 
 struct FragmentCommonData
 {
@@ -194,14 +194,14 @@ struct FragmentCommonData
 	#define UNITY_SETUP_BRDF_INPUT SpecularSetup
 #endif
 
-inline FragmentCommonData SpecularSetup (float4 i_tex)
+inline FragmentCommonData SpecularSetup (float4 i_tex,float4 dataColor)
 {
 	half4 specGloss = SpecularGloss(i_tex.xy);
 	half3 specColor = specGloss.rgb;
 	half oneMinusRoughness = specGloss.a;
 
 	half oneMinusReflectivity;
-	half3 diffColor = EnergyConservationBetweenDiffuseAndSpecular (Albedo(i_tex), specColor, /*out*/ oneMinusReflectivity);
+	half3 diffColor = EnergyConservationBetweenDiffuseAndSpecular (DataAlbedo(i_tex, dataColor), specColor, /*out*/ oneMinusReflectivity);
 	
 	FragmentCommonData o = (FragmentCommonData)0;
 	o.diffColor = diffColor;
@@ -211,7 +211,7 @@ inline FragmentCommonData SpecularSetup (float4 i_tex)
 	return o;
 }
 
-inline FragmentCommonData MetallicSetup (float4 i_tex)
+inline FragmentCommonData MetallicSetup (float4 i_tex,float4 dataColor)
 {
 	half2 metallicGloss = MetallicGloss(i_tex.xy);
 	half metallic = metallicGloss.x;
@@ -219,7 +219,7 @@ inline FragmentCommonData MetallicSetup (float4 i_tex)
 
 	half oneMinusReflectivity;
 	half3 specColor;
-	half3 diffColor = DiffuseAndSpecularFromMetallic (Albedo(i_tex), metallic, /*out*/ specColor, /*out*/ oneMinusReflectivity);
+	half3 diffColor = DiffuseAndSpecularFromMetallic (DataAlbedo(i_tex, dataColor), metallic, /*out*/ specColor, /*out*/ oneMinusReflectivity);
 
 	FragmentCommonData o = (FragmentCommonData)0;
 	o.diffColor = diffColor;
@@ -229,7 +229,7 @@ inline FragmentCommonData MetallicSetup (float4 i_tex)
 	return o;
 } 
 
-inline FragmentCommonData FragmentSetup (float4 i_tex, half3 i_eyeVec, half3 i_viewDirForParallax, half4 tangentToWorld[3], half3 i_posWorld)
+inline FragmentCommonData FragmentSetup (float4 i_tex, half3 i_eyeVec, half3 i_viewDirForParallax, half4 tangentToWorld[3], half3 i_posWorld,float4 dataColor)
 {
 	i_tex = Parallax(i_tex, i_viewDirForParallax);
 
@@ -238,7 +238,7 @@ inline FragmentCommonData FragmentSetup (float4 i_tex, half3 i_eyeVec, half3 i_v
 		clip (alpha - _Cutoff);
 	#endif
 
-	FragmentCommonData o = UNITY_SETUP_BRDF_INPUT (i_tex);
+	FragmentCommonData o = UNITY_SETUP_BRDF_INPUT (i_tex, dataColor);
 	o.normalWorld = PerPixelWorldNormal(i_tex, tangentToWorld);
 	o.eyeVec = NormalizePerPixelNormal(i_eyeVec);
 	o.posWorld = i_posWorld;
@@ -344,6 +344,7 @@ struct VertexOutputForwardBase
 	half3 eyeVec 						: TEXCOORD1;
 	half4 tangentToWorldAndParallax[3]	: TEXCOORD2;	// [3x3:tangentToWorld | 1x3:viewDirForParallax]
 	half4 ambientOrLightmapUV			: TEXCOORD5;	// SH or Lightmap UV
+	float4 dataColor					: COLOR;
 	SHADOW_COORDS(6)
 	UNITY_FOG_COORDS(7)
 
@@ -377,6 +378,7 @@ VertexOutputForwardBase vertForwardBase (VertexInput v)
 	o.pos = UnityObjectToClipPos(v.vertex);
 		
 	o.tex = TexCoords(v);
+	o.dataColor = v.color;
 	o.eyeVec = NormalizePerVertexNormal(posWorld.xyz - _WorldSpaceCameraPos);
 	float3 normalWorld = UnityObjectToWorldNormal(v.normal);
 	#ifdef _TANGENT_TO_WORLD
@@ -414,6 +416,7 @@ VertexOutputForwardBase vertForwardBase (VertexInput v)
 
 half4 fragForwardBaseInternal (VertexOutputForwardBase i)
 {
+
 	FRAGMENT_SETUP(s)
 #if UNITY_OPTIMIZE_TEXCUBELOD
 	s.reflUVW		= i.reflUVW;
@@ -448,6 +451,7 @@ struct VertexOutputForwardAdd
 	float4 tex							: TEXCOORD0;
 	half3 eyeVec 						: TEXCOORD1;
 	half4 tangentToWorldAndLightDir[3]	: TEXCOORD2;	// [3x3:tangentToWorld | 1x3:lightDir]
+	float4	dataColor					: COLOR;
 	LIGHTING_COORDS(5,6)
 	UNITY_FOG_COORDS(7)
 
@@ -469,6 +473,7 @@ VertexOutputForwardAdd vertForwardAdd (VertexInput v)
 	o.pos = UnityObjectToClipPos(v.vertex);
 
 	o.tex = TexCoords(v);
+	o.dataColor = v.color;
 	o.eyeVec = NormalizePerVertexNormal(posWorld.xyz - _WorldSpaceCameraPos);
 	float3 normalWorld = UnityObjectToWorldNormal(v.normal);
 	#ifdef _TANGENT_TO_WORLD
@@ -530,7 +535,8 @@ struct VertexOutputDeferred
 	float4 tex							: TEXCOORD0;
 	half3 eyeVec 						: TEXCOORD1;
 	half4 tangentToWorldAndParallax[3]	: TEXCOORD2;	// [3x3:tangentToWorld | 1x3:viewDirForParallax]
-	half4 ambientOrLightmapUV			: TEXCOORD5;	// SH or Lightmap UVs			
+	half4 ambientOrLightmapUV			: TEXCOORD5;	// SH or Lightmap UVs	
+	float4 dataColor					: COLOR;
 
 	#if UNITY_SPECCUBE_BOX_PROJECTION || UNITY_LIGHT_PROBE_PROXY_VOLUME
 		float3 posWorld						: TEXCOORD6;
@@ -562,6 +568,7 @@ VertexOutputDeferred vertDeferred (VertexInput v)
 	o.pos = UnityObjectToClipPos(v.vertex);
 
 	o.tex = TexCoords(v);
+	o.dataColor = v.color;
 	o.eyeVec = NormalizePerVertexNormal(posWorld.xyz - _WorldSpaceCameraPos);
 	float3 normalWorld = UnityObjectToWorldNormal(v.normal);
 	#ifdef _TANGENT_TO_WORLD

@@ -60,6 +60,7 @@ struct VertexInput
 	half3 normal	: NORMAL;
 	float2 uv0		: TEXCOORD0;
 	float2 uv1		: TEXCOORD1;
+	float4 color: COLOR;
 #if defined(DYNAMICLIGHTMAP_ON) || defined(UNITY_PASS_META)
 	float2 uv2		: TEXCOORD2;
 #endif
@@ -67,6 +68,7 @@ struct VertexInput
 	half4 tangent	: TANGENT;
 #endif
 	UNITY_INSTANCE_ID
+
 };
 
 float4 TexCoords(VertexInput v)
@@ -75,34 +77,34 @@ float4 TexCoords(VertexInput v)
 	texcoord.xy = TRANSFORM_TEX(v.uv0, _MainTex); // Always source from uv0
 	texcoord.zw = TRANSFORM_TEX(((_UVSec == 0) ? v.uv0 : v.uv1), _DetailAlbedoMap);
 	return texcoord;
-}		
+}
 
 half DetailMask(float2 uv)
 {
 	return tex2D (_DetailMask, uv).a;
 }
 
-half3 Albedo(float4 texcoords)
+half3 DataAlbedo(float4 texcoords,float4 dataColor)
 {
-	half3 albedo = _Color.rgb * tex2D (_MainTex, texcoords.xy).rgb;
+	half3 albedo = dataColor.rgb * dataColor.rgb;
 #if _DETAIL
-	#if (SHADER_TARGET < 30)
-		// SM20: instruction count limitation
-		// SM20: no detail mask
-		half mask = 1; 
-	#else
-		half mask = DetailMask(texcoords.xy);
-	#endif
-	half3 detailAlbedo = tex2D (_DetailAlbedoMap, texcoords.zw).rgb;
-	#if _DETAIL_MULX2
-		albedo *= LerpWhiteTo (detailAlbedo * unity_ColorSpaceDouble.rgb, mask);
-	#elif _DETAIL_MUL
-		albedo *= LerpWhiteTo (detailAlbedo, mask);
-	#elif _DETAIL_ADD
-		albedo += detailAlbedo * mask;
-	#elif _DETAIL_LERP
-		albedo = lerp (albedo, detailAlbedo, mask);
-	#endif
+#if (SHADER_TARGET < 30)
+	// SM20: instruction count limitation
+	// SM20: no detail mask
+	half mask = 1;
+#else
+	half mask = DetailMask(texcoords.xy);
+#endif
+	half3 detailAlbedo = tex2D(_DetailAlbedoMap, texcoords.zw).rgb;
+#if _DETAIL_MULX2
+	albedo *= LerpWhiteTo(detailAlbedo * unity_ColorSpaceDouble.rgb, mask);
+#elif _DETAIL_MUL
+	albedo *= LerpWhiteTo(detailAlbedo, mask);
+#elif _DETAIL_ADD
+	albedo += detailAlbedo * mask;
+#elif _DETAIL_LERP
+	albedo = lerp(albedo, detailAlbedo, mask);
+#endif
 #endif
 	return albedo;
 }
