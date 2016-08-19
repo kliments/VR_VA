@@ -6,22 +6,122 @@ using System.Collections.Generic;
 /// Implements the Data space handler of a categorical data space object
 /// Splits objects into individual cubes (and minimizes the count of unity game objects while doing so)
 /// </summary>
+[System.Serializable]
 public class DataSpaceHandler : MonoBehaviour {
 
     public GameObject dataObject;
-    public Material material1;
-    public Material material2;
-    public Material material3;
 
+    [SerializeField]
     public TextAsset data;
+    [SerializeField]
     public Material dataMappedMaterial;
 
-    public string category1;
-    public string category2;
-    public string category3;
+
+    private float minX;
+    //selection booleans
+    [SerializeField]
+    public float SelectionMinX
+    {
+        get {
+            return minX;
+        }
+
+        set
+        {
+            minX = value;
+            dataMappedMaterial.SetFloat("_SelectionMinX", minX);
+        }
+    }
 
 
-    public bool colorAsAttributes = true;
+    private float maxX;
+    //selection booleans
+    [SerializeField]
+    public float SelectionMaxX
+    {
+        get
+        {
+            return maxX;
+        }
+
+        set
+        {
+            maxX = value;
+            dataMappedMaterial.SetFloat("_SelectionMaxX", maxX);
+        }
+    }
+
+
+    private float minY;
+    //selection booleans
+    [SerializeField]
+    public float SelectionMinY
+    {
+        get
+        {
+            return minY;
+        }
+
+        set
+        {
+            minY = value;
+            dataMappedMaterial.SetFloat("_SelectionMinY", minY);
+        }
+    }
+
+
+    private float maxY;
+    //selection booleans
+    [SerializeField]
+    public float SelectionMaxY
+    {
+        get
+        {
+            return maxY;
+        }
+
+        set
+        {
+            maxY = value;
+            dataMappedMaterial.SetFloat("_SelectionMaxY", maxY);
+        }
+    }
+
+
+    private float minZ;
+    //selection booleans
+    [SerializeField]
+    public float SelectionMinZ
+    {
+        get
+        {
+            return minZ;
+        }
+
+        set
+        {
+            minZ = value;
+            dataMappedMaterial.SetFloat("_SelectionMinZ", minZ);
+        }
+    }
+
+
+    private float maxZ;
+    //selection booleans
+    [SerializeField]
+    public float SelectionMaxZ
+    {
+        get
+        {
+            return maxZ;
+        }
+
+        set
+        {
+            maxZ = value;
+            dataMappedMaterial.SetFloat("_SelectionMaxZ", maxZ);
+        }
+    }
 
     // Use this for initialization
     void Start () {
@@ -29,6 +129,16 @@ public class DataSpaceHandler : MonoBehaviour {
         //prepare data
         string[] lines =data.text.Split('\n');
 
+        //copy material and set selection parameter
+        dataMappedMaterial = new Material(dataMappedMaterial);
+        dataMappedMaterial.SetFloat("_SelectionMinX",minX);
+        dataMappedMaterial.SetFloat("_SelectionMaxX",maxX);
+
+        dataMappedMaterial.SetFloat("_SelectionMinY", minY);
+        dataMappedMaterial.SetFloat("_SelectionMaxY", maxY);
+
+        dataMappedMaterial.SetFloat("_SelectionMinZ", minZ);
+        dataMappedMaterial.SetFloat("_SelectionMaxZ", maxZ);
 
         int count = 0;
 
@@ -51,29 +161,6 @@ public class DataSpaceHandler : MonoBehaviour {
                 float.Parse(attributes[2], System.Globalization.CultureInfo.InvariantCulture),
                 float.Parse(attributes[3], System.Globalization.CultureInfo.InvariantCulture));
 
-
-
-            //parse category
-            if (!colorAsAttributes)
-            {
-                string cat = attributes[0].Substring(1, attributes[0].Length - 2);
-                if (cat == category1)
-                {
-                    childCat1.Add(dataPoint);
-                }
-
-                else if (cat == category2)
-                {
-                    childCat2.Add(dataPoint);
-                }
-
-                else if (cat == category3)
-                {
-                    childCat3.Add(dataPoint);
-                }
-            }
-            else
-            {
                 //set vertex color
                 Mesh mesh = dataPoint.GetComponent<MeshFilter>().mesh;
                 Vector3[] vertices = mesh.vertices;
@@ -86,26 +173,14 @@ public class DataSpaceHandler : MonoBehaviour {
                 }
                 mesh.colors = colors;
                 childCat1.Add(dataPoint);
-            }
 
             count++;
 
         }
 
         Debug.Log("Starting Creating Cubes");
+        createTiledCube(dataMappedMaterial, childCat1);
 
-
-        //create colored cube objects
-        if (!colorAsAttributes)
-        {
-            createTiledCube(material1, childCat1);
-            createTiledCube(material2, childCat2);
-            createTiledCube(material3, childCat3);
-        }
-        else
-        {
-            createTiledCube(dataMappedMaterial, childCat1);
-        }
 
         //combine children
 
@@ -133,6 +208,8 @@ public class DataSpaceHandler : MonoBehaviour {
             Debug.Log("Tiling cubes. Needed subcubes:"+ System.Math.Ceiling((double)vertexCount/ System.UInt16.MaxValue));
             GameObject tiledCube = new GameObject("tiledCube");
             tiledCube.transform.parent = gameObject.transform;
+            tiledCube.transform.localPosition = new Vector3(0, 0, 0);
+            tiledCube.transform.localScale = new Vector3(1, 1, 1);
 
             int objectsPerRun = (int)System.Math.Floor(System.UInt16.MaxValue / (double)dataObject.GetComponent<MeshFilter>().sharedMesh.vertexCount);
 
@@ -166,6 +243,7 @@ public class DataSpaceHandler : MonoBehaviour {
         GameObject cube = new GameObject("Cube");
         cube.transform.parent = parent.transform;
 
+
         MeshFilter filter = cube.AddComponent<MeshFilter>();
         MeshRenderer renderer = cube.AddComponent<MeshRenderer>();
 
@@ -173,6 +251,8 @@ public class DataSpaceHandler : MonoBehaviour {
         mergeChildren(cube,objects, filter);
 
         cube.transform.parent = parent.transform;
+        cube.transform.localPosition = new Vector3(0, 0, 0);
+        cube.transform.localScale = new Vector3(1, 1, 1); 
         cube.SetActive(true);
         return cube;
     }
@@ -184,7 +264,10 @@ public class DataSpaceHandler : MonoBehaviour {
 //        System.Random rnd = new System.Random();
         for (int i = 0;i<objects.Count;i++)
         {
+            //make sure the points are aligned with the scatterplot
+            Vector3 localPos = objects[i].transform.localPosition;
             objects[i].transform.parent = parent.transform;
+            objects[i].transform.localPosition = localPos;
             combine[i].mesh = objects[i].GetComponent<MeshFilter>().sharedMesh;
             combine[i].transform = objects[i].transform.localToWorldMatrix;
             objects[i].SetActive(false);

@@ -345,6 +345,9 @@ struct VertexOutputForwardBase
 	half4 tangentToWorldAndParallax[3]	: TEXCOORD2;	// [3x3:tangentToWorld | 1x3:viewDirForParallax]
 	half4 ambientOrLightmapUV			: TEXCOORD5;	// SH or Lightmap UV
 	float4 dataColor					: COLOR;
+
+	float3 posInObjectCoords : TEXCOORD10;
+
 	SHADOW_COORDS(6)
 	UNITY_FOG_COORDS(7)
 
@@ -376,9 +379,12 @@ VertexOutputForwardBase vertForwardBase (VertexInput v)
 		o.posWorld = posWorld.xyz;
 	#endif
 	o.pos = UnityObjectToClipPos(v.vertex);
-		
+
 	o.tex = TexCoords(v);
+
 	o.dataColor = v.color;
+	o.posInObjectCoords = v.vertex;
+
 	o.eyeVec = NormalizePerVertexNormal(posWorld.xyz - _WorldSpaceCameraPos);
 	float3 normalWorld = UnityObjectToWorldNormal(v.normal);
 	#ifdef _TANGENT_TO_WORLD
@@ -414,8 +420,23 @@ VertexOutputForwardBase vertForwardBase (VertexInput v)
 	return o;
 }
 
+//checks if the objects is selected
+void checkIfSelected(float3 pos) {
+	if (pos.x<_SelectionMinX || pos.x>_SelectionMaxX ||
+		pos.y<_SelectionMinY || pos.y>_SelectionMaxY ||
+		pos.z<_SelectionMinZ || pos.z>_SelectionMaxZ
+		) {
+		discard;
+	}
+
+//	if (pos.x<_SelectionMinX || pos.x>_SelectionMaxX) {
+//		discard;
+//	}
+}
+
 half4 fragForwardBaseInternal (VertexOutputForwardBase i)
 {
+	checkIfSelected(i.posInObjectCoords);
 
 	FRAGMENT_SETUP(s)
 #if UNITY_OPTIMIZE_TEXCUBELOD
@@ -455,6 +476,8 @@ struct VertexOutputForwardAdd
 	LIGHTING_COORDS(5,6)
 	UNITY_FOG_COORDS(7)
 
+	float3 posInObjectCoords : TEXCOORD10;
+
 	// next ones would not fit into SM2.0 limits, but they are always for SM3.0+
 #if defined(_PARALLAXMAP)
 	half3 viewDirForParallax			: TEXCOORD8;
@@ -471,6 +494,8 @@ VertexOutputForwardAdd vertForwardAdd (VertexInput v)
 
 	float4 posWorld = mul(unity_ObjectToWorld, v.vertex);
 	o.pos = UnityObjectToClipPos(v.vertex);
+
+	o.posInObjectCoords = v.vertex;
 
 	o.tex = TexCoords(v);
 	o.dataColor = v.color;
@@ -510,6 +535,8 @@ VertexOutputForwardAdd vertForwardAdd (VertexInput v)
 
 half4 fragForwardAddInternal (VertexOutputForwardAdd i)
 {
+	checkIfSelected(i.posInObjectCoords);
+
 	FRAGMENT_SETUP_FWDADD(s)
 
 	UnityLight light = AdditiveLight (s.normalWorld, IN_LIGHTDIR_FWDADD(i), LIGHT_ATTENUATION(i));

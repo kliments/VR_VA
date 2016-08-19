@@ -51,6 +51,14 @@ half		_UVSec;
 half4 		_EmissionColor;
 sampler2D	_EmissionMap;
 
+float _SelectionMinX;
+float _SelectionMaxX;
+
+float _SelectionMinY;
+float _SelectionMaxY;
+
+float _SelectionMinZ;
+float _SelectionMaxZ;
 //-------------------------------------------------------------------------------------
 // Input functions
 

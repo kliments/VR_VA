@@ -4,30 +4,16 @@ using System.Collections;
 /// <summary>
 /// A scatterplot object which can be used to display 3D categorized scatterplots
 /// </summary>
+[System.Serializable] 
 public class Scatterplot : MonoBehaviour {
-
-    public Material material1;
-    public Material material2;
-    public Material material3;
-
-    public Material dataMappedMaterial;
-
     public bool colorAsAttributes = true;
 
-    private DataSpaceHandler dataSpaceHandler;
+    [SerializeField]
+    public DataSpaceHandler dataSpaceHandler;
 
     //setup materials and data objects
     void Awake()
     {
-        //set the child data space handler and the correct materials and data objects
-        dataSpaceHandler = GetComponentInChildren<DataSpaceHandler>();
-        
-        dataSpaceHandler.dataObject = (GameObject)Resources.Load("Objects/DataPointCube");
-        dataSpaceHandler.material1 = material1;
-        dataSpaceHandler.material2 = material2;
-        dataSpaceHandler.material3 = material3;
-        dataSpaceHandler.dataMappedMaterial = dataMappedMaterial;
-        dataSpaceHandler.colorAsAttributes = colorAsAttributes;
     }
 
     // Use this for initialization
