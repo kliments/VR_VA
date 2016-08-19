@@ -1,4 +1,6 @@
-﻿Shader "Custom/DataShader"
+﻿// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+
+Shader "Custom/DataShader"
 {
 	Properties
 	{
@@ -139,28 +141,26 @@
 	}
 		// ------------------------------------------------------------------
 		//  Shadow rendering pass
-		Pass{
-		Name "ShadowCaster"
-		Tags{ "LightMode" = "ShadowCaster" }
+		// Pass to render object as a shadow caster
+			Pass{
+			Name "ShadowCaster"
+			Tags{ "LightMode" = "ShadowCaster" }
 
-		ZWrite On ZTest LEqual
+			Fog{ Mode Off }
+			ZWrite On ZTest Less Cull Off
+			Offset 1, 1
 
-		CGPROGRAM
-#pragma target 3.0
-
-		// -------------------------------------
-
-
-#pragma shader_feature _ _ALPHATEST_ON _ALPHABLEND_ON _ALPHAPREMULTIPLY_ON
+			CGPROGRAM
+#pragma vertex vert
+#pragma fragment frag
 #pragma multi_compile_shadowcaster
+#pragma fragmentoption ARB_precision_hint_fastest
 
-#pragma vertex vertShadowCaster
-#pragma fragment fragShadowCaster
 
 #include "./Includes/CustomStandardShadow.cginc"
+			ENDCG
 
-		ENDCG
-	}
+		}
 		// ------------------------------------------------------------------
 		//  Deferred pass
 		Pass
