@@ -157,7 +157,7 @@
 #pragma vertex vertShadowCaster
 #pragma fragment fragShadowCaster
 
-#include "UnityStandardShadow.cginc"
+#include "./Includes/CustomStandardShadow.cginc"
 
 		ENDCG
 	}

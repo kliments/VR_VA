@@ -420,19 +420,6 @@ VertexOutputForwardBase vertForwardBase (VertexInput v)
 	return o;
 }
 
-//checks if the objects is selected
-void checkIfSelected(float3 pos) {
-	if (pos.x<_SelectionMinX || pos.x>_SelectionMaxX ||
-		pos.y<_SelectionMinY || pos.y>_SelectionMaxY ||
-		pos.z<_SelectionMinZ || pos.z>_SelectionMaxZ
-		) {
-		discard;
-	}
-
-//	if (pos.x<_SelectionMinX || pos.x>_SelectionMaxX) {
-//		discard;
-//	}
-}
 
 half4 fragForwardBaseInternal (VertexOutputForwardBase i)
 {

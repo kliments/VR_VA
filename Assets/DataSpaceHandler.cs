@@ -17,7 +17,7 @@ public class DataSpaceHandler : MonoBehaviour {
     public Material dataMappedMaterial;
 
 
-    private float minX;
+    private float minX = 0.0f;
     //selection booleans
     [SerializeField]
     public float SelectionMinX
@@ -34,7 +34,7 @@ public class DataSpaceHandler : MonoBehaviour {
     }
 
 
-    private float maxX;
+    private float maxX = 1.0f;
     //selection booleans
     [SerializeField]
     public float SelectionMaxX
@@ -52,7 +52,7 @@ public class DataSpaceHandler : MonoBehaviour {
     }
 
 
-    private float minY;
+    private float minY =0.0f;
     //selection booleans
     [SerializeField]
     public float SelectionMinY
@@ -70,7 +70,7 @@ public class DataSpaceHandler : MonoBehaviour {
     }
 
 
-    private float maxY;
+    private float maxY = 1.0f;
     //selection booleans
     [SerializeField]
     public float SelectionMaxY
@@ -88,7 +88,7 @@ public class DataSpaceHandler : MonoBehaviour {
     }
 
 
-    private float minZ;
+    private float minZ = 0.0f;
     //selection booleans
     [SerializeField]
     public float SelectionMinZ
@@ -106,7 +106,7 @@ public class DataSpaceHandler : MonoBehaviour {
     }
 
 
-    private float maxZ;
+    private float maxZ = 1.0f;
     //selection booleans
     [SerializeField]
     public float SelectionMaxZ
