@@ -11,6 +11,10 @@ public class DataSpaceHandler : MonoBehaviour {
 
     public GameObject dataObject;
 
+    //todo performance
+    public List<Vector3> dataPositions;
+    public List<string> dataClasses;
+
     [SerializeField]
     public TextAsset data;
     [SerializeField]
@@ -131,20 +135,12 @@ public class DataSpaceHandler : MonoBehaviour {
 
         //copy material and set selection parameter
         dataMappedMaterial = new Material(dataMappedMaterial);
-        dataMappedMaterial.SetFloat("_SelectionMinX",minX);
-        dataMappedMaterial.SetFloat("_SelectionMaxX",maxX);
-
-        dataMappedMaterial.SetFloat("_SelectionMinY", minY);
-        dataMappedMaterial.SetFloat("_SelectionMaxY", maxY);
-
-        dataMappedMaterial.SetFloat("_SelectionMinZ", minZ);
-        dataMappedMaterial.SetFloat("_SelectionMaxZ", maxZ);
+        dataMappedMaterial.SetFloat("_SelectionSphereRadiusSquared", 25);
+        dataMappedMaterial.SetVector("_SelectionSphereCenter", new Vector3(0.5f, 0.5f, 0.5f));
 
         int count = 0;
 
         List<GameObject> childCat1 = new List<GameObject>();
-        List<GameObject> childCat2 = new List<GameObject>();
-        List<GameObject> childCat3 = new List<GameObject>();
 
         //Debug.Log("Starting Creating datapoints");
         //initialize points
@@ -156,10 +152,16 @@ public class DataSpaceHandler : MonoBehaviour {
             //prepare data point game objects
             GameObject dataPoint = Instantiate(dataObject);
             dataPoint.transform.parent = gameObject.transform;
-            dataPoint.transform.localPosition = new Vector3(
-                float.Parse(attributes[1],System.Globalization.CultureInfo.InvariantCulture) ,
+            Vector3 dataPosition = new Vector3(
+                float.Parse(attributes[1], System.Globalization.CultureInfo.InvariantCulture),
                 float.Parse(attributes[2], System.Globalization.CultureInfo.InvariantCulture),
                 float.Parse(attributes[3], System.Globalization.CultureInfo.InvariantCulture));
+
+            dataPoint.transform.localPosition = dataPosition;
+
+            //add the data position
+            dataPositions.Add(dataPosition);
+            dataClasses.Add(attributes[0]);
 
                 //set vertex color
                 Mesh mesh = dataPoint.GetComponent<MeshFilter>().mesh;
@@ -311,5 +313,22 @@ public class DataSpaceHandler : MonoBehaviour {
     {
         dataMappedMaterial.SetFloat("_SelectionSphereRadiusSquared", radius);
         dataMappedMaterial.SetVector("_SelectionSphereCenter", center);
+
+        float squaredRad = radius * radius;
+        //update selected statistics TODO this is not performant
+        int count = 0;
+
+        for(int i =0;i<dataPositions.Count;i++)
+        {
+            Vector3 pos = dataPositions[i];
+            Vector3 diff = pos - center;
+            float squaredDistance = diff.x * diff.x + diff.y * diff.y + diff.z * diff.z;
+            if(squaredDistance<squaredRad)
+            {
+                count++;
+            }
+        }
+
+        Debug.Log(count);
     }
 }
