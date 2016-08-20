@@ -167,10 +167,10 @@ half3 PerPixelWorldNormal(float4 i_tex, half4 tangentToWorld[3])
 #define IN_LIGHTDIR_FWDADD(i) half3(i.tangentToWorldAndLightDir[0].w, i.tangentToWorldAndLightDir[1].w, i.tangentToWorldAndLightDir[2].w)
 
 #define FRAGMENT_SETUP(x) FragmentCommonData x = \
-	FragmentSetup(i.tex, i.eyeVec, IN_VIEWDIR4PARALLAX(i), i.tangentToWorldAndParallax, IN_WORLDPOS(i),i.dataColor);
+	FragmentSetup(i.tex, i.eyeVec, IN_VIEWDIR4PARALLAX(i), i.tangentToWorldAndParallax, IN_WORLDPOS(i),i.dataColor,i.posInObjectCoords);
 
 #define FRAGMENT_SETUP_FWDADD(x) FragmentCommonData x = \
-	FragmentSetup(i.tex, i.eyeVec, IN_VIEWDIR4PARALLAX_FWDADD(i), i.tangentToWorldAndLightDir, half3(0,0,0),i.dataColor);
+	FragmentSetup(i.tex, i.eyeVec, IN_VIEWDIR4PARALLAX_FWDADD(i), i.tangentToWorldAndLightDir, half3(0,0,0),i.dataColor,i.posInObjectCoords);
 
 struct FragmentCommonData
 {
@@ -229,11 +229,19 @@ inline FragmentCommonData MetallicSetup (float4 i_tex,float4 dataColor)
 	return o;
 } 
 
-inline FragmentCommonData FragmentSetup (float4 i_tex, half3 i_eyeVec, half3 i_viewDirForParallax, half4 tangentToWorld[3], half3 i_posWorld,float4 dataColor)
+inline FragmentCommonData FragmentSetup (float4 i_tex, half3 i_eyeVec, half3 i_viewDirForParallax, half4 tangentToWorld[3], half3 i_posWorld,float4 dataColor,float3 posInObjectCoords)
 {
 	i_tex = Parallax(i_tex, i_viewDirForParallax);
 
 	half alpha = Alpha(i_tex.xy);
+
+	if (checkIfSelectedBool(posInObjectCoords)) {
+		alpha =1.0;
+	}
+	else {
+		alpha = 0.2;
+	}
+
 	#if defined(_ALPHATEST_ON)
 		clip (alpha - _Cutoff);
 	#endif
@@ -564,6 +572,8 @@ struct VertexOutputDeferred
 		#endif
 	#endif
 
+			float3 posInObjectCoords : TEXOORD10;
+
 	UNITY_VERTEX_OUTPUT_STEREO
 };
 
@@ -583,6 +593,7 @@ VertexOutputDeferred vertDeferred (VertexInput v)
 
 	o.tex = TexCoords(v);
 	o.dataColor = v.color;
+	o.posInObjectCoords = v.vertex;
 	o.eyeVec = NormalizePerVertexNormal(posWorld.xyz - _WorldSpaceCameraPos);
 	float3 normalWorld = UnityObjectToWorldNormal(v.normal);
 	#ifdef _TANGENT_TO_WORLD

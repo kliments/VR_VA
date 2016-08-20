@@ -81,6 +81,8 @@ struct VertexInput
 
 //checks if the objects is selected
 void checkIfSelected(float3 pos) {
+	return;
+	
 	if (pos.x<_SelectionMinX || pos.x>_SelectionMaxX ||
 		pos.y<_SelectionMinY || pos.y>_SelectionMaxY ||
 		pos.z<_SelectionMinZ || pos.z>_SelectionMaxZ
@@ -92,6 +94,22 @@ void checkIfSelected(float3 pos) {
 	//		discard;
 	//	}
 }
+
+//checks if the objects is selected
+bool checkIfSelectedBool(float3 pos) {
+	if (pos.x<_SelectionMinX || pos.x>_SelectionMaxX ||
+		pos.y<_SelectionMinY || pos.y>_SelectionMaxY ||
+		pos.z<_SelectionMinZ || pos.z>_SelectionMaxZ
+		) {
+		return false;
+	}
+
+	return true;
+	//	if (pos.x<_SelectionMinX || pos.x>_SelectionMaxX) {
+	//		discard;
+	//	}
+}
+
 
 
 float4 TexCoords(VertexInput v)
