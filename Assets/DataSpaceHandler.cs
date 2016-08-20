@@ -146,7 +146,7 @@ public class DataSpaceHandler : MonoBehaviour {
         List<GameObject> childCat2 = new List<GameObject>();
         List<GameObject> childCat3 = new List<GameObject>();
 
-        Debug.Log("Starting Creating datapoints");
+        //Debug.Log("Starting Creating datapoints");
         //initialize points
         for (int i = 0;i<lines.Length;i++)
         {
@@ -178,13 +178,13 @@ public class DataSpaceHandler : MonoBehaviour {
 
         }
 
-        Debug.Log("Starting Creating Cubes");
+        //Debug.Log("Starting Creating Cubes");
         createTiledCube(dataMappedMaterial, childCat1);
 
 
         //combine children
 
-        Debug.Log(count);
+        //Debug.Log(count);
     }
 	
 	// Update is called once per frame
@@ -199,13 +199,13 @@ public class DataSpaceHandler : MonoBehaviour {
 
         //calculate max objects per cube (unity vertices limit)
         int vertexCount = dataObject.GetComponent<MeshFilter>().sharedMesh.vertexCount*objects.Count;
-        Debug.Log("Total Vertices:" + vertexCount);
+        //Debug.Log("Total Vertices:" + vertexCount);
 
         //Unity limitation. we need to split the object list
         if(vertexCount> System.UInt16.MaxValue)
         {
             //
-            Debug.Log("Tiling cubes. Needed subcubes:"+ System.Math.Ceiling((double)vertexCount/ System.UInt16.MaxValue));
+          //Debug.Log("Tiling cubes. Needed subcubes:"+ System.Math.Ceiling((double)vertexCount/ System.UInt16.MaxValue));
             GameObject tiledCube = new GameObject("tiledCube");
             tiledCube.transform.parent = gameObject.transform;
             tiledCube.transform.localPosition = new Vector3(0, 0, 0);
@@ -274,5 +274,26 @@ public class DataSpaceHandler : MonoBehaviour {
         }
 
         target.mesh.CombineMeshes(combine);
+    }
+
+    /// <summary>
+    /// Set the selection by specifying a bounding box. TODO change to plane / sphere coliders
+    /// </summary>
+    /// <param name="minX"></param>
+    /// <param name="minY"></param>
+    /// <param name="minZ"></param>
+    /// <param name="maxX"></param>
+    /// <param name="maxY"></param>
+    /// <param name="maxZ"></param>
+    public void setSelection(float minX, float minY, float minZ, float maxX, float maxY, float maxZ)
+    {
+        SelectionMinX = minX;
+        SelectionMaxX = maxX;
+
+        SelectionMinY = minY;
+        SelectionMaxY = maxY;
+
+        SelectionMinZ = minZ;
+        SelectionMaxZ = maxZ;
     }
 }

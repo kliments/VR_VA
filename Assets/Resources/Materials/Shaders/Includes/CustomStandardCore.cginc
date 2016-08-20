@@ -239,7 +239,7 @@ inline FragmentCommonData FragmentSetup (float4 i_tex, half3 i_eyeVec, half3 i_v
 		alpha =1.0;
 	}
 	else {
-		alpha = 0.2;
+		alpha = 0.1;
 	}
 
 	#if defined(_ALPHATEST_ON)
