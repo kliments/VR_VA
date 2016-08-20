@@ -51,14 +51,17 @@ half		_UVSec;
 half4 		_EmissionColor;
 sampler2D	_EmissionMap;
 
-float _SelectionMinX;
-float _SelectionMaxX;
+uniform float _SelectionMinX;
+uniform float _SelectionMaxX;
 
-float _SelectionMinY;
-float _SelectionMaxY;
+uniform float _SelectionMinY;
+uniform float _SelectionMaxY;
 
-float _SelectionMinZ;
-float _SelectionMaxZ;
+uniform float _SelectionMinZ;
+uniform float _SelectionMaxZ;
+
+uniform float4 _SelectionSphereCenter;
+uniform float _SelectionSphereRadiusSquared;
 //-------------------------------------------------------------------------------------
 // Input functions
 
@@ -83,12 +86,12 @@ struct VertexInput
 void checkIfSelected(float3 pos) {
 	return;
 	
-	if (pos.x<_SelectionMinX || pos.x>_SelectionMaxX ||
-		pos.y<_SelectionMinY || pos.y>_SelectionMaxY ||
-		pos.z<_SelectionMinZ || pos.z>_SelectionMaxZ
-		) {
-		discard;
-	}
+	//if (pos.x<_SelectionMinX || pos.x>_SelectionMaxX ||
+	//	pos.y<_SelectionMinY || pos.y>_SelectionMaxY ||
+	//	pos.z<_SelectionMinZ || pos.z>_SelectionMaxZ
+	//	) {
+	//	discard;
+	//}
 
 	//	if (pos.x<_SelectionMinX || pos.x>_SelectionMaxX) {
 	//		discard;
@@ -97,14 +100,19 @@ void checkIfSelected(float3 pos) {
 
 //checks if the objects is selected
 bool checkIfSelectedBool(float3 pos) {
-	if (pos.x<_SelectionMinX || pos.x>_SelectionMaxX ||
-		pos.y<_SelectionMinY || pos.y>_SelectionMaxY ||
-		pos.z<_SelectionMinZ || pos.z>_SelectionMaxZ
-		) {
-		return false;
-	}
 
-	return true;
+	float3 diffPos = pos - _SelectionSphereCenter.xyz;
+	float3 squaredDiff = diffPos*diffPos;
+		//pairwise multiplication
+	return sqrt(squaredDiff.x+ squaredDiff.y+ squaredDiff.z)<_SelectionSphereRadiusSquared;
+	//if (pos.x<_SelectionMinX || pos.x>_SelectionMaxX ||
+	//	pos.y<_SelectionMinY || pos.y>_SelectionMaxY ||
+	//	pos.z<_SelectionMinZ || pos.z>_SelectionMaxZ
+	//	) {
+	//	return false;
+	//}
+
+	//return true;
 	//	if (pos.x<_SelectionMinX || pos.x>_SelectionMaxX) {
 	//		discard;
 	//	}

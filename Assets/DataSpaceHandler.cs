@@ -296,4 +296,20 @@ public class DataSpaceHandler : MonoBehaviour {
         SelectionMinZ = minZ;
         SelectionMaxZ = maxZ;
     }
+
+
+    /// <summary>
+    /// Set the selection by specifying a bounding box. TODO change to plane / sphere coliders
+    /// </summary>
+    /// <param name="minX"></param>
+    /// <param name="minY"></param>
+    /// <param name="minZ"></param>
+    /// <param name="maxX"></param>
+    /// <param name="maxY"></param>
+    /// <param name="maxZ"></param>
+    public void setSelectionSphere(Vector3 center,float radius)
+    {
+        dataMappedMaterial.SetFloat("_SelectionSphereRadiusSquared", radius);
+        dataMappedMaterial.SetVector("_SelectionSphereCenter", center);
+    }
 }

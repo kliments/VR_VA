@@ -4,6 +4,7 @@ using System;
 using VRTK;
 using UnityEngine.Events;
 
+[System.Serializable]
 public enum MENU_ACTION
 {
     ADD,

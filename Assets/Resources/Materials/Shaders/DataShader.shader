@@ -46,13 +46,16 @@ Shader "Custom/DataShader"
 		[HideInInspector] _DstBlend("__dst", Float) = 0.0
 		[HideInInspector] _ZWrite("__zw", Float) = 1.0
 
-		//my selection properties
+		//my selection properties TODO obsolete
 			_SelectionMinX("Selection Min X", Float) = 0.5
 			_SelectionMaxX("Selecton Max X", Float) = 0.6
 			_SelectionMinY("Selection Min Y", Float) = 0.3
 			_SelectionMaxY("Seleciton Max Y", Float) = 0.5
 			_SelectionMinZ("Selection Min Z", Float) = 0.25
 			_SelectionMaxZ("Seleciton Max Z", Float) = 0.75
+
+		_SelectionSphereCenter("Selection Sphere Center", Vector) = (0.5,0.5,0.5,0)
+		_SelectionSphereRadiusSquared("Selection Sphere Radius", Float) = 25
 	}
 
 		CGINCLUDE

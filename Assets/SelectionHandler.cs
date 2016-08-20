@@ -10,7 +10,9 @@ public class SelectionHandler : MonoBehaviour
     DataSpaceHandler handler;
     //TODO handle multiple selections here and in shader
     //TODO switch from box to plane equations to allow rotation invariants
-    Collider selection;
+    GameObject selector;
+
+    Transform oldSelectorParent;
 
     void Awake()
     {
@@ -19,13 +21,33 @@ public class SelectionHandler : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        selection = other;
+        //check if a desired parent can be set
+
+        selector = other.gameObject;
+        oldSelectorParent = selector.transform.parent;
+
+        if(selector.GetComponent<DesiredParent>()!=null)
+        {
+            selector.GetComponent<DesiredParent>().desiredParent = gameObject;
+        }
     }
 
     void OnTriggerExit(Collider other)
     {
-        selection = null;
+
+
+        if (selector.GetComponent<DesiredParent>() != null)
+        {
+            selector.GetComponent<DesiredParent>().desiredParent = null;
+        }
+
+        //selector.transform.parent = oldSelectorParent;
+
+        selector = null;
+        handler.setSelectionSphere(new Vector3(0.5f, 0.5f, 0.5f), 25);
         handler.setSelection(0, 0, 0, 1, 1, 1);
+
+
     }
 
     //    use this for initialization
@@ -41,22 +63,21 @@ public class SelectionHandler : MonoBehaviour
     void Update()
     {
         //no selection no paramter
-        if(!selection)
+        if(!selector)
         {
             return;
         }
 
-        //get collider bounds
-        Bounds bounds = selection.bounds;
-
         //convert to local coordinates
-        Vector3 minTransformed = gameObject.transform.InverseTransformPoint(bounds.min);
-        Vector3 maxTransformed = gameObject.transform.InverseTransformPoint(bounds.max);
+        Vector3 centerTransformed = gameObject.transform.InverseTransformPoint(selector.transform.TransformPoint(new Vector3(0, 0, 0)));
+        //Vector3 maxTransformed = gameObject.transform.InverseTransformPoint(bounds.max);
 
+        float localSphereMagnitude = selector.transform.TransformVector(new Vector3(1,0,0)).magnitude;
+        float selectorSize = gameObject.transform.InverseTransformVector(new Vector3(localSphereMagnitude, 0, 0)).magnitude;
         //Debug.Log(minTransformed +" "+ maxTransformed);
 
         //set selection
-        handler.setSelection(minTransformed.x, minTransformed.y, minTransformed.z, maxTransformed.x, maxTransformed.y, maxTransformed.z);
+        handler.setSelectionSphere(centerTransformed, selectorSize/2.0f);
     }
 
 }

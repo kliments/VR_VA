@@ -3,11 +3,45 @@ using System.Collections;
 using VRTK;
 
 
+[System.Serializable]
 public class PointerEventListener : MonoBehaviour {
 
-    private MENU_ACTION menuAction=MENU_ACTION.ADD;
+    //needd because as of 5.4 properties are not shown in the unity editor
+    public MENU_ACTION defaultMenuAction = MENU_ACTION.DELETE;
 
-    public LayerMask layersToIgnoreAdd = Physics.IgnoreRaycastLayer;
+    //internal variable for the action to perform
+    private MENU_ACTION menuAction= MENU_ACTION.ADD;
+
+    //sets the menu action and the correct colors
+    public MENU_ACTION MenuAction {
+        get { return menuAction; }
+        set
+        {
+            switch (value)
+            {
+                case MENU_ACTION.ADD:
+                    setAddMode();
+                    break;
+                case MENU_ACTION.DELETE:
+                    setDeleteMode();
+                    break;
+                case MENU_ACTION.MOVE:
+                    setMoveMode();
+                    break;
+                case MENU_ACTION.ROTATE:
+                    setRotationMode();
+                    break;
+                case MENU_ACTION.SCALE:
+                    setScalingMode();
+                    break;
+                default:
+                    setAddMode();
+                    break;
+            }
+        }
+    }
+
+public LayerMask layersToIgnoreAdd = Physics.IgnoreRaycastLayer;
     public LayerMask layersToIgnoreModify = Physics.IgnoreRaycastLayer;
 
     public Color addColor;
@@ -15,6 +49,8 @@ public class PointerEventListener : MonoBehaviour {
     public Color moveColor;
     public Color rotateColor;
     public Color scaleColor;
+
+    public GameObject addObject = null;
 
     VRTK_SimplePointer pointer;
     VRTK_ControllerEvents controller;
@@ -43,6 +79,8 @@ public class PointerEventListener : MonoBehaviour {
 
     private void Start()
     {
+
+
         if (GetComponent<VRTK_SimplePointer>() == null || GetComponent<VRTK_ControllerEvents>() == null)
         {
             Debug.LogError("PointerEventListener is required to be attached to a SteamVR Controller that has the VRTK_SimplePointer script attached to it");
@@ -62,7 +100,7 @@ public class PointerEventListener : MonoBehaviour {
         controller.TriggerReleased += new ControllerInteractionEventHandler(triggerReleased);
 
         //initial mode
-        setAddMode();
+        MenuAction = defaultMenuAction;
     }
 
     private void Update()
@@ -131,10 +169,10 @@ public class PointerEventListener : MonoBehaviour {
         switch(menuAction)
         {
             case MENU_ACTION.ADD:
-                addScatterplot(e.destinationPosition);
+                addNewObject(e.destinationPosition);
                 break;
             case MENU_ACTION.DELETE:
-                deleteScatterplot(e.target.gameObject);
+                deleteObject(e.target.gameObject);
                 break;
             default:
                 break;
@@ -192,21 +230,26 @@ public class PointerEventListener : MonoBehaviour {
     }
 
     /// <summary>
-    /// Adds a new Scatterplot to the world
+    /// Adds a new Object to the world
     /// </summary>
-    /// <param name="position">The world position of where to add the scatterplot</param>
-    private void addScatterplot(Vector3 position)
+    /// <param name="position">The world position of where to add the object</param>
+    private void addNewObject(Vector3 position)
     {
-        Instantiate(Resources.Load("Objects/Scatterplot", typeof(GameObject)),position+new Vector3(0,0.7f,0),Quaternion.identity);
+        if(addObject ==null )
+        {
+            return;
+        }
+
+        Instantiate(addObject,position+new Vector3(0,0.7f,0),Quaternion.identity);
     }
 
     /// <summary>
-    /// Deletes a scatterplot from the world
+    /// Deletes an object from the world
     /// </summary>
-    /// <param name="scatterplot">The scatterplot to remove</param>
-    private void deleteScatterplot(GameObject scatterplot)
+    /// <param name="selectedObject">The object to remove</param>
+    private void deleteObject(GameObject selectedObject)
     {
-        Destroy(scatterplot);
+        Destroy(selectedObject);
 
     }
 
@@ -226,6 +269,18 @@ public class PointerEventListener : MonoBehaviour {
         else
         {
             selectedObject.transform.parent = null;
+
+            ////TODO remove for release? (restore parent if it changed)
+            DesiredParent desiredParent = selectedObject.GetComponent<DesiredParent>();
+            if (desiredParent != null)
+            {
+                if (desiredParent.desiredParent != null)
+                {
+                    selectedObject.transform.parent = desiredParent.desiredParent.transform;
+                }
+            }
+
+
             //free selection again
             fixSelection = false;
         }
