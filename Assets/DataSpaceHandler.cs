@@ -1,6 +1,17 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
+/// <summary>
+/// Needed because unity runs on an ancient version of c# as of 5.4. If you now something better pleace replace this. It's used below to sorte the classes of selected objects
+/// </summary>
+public class ListStringIntComparer : IComparer<KeyValuePair<string,int>>
+{
+    public int Compare(KeyValuePair<string, int> a, KeyValuePair<string, int> b)
+    {
+        return b.Value - a.Value;
+    }
+}
 
 /// <summary>
 /// Implements the Data space handler of a categorical data space object
@@ -10,6 +21,9 @@ using System.Collections.Generic;
 public class DataSpaceHandler : MonoBehaviour {
 
     public GameObject dataObject;
+
+    //TODO replace with something more sensible
+    public Text countingTextList;
 
     //todo performance
     public List<Vector3> dataPositions;
@@ -129,6 +143,9 @@ public class DataSpaceHandler : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
+
+        //TODO rework
+        countingTextList = GameObject.FindGameObjectWithTag("SelectionText").GetComponent<Text>();
 
         //prepare data
         string[] lines =data.text.Split('\n');
@@ -314,11 +331,18 @@ public class DataSpaceHandler : MonoBehaviour {
         dataMappedMaterial.SetFloat("_SelectionSphereRadiusSquared", radius);
         dataMappedMaterial.SetVector("_SelectionSphereCenter", center);
 
-        float squaredRad = radius * radius;
-        //update selected statistics TODO this is not performant
-        int count = 0;
 
-        for(int i =0;i<dataPositions.Count;i++)
+
+
+
+        //update selected statistics TODO all that follows is not performant
+        int count = 0;
+        float squaredRad = radius * radius;
+
+        Dictionary<string, int> selectedClasses = new Dictionary<string, int>();
+
+
+        for (int i =0;i<dataPositions.Count;i++)
         {
             Vector3 pos = dataPositions[i];
             Vector3 diff = pos - center;
@@ -326,9 +350,33 @@ public class DataSpaceHandler : MonoBehaviour {
             if(squaredDistance<squaredRad)
             {
                 count++;
+                string dataClass = dataClasses[i];
+                //insert class count
+                if (!selectedClasses.ContainsKey(dataClass))
+                {
+                    selectedClasses[dataClass] = 1;
+                }
+                else
+                {
+                    int oldCount = selectedClasses[dataClass];
+                    selectedClasses[dataClass] = ++oldCount;
+                }
             }
         }
 
-        Debug.Log(count);
+        //set text
+        if (countingTextList != null)
+        {
+            countingTextList.text = "Total: " + count + "\n\n";
+
+            //workarounds because unity uses an ancient version of c#
+            List< KeyValuePair < string, int>> sortedClasses = new List<KeyValuePair<string, int>>(selectedClasses);
+            sortedClasses.Sort(new ListStringIntComparer());
+            foreach (KeyValuePair<string, int> entry in sortedClasses)
+            {
+                countingTextList.text += entry.Key + ": " + entry.Value + "\n";
+            }
+        }
+
     }
 }
