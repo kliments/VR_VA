@@ -167,10 +167,10 @@ half3 PerPixelWorldNormal(float4 i_tex, half4 tangentToWorld[3])
 #define IN_LIGHTDIR_FWDADD(i) half3(i.tangentToWorldAndLightDir[0].w, i.tangentToWorldAndLightDir[1].w, i.tangentToWorldAndLightDir[2].w)
 
 #define FRAGMENT_SETUP(x) FragmentCommonData x = \
-	FragmentSetup(i.tex, i.eyeVec, IN_VIEWDIR4PARALLAX(i), i.tangentToWorldAndParallax, IN_WORLDPOS(i),i.dataColor,i.posInObjectCoords);
+	FragmentSetup(i.tex, i.eyeVec, IN_VIEWDIR4PARALLAX(i), i.tangentToWorldAndParallax, IN_WORLDPOS(i),i.dataColor);
 
 #define FRAGMENT_SETUP_FWDADD(x) FragmentCommonData x = \
-	FragmentSetup(i.tex, i.eyeVec, IN_VIEWDIR4PARALLAX_FWDADD(i), i.tangentToWorldAndLightDir, half3(0,0,0),i.dataColor,i.posInObjectCoords);
+	FragmentSetup(i.tex, i.eyeVec, IN_VIEWDIR4PARALLAX_FWDADD(i), i.tangentToWorldAndLightDir, half3(0,0,0),i.dataColor);
 
 struct FragmentCommonData
 {
@@ -229,7 +229,7 @@ inline FragmentCommonData MetallicSetup (float4 i_tex,float4 dataColor)
 	return o;
 } 
 
-inline FragmentCommonData FragmentSetup (float4 i_tex, half3 i_eyeVec, half3 i_viewDirForParallax, half4 tangentToWorld[3], half3 i_posWorld,float4 dataColor,float3 posInObjectCoords)
+inline FragmentCommonData FragmentSetup (float4 i_tex, half3 i_eyeVec, half3 i_viewDirForParallax, half4 tangentToWorld[3], half3 i_posWorld,float4 dataColor)
 {
 	i_tex = Parallax(i_tex, i_viewDirForParallax);
 
@@ -349,7 +349,7 @@ struct VertexOutputForwardBase
 	half4 ambientOrLightmapUV			: TEXCOORD5;	// SH or Lightmap UV
 	float4 dataColor					: COLOR;
 
-	float3 posInObjectCoords : TEXCOORD10;
+	//float3 posInObjectCoords : TEXCOORD10;
 
 	SHADOW_COORDS(6)
 	UNITY_FOG_COORDS(7)
@@ -368,6 +368,8 @@ struct VertexOutputForwardBase
 	#endif
 
 	UNITY_VERTEX_OUTPUT_STEREO
+
+	float3 isSelected : TEXCOORD10;
 };
 
 VertexOutputForwardBase vertForwardBase (VertexInput v)
@@ -386,7 +388,14 @@ VertexOutputForwardBase vertForwardBase (VertexInput v)
 	o.tex = TexCoords(v);
 
 	o.dataColor = v.color;
-	o.posInObjectCoords = v.vertex;
+	//o.posInObjectCoords = v.vertex;
+	//check if this vertex was selected
+	if (checkIfSelectedBool(v.vertex)) {
+		o.isSelected = float3(1, 0, 0);
+	}
+	else {
+		o.isSelected = float3(0, 0, 0);
+	}
 
 	o.eyeVec = NormalizePerVertexNormal(posWorld.xyz - _WorldSpaceCameraPos);
 	float3 normalWorld = UnityObjectToWorldNormal(v.normal);
@@ -426,7 +435,12 @@ VertexOutputForwardBase vertForwardBase (VertexInput v)
 
 half4 fragForwardBaseInternal (VertexOutputForwardBase i)
 {
-	checkIfSelected(i.posInObjectCoords);
+	//checkIfSelected(i.posInObjectCoords);
+	//discard the fragment if we are not using it
+	if (i.isSelected.x < 0.5) {
+		discard;
+	}
+
 
 	FRAGMENT_SETUP(s)
 #if UNITY_OPTIMIZE_TEXCUBELOD
@@ -466,7 +480,7 @@ struct VertexOutputForwardAdd
 	LIGHTING_COORDS(5,6)
 	UNITY_FOG_COORDS(7)
 
-	float3 posInObjectCoords : TEXCOORD10;
+	//float3 posInObjectCoords : TEXCOORD10;
 
 	// next ones would not fit into SM2.0 limits, but they are always for SM3.0+
 #if defined(_PARALLAXMAP)
@@ -474,6 +488,8 @@ struct VertexOutputForwardAdd
 #endif
 
 	UNITY_VERTEX_OUTPUT_STEREO
+
+	float3 isSelected : TEXCOORD10;
 };
 
 VertexOutputForwardAdd vertForwardAdd (VertexInput v)
@@ -485,7 +501,14 @@ VertexOutputForwardAdd vertForwardAdd (VertexInput v)
 	float4 posWorld = mul(unity_ObjectToWorld, v.vertex);
 	o.pos = UnityObjectToClipPos(v.vertex);
 
-	o.posInObjectCoords = v.vertex;
+	//o.posInObjectCoords = v.vertex;
+	//check if this vertex is selected
+	if (checkIfSelectedBool(v.vertex)) {
+		o.isSelected = float3(1, 0, 0);
+	}
+	else {
+		o.isSelected = float3(0, 0, 0);
+	}
 
 	o.tex = TexCoords(v);
 	o.dataColor = v.color;
@@ -525,7 +548,11 @@ VertexOutputForwardAdd vertForwardAdd (VertexInput v)
 
 half4 fragForwardAddInternal (VertexOutputForwardAdd i)
 {
-	checkIfSelected(i.posInObjectCoords);
+	//checkIfSelected(i.posInObjectCoords);
+	if (i.isSelected.x < 0.5) {
+		discard;
+	}
+
 
 	FRAGMENT_SETUP_FWDADD(s)
 
@@ -567,9 +594,11 @@ struct VertexOutputDeferred
 		#endif
 	#endif
 
-			float3 posInObjectCoords : TEXOORD10;
+		//	float3 posInObjectCoords : TEXOORD10;
 
 	UNITY_VERTEX_OUTPUT_STEREO
+
+	float3 isSelected : TEXCOORD10;
 };
 
 
@@ -588,7 +617,15 @@ VertexOutputDeferred vertDeferred (VertexInput v)
 
 	o.tex = TexCoords(v);
 	o.dataColor = v.color;
-	o.posInObjectCoords = v.vertex;
+	//o.posInObjectCoords = v.vertex;
+	//check if this vertex is selected
+	if (checkIfSelectedBool(v.vertex)) {
+		o.isSelected = float3(1, 0, 0);
+	}
+	else {
+		o.isSelected = float3(0, 0, 0);
+	}
+
 	o.eyeVec = NormalizePerVertexNormal(posWorld.xyz - _WorldSpaceCameraPos);
 	float3 normalWorld = UnityObjectToWorldNormal(v.normal);
 	#ifdef _TANGENT_TO_WORLD
@@ -644,6 +681,10 @@ void fragDeferred (
 		outEmission = 0;
 		return;
 	#endif
+
+	if (i.isSelected.x < 0.5) {
+		discard;
+	}
 
 	FRAGMENT_SETUP(s)
 #if UNITY_OPTIMIZE_TEXCUBELOD
