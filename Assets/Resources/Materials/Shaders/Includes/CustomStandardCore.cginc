@@ -233,14 +233,9 @@ inline FragmentCommonData FragmentSetup (float4 i_tex, half3 i_eyeVec, half3 i_v
 {
 	i_tex = Parallax(i_tex, i_viewDirForParallax);
 
-	half alpha = Alpha(i_tex.xy);
+//	half alpha = Alpha(i_tex.xy);
 
-	if (checkIfSelectedBool(posInObjectCoords)) {
-		alpha =1.0;
-	}
-	else {
-		alpha = 0.1;
-	}
+	half alpha = _TargetAlpha;
 
 	#if defined(_ALPHATEST_ON)
 		clip (alpha - _Cutoff);

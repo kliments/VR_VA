@@ -56,6 +56,9 @@ Shader "Custom/DataShader"
 
 		_SelectionSphereCenter("Selection Sphere Center", Vector) = (0.5,0.5,0.5,0)
 		_SelectionSphereRadiusSquared("Selection Sphere Radius", Float) = 25
+
+		_InverseSelection("Invert The selection", Float) = 1
+		_TargetAlpha("The desired alpha of pixels", Float) = 1
 	}
 
 		CGINCLUDE

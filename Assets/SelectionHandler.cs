@@ -30,6 +30,7 @@ public class SelectionHandler : MonoBehaviour
         {
             selector.GetComponent<DesiredParent>().desiredParent = gameObject;
         }
+        //handler.dataMappedMaterial.SetFloat("_Mode", 2);
     }
 
     void OnTriggerExit(Collider other)
@@ -46,6 +47,9 @@ public class SelectionHandler : MonoBehaviour
         selector = null;
         handler.setSelectionSphere(new Vector3(0.5f, 0.5f, 0.5f), 25);
         handler.setSelection(0, 0, 0, 1, 1, 1);
+
+        //FIXME set rendering mode opaque for now since the transparent one is not working correctly when there are 
+        //handler.dataMappedMaterial.SetFloat("_Mode", 0);
 
 
     }

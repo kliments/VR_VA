@@ -31,8 +31,14 @@ public class DataSpaceHandler : MonoBehaviour {
 
     [SerializeField]
     public TextAsset data;
+
+    //FIXMEE performance
+    //the solid material (selection)
     [SerializeField]
     public Material dataMappedMaterial;
+    //the transparent material (rest) (and potential ordered wrong)
+    [SerializeField]
+    public Material dataMappedTransparent;
 
 
     private float minX = 0.0f;
@@ -145,7 +151,10 @@ public class DataSpaceHandler : MonoBehaviour {
     void Start () {
 
         //TODO rework
-        countingTextList = GameObject.FindGameObjectWithTag("SelectionText").GetComponent<Text>();
+        if (GameObject.FindGameObjectWithTag("SelectionText") != null)
+        {
+            countingTextList = GameObject.FindGameObjectWithTag("SelectionText").GetComponent<Text>();
+        }
 
         //prepare data
         string[] lines =data.text.Split('\n');
@@ -154,6 +163,9 @@ public class DataSpaceHandler : MonoBehaviour {
         dataMappedMaterial = new Material(dataMappedMaterial);
         dataMappedMaterial.SetFloat("_SelectionSphereRadiusSquared", 25);
         dataMappedMaterial.SetVector("_SelectionSphereCenter", new Vector3(0.5f, 0.5f, 0.5f));
+
+        dataMappedTransparent.SetFloat("_SelectionSphereRadiusSquared", 25);
+        dataMappedTransparent.SetVector("_SelectionSphereCenter", new Vector3(0.5f, 0.5f, 0.5f));
 
         int count = 0;
 
@@ -198,7 +210,7 @@ public class DataSpaceHandler : MonoBehaviour {
         }
 
         //Debug.Log("Starting Creating Cubes");
-        createTiledCube(dataMappedMaterial, childCat1);
+        createTiledCube(childCat1);
 
 
         //combine children
@@ -212,7 +224,7 @@ public class DataSpaceHandler : MonoBehaviour {
 	}
 
     //Create a cube with all objects of that type and subdivide if needed
-    private GameObject createTiledCube(Material mat,List<GameObject> objects)
+    private GameObject createTiledCube(List<GameObject> objects)
     {
         GameObject ret = null;
 
@@ -236,14 +248,14 @@ public class DataSpaceHandler : MonoBehaviour {
             int index = 0;
             while(index<objects.Count)
             {
-                createCubeObject(mat, objects.GetRange(index, index+objectsPerRun>=objects.Count?objects.Count-index:objectsPerRun),tiledCube);
+                createCubeObject(objects.GetRange(index, index+objectsPerRun>=objects.Count?objects.Count-index:objectsPerRun),tiledCube);
                 index += objectsPerRun;
             }
            ret=tiledCube;
         }
         else
         {
-           ret=createCubeObject(mat, objects,gameObject);
+           ret=createCubeObject(objects,gameObject);
         }
 
         //destroy child objects
@@ -256,9 +268,9 @@ public class DataSpaceHandler : MonoBehaviour {
     }
 
     //create a single colored cube object out of the children
-    private GameObject createCubeObject(Material mat,List<GameObject>objects,GameObject parent)
+    private GameObject createCubeObject(List<GameObject>objects,GameObject parent)
     {
-
+        //"realobject"
         GameObject cube = new GameObject("Cube");
         cube.transform.parent = parent.transform;
 
@@ -266,13 +278,33 @@ public class DataSpaceHandler : MonoBehaviour {
         MeshFilter filter = cube.AddComponent<MeshFilter>();
         MeshRenderer renderer = cube.AddComponent<MeshRenderer>();
 
-        renderer.material = mat;
+
+        renderer.material = dataMappedMaterial;
+        
         mergeChildren(cube,objects, filter);
 
         cube.transform.parent = parent.transform;
         cube.transform.localPosition = new Vector3(0, 0, 0);
         cube.transform.localScale = new Vector3(1, 1, 1); 
-        cube.SetActive(true);
+       // cube.SetActive(true);
+
+        //"transparent object" since unity has some draw problems
+        GameObject transCube = new GameObject("TransCubeCube");
+        transCube.transform.parent = parent.transform;
+
+        MeshFilter filterTrans = transCube.AddComponent<MeshFilter>();
+        filterTrans.sharedMesh = filter.mesh;
+
+        renderer = transCube.AddComponent<MeshRenderer>();
+        renderer.material = dataMappedTransparent;
+
+        transCube.transform.parent = parent.transform;
+        transCube.transform.localPosition = new Vector3(0, 0, 0);
+        transCube.transform.localScale = new Vector3(1, 1, 1);
+        transCube.SetActive(true);
+
+        dataMappedTransparent.SetFloat("_InverseSelection", -1.0f);
+        dataMappedTransparent.SetFloat("_TargetAlpha", 0.2f);
         return cube;
     }
 
@@ -328,12 +360,14 @@ public class DataSpaceHandler : MonoBehaviour {
     /// <param name="maxZ"></param>
     public void setSelectionSphere(Vector3 center,float radius)
     {
-        dataMappedMaterial.SetFloat("_SelectionSphereRadiusSquared", radius);
+        dataMappedMaterial.SetFloat("_SelectionSphereRadiusSquared", radius*radius);
         dataMappedMaterial.SetVector("_SelectionSphereCenter", center);
 
+        dataMappedTransparent.SetFloat("_SelectionSphereRadiusSquared", radius * radius);
+        dataMappedTransparent.SetVector("_SelectionSphereCenter", center);
 
 
-
+        return;
 
         //update selected statistics TODO all that follows is not performant
         int count = 0;

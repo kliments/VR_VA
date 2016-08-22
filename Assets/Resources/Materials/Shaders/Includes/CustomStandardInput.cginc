@@ -62,6 +62,9 @@ uniform float _SelectionMaxZ;
 
 uniform float4 _SelectionSphereCenter;
 uniform float _SelectionSphereRadiusSquared;
+
+uniform float _InverseSelection;
+uniform float _TargetAlpha;
 //-------------------------------------------------------------------------------------
 // Input functions
 
@@ -82,21 +85,7 @@ struct VertexInput
 
 };
 
-//checks if the objects is selected
-void checkIfSelected(float3 pos) {
-	return;
-	
-	//if (pos.x<_SelectionMinX || pos.x>_SelectionMaxX ||
-	//	pos.y<_SelectionMinY || pos.y>_SelectionMaxY ||
-	//	pos.z<_SelectionMinZ || pos.z>_SelectionMaxZ
-	//	) {
-	//	discard;
-	//}
 
-	//	if (pos.x<_SelectionMinX || pos.x>_SelectionMaxX) {
-	//		discard;
-	//	}
-}
 
 //checks if the objects is selected
 bool checkIfSelectedBool(float3 pos) {
@@ -104,7 +93,7 @@ bool checkIfSelectedBool(float3 pos) {
 	float3 diffPos = pos - _SelectionSphereCenter.xyz;
 	float3 squaredDiff = diffPos*diffPos;
 		//pairwise multiplication
-	return sqrt(squaredDiff.x+ squaredDiff.y+ squaredDiff.z)<_SelectionSphereRadiusSquared;
+	return (squaredDiff.x+ squaredDiff.y+ squaredDiff.z)*_InverseSelection<_SelectionSphereRadiusSquared*_InverseSelection;
 	//if (pos.x<_SelectionMinX || pos.x>_SelectionMaxX ||
 	//	pos.y<_SelectionMinY || pos.y>_SelectionMaxY ||
 	//	pos.z<_SelectionMinZ || pos.z>_SelectionMaxZ
@@ -118,6 +107,25 @@ bool checkIfSelectedBool(float3 pos) {
 	//	}
 }
 
+//checks if the objects is selected
+void checkIfSelected(float3 pos) {
+
+
+	if (!checkIfSelectedBool(pos)) {
+		discard;
+	}
+
+	//if (pos.x<_SelectionMinX || pos.x>_SelectionMaxX ||
+	//	pos.y<_SelectionMinY || pos.y>_SelectionMaxY ||
+	//	pos.z<_SelectionMinZ || pos.z>_SelectionMaxZ
+	//	) {
+	//	discard;
+	//}
+
+	//	if (pos.x<_SelectionMinX || pos.x>_SelectionMaxX) {
+	//		discard;
+	//	}
+}
 
 
 float4 TexCoords(VertexInput v)
