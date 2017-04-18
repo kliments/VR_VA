@@ -198,9 +198,10 @@ public class DataSpaceHandler : MonoBehaviour {
                 Color[] colors = new Color[vertices.Length];
                 for (int t = 0; t < vertices.Length; t++)
                 {
-                    colors[t] = new Color(float.Parse(attributes[4], System.Globalization.CultureInfo.InvariantCulture),
-                        float.Parse(attributes[5], System.Globalization.CultureInfo.InvariantCulture),
-                        float.Parse(attributes[6], System.Globalization.CultureInfo.InvariantCulture));
+                   colors[t] = new Color(float.Parse(attributes[4], System.Globalization.CultureInfo.InvariantCulture),
+                       float.Parse(attributes[5], System.Globalization.CultureInfo.InvariantCulture),
+                       float.Parse(attributes[6], System.Globalization.CultureInfo.InvariantCulture));
+                //colors[t] = new Color(0.2f, 0.6f, 0.4f);
                 }
                 mesh.colors = colors;
                 childCat1.Add(dataPoint);
@@ -367,7 +368,7 @@ public class DataSpaceHandler : MonoBehaviour {
         dataMappedTransparent.SetVector("_SelectionSphereCenter", center);
 
 
-        return;
+        //return;
 
         //update selected statistics TODO all that follows is not performant
         int count = 0;
