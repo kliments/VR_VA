@@ -7,10 +7,10 @@ using VRTK;
 public class PointerEventListener : MonoBehaviour {
 
     //needd because as of 5.4 properties are not shown in the unity editor
-    public MENU_ACTION defaultMenuAction = MENU_ACTION.DELETE;
+    public MENU_ACTION defaultMenuAction = MENU_ACTION.SELECTDATA;
 
     //internal variable for the action to perform
-    private MENU_ACTION menuAction= MENU_ACTION.ADD;
+    private MENU_ACTION menuAction= MENU_ACTION.SELECTDATA;
 
     //sets the menu action and the correct colors
     public MENU_ACTION MenuAction {
@@ -34,8 +34,11 @@ public class PointerEventListener : MonoBehaviour {
                 case MENU_ACTION.SCALE:
                     setScalingMode();
                     break;
+                case MENU_ACTION.SELECTDATA:
+                    setSelectDataMode();
+                    break;
                 default:
-                    setAddMode();
+                    setSelectDataMode();
                     break;
             }
         }
@@ -49,9 +52,9 @@ public LayerMask layersToIgnoreAdd = Physics.IgnoreRaycastLayer;
     public Color moveColor;
     public Color rotateColor;
     public Color scaleColor;
+    public Color selectDataColor;
 
-    public GameObject addObject = null;
-
+    public GameObject BackUpScatterplot;
     VRTK_SimplePointer pointer;
     VRTK_ControllerEvents controller;
 
@@ -174,6 +177,9 @@ public LayerMask layersToIgnoreAdd = Physics.IgnoreRaycastLayer;
             case MENU_ACTION.DELETE:
                 deleteObject(e.target.gameObject);
                 break;
+            case MENU_ACTION.SELECTDATA:
+                selectDataMode(e.target.gameObject);
+                break;
             default:
                 break;
         }
@@ -235,8 +241,16 @@ public LayerMask layersToIgnoreAdd = Physics.IgnoreRaycastLayer;
     /// <param name="position">The world position of where to add the object</param>
     private void addNewObject(Vector3 position)
     {
-        if(addObject ==null )
+        GameObject addObject = GameObject.FindGameObjectWithTag("ScatterplotObject");
+        
+        //draw backup scatterplot
+        if (addObject ==null )
         {
+            if (BackUpScatterplot == null)
+            {
+                return;
+            }
+            Instantiate(BackUpScatterplot, position + new Vector3(0, 0.7f, 0), Quaternion.identity);
             return;
         }
 
@@ -249,10 +263,30 @@ public LayerMask layersToIgnoreAdd = Physics.IgnoreRaycastLayer;
     /// <param name="selectedObject">The object to remove</param>
     private void deleteObject(GameObject selectedObject)
     {
+        //Dataset choosers wont be affected
+        if (selectedObject.tag == "WallChooser")
+        {
+            return;
+        }
         Destroy(selectedObject);
 
     }
 
+
+    /// <summary>
+    /// Creates new object with the selected data from the wall
+    /// </summary>
+    /// <param name="selectedObject">Creates new </param>
+    private void selectDataMode(GameObject selectedObject)
+    {
+        // Only Dataset Choosers will be affected
+        if (selectedObject.tag != "WallChooser")
+        {
+            return;
+        }
+
+        selectedObject.GetComponent<datasetChangerScript>().startTargetedAction();
+    }
     /// <summary>
     /// Starts or Ends the movement of a selected object by parenting it to the controller
     /// </summary>
@@ -260,6 +294,12 @@ public LayerMask layersToIgnoreAdd = Physics.IgnoreRaycastLayer;
     /// <param name="start">if true the object is parented to the controller. if false it's unparented again</param>
     private void moveSelection(GameObject selectedObject,bool start)
     {
+        //Dataset choosers wont be affected
+        if (selectedObject.tag == "WallChooser")
+        {
+            return;
+        }
+
         if (start)
         {
             selectedObject.transform.parent = gameObject.transform;
@@ -293,6 +333,12 @@ public LayerMask layersToIgnoreAdd = Physics.IgnoreRaycastLayer;
     /// <param name="start">if true the rotation mode is started if false it's disabled</param>
     private void rotateSelection(GameObject selectedObject, bool start)
     {
+        //Dataset choosers wont be affected
+        if (selectedObject.tag == "WallChooser")
+        {
+            return;
+        }
+
         if (start)
         {
             //disallow the changing of the selection while the move is progress
@@ -321,7 +367,13 @@ public LayerMask layersToIgnoreAdd = Physics.IgnoreRaycastLayer;
     /// <param name="start">if true the scaling mode is started if false it's disabled</param>
     private void scaleSelection(GameObject selectedObject,bool start)
     {
-        if(start)
+        //Dataset choosers wont be affected
+        if (selectedObject.tag == "WallChooser")
+        {
+            return;
+        }
+
+        if (start)
         {
             //dissalow the changing of the selection while the scaling is in process
             fixSelection = true;
@@ -372,6 +424,13 @@ public LayerMask layersToIgnoreAdd = Physics.IgnoreRaycastLayer;
         GetComponent<VRTK_SimplePointer>().layersToIgnore = layersToIgnoreModify;
         pointer.pointerHitColor = rotateColor;
         pointer.pointerMissColor = new Color(rotateColor.r, rotateColor.g, rotateColor.b, 0.3f);
+    }
+    public void setSelectDataMode()
+    {
+        menuAction = MENU_ACTION.SELECTDATA;
+        GetComponent<VRTK_SimplePointer>().layersToIgnore = layersToIgnoreModify;
+        pointer.pointerHitColor = selectDataColor;
+        pointer.pointerMissColor = new Color(selectDataColor.r, selectDataColor.g, selectDataColor.b, 0.3f);
     }
 
     public void setScalingMode()

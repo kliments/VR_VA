@@ -11,7 +11,8 @@ public enum MENU_ACTION
     DELETE,
     MOVE,
     ROTATE,
-    SCALE
+    SCALE,
+    SELECTDATA
 }
 
 
@@ -22,6 +23,7 @@ public class MenuButtonController : MonoBehaviour {
     public UnityEvent moveListeners;
     public UnityEvent rotationModeListeners;
     public UnityEvent scalingModeListeners;
+    public UnityEvent selectDataListeners;
 
     public void AddModeSelected ()
     {
@@ -52,4 +54,11 @@ public class MenuButtonController : MonoBehaviour {
         Debug.Log("Scaling Mode Selected");
         scalingModeListeners.Invoke();
     }
+
+    public void SelectDataModeSelected()
+    {
+        Debug.Log("Add Mode Selected");
+        selectDataListeners.Invoke();
+    }
+
 }
