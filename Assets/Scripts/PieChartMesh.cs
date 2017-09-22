@@ -38,7 +38,7 @@ public class PieChartMesh : MonoBehaviour
             mMeshRenderer = gameObject.GetComponent("MeshRenderer") as MeshRenderer;
         }
         
-        mMaterials = materials;
+        //mMaterials = materials;
         transform.localPosition = new Vector3(vector.x, vector.y, vector.z);
         //transform.rotation = Quaternion.AngleAxis(180, Vector3.up);
         //transform.localScale -= new Vector3(0.95F, 0.95F, 0.95F);

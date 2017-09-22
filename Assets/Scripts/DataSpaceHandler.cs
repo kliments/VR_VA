@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.UI;
-using System.Linq;
 using System;
 
 /// <summary>
@@ -22,21 +21,22 @@ public class ListStringIntComparer : IComparer<KeyValuePair<string, int>>
 [System.Serializable]
 public class DataSpaceHandler : MonoBehaviour
 {
-
     public GameObject dataObject;
-    private GameObject[] rotateObjects;
-    private GameObject rotateObject;
+    public GameObject planeBox;
+    public GameObject trackObj;
     //TODO replace with something more sensible
     public Text countingTextList;
-
+    
     //todo performance
     public List<Vector3> dataPositions;
-    public List<string> dataClasses;
+    public List<string> classes;
 
     [SerializeField]
     public TextAsset data;
     //counterData initialized to 0 if app is started for first time to load the data from begining
     private int counterData = 0;
+
+    public int count;
     //FIXMEE performance
     //the solid material (selection)
     [SerializeField]
@@ -47,6 +47,11 @@ public class DataSpaceHandler : MonoBehaviour
 
     private List<GameObject> childCat1;
 
+
+    public List<Color> listOfColors = new List<Color>();
+    private Color tempColor;
+
+    public int ind = 0;
     private float minX = 0.0f;
     //selection booleans
     [SerializeField]
@@ -157,7 +162,6 @@ public class DataSpaceHandler : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-
         //TODO rework
         if (GameObject.FindGameObjectWithTag("SelectionText") != null)
         {
@@ -171,19 +175,24 @@ public class DataSpaceHandler : MonoBehaviour
             data = FindObjectOfType<datasetChooserWallScript>().datasets[0];
         }
         string[] lines = data.text.Split('\n');
-
-
+        string[] attr = lines[0].Split(',');
+        int rows = lines.Length;
+        int cols = attr.Length;
+        classes = new List<string>();
+        
         //variables for PCA
-        double[,] dataset = new double[150, 4];
-        double[,] normData = new double[150, 4];
+        // cols-2 because the last 2 colums are number of classes and the actual classes
+        double[,] dataset = new double[rows, cols - 2];
+        string[,] strDataset = new string[rows, cols];
+        double[,] normData = new double[rows, cols - 2];
+        double[,] reducedNormalizedData = new double[rows, cols - 2];
         double[] eigenValueSym;
         double[,] eigenVectorSym;
-        double[,] covarianceMatrix = new double[4, 4];
-        double[,] eigenVectorMatrix = new double[4, 4];
-        double[,] transposedEigenVector = new double[4, 4];
-        double[,] reducedDataMatrix = new double[150, 4];
-        double[] meanVector = new double[150];
-
+        double[,] covarianceMatrix = new double[cols - 2, cols - 2];
+        double[,] eigenVectorMatrix = new double[cols - 2, cols - 2];
+        double[,] transposedEigenVector = new double[cols - 2, cols - 2];
+        double[,] reducedDataMatrix = new double[rows, cols - 2];
+        
         //copy material and set selection parameter
         dataMappedMaterial = new Material(dataMappedMaterial);
         dataMappedMaterial.SetFloat("_SelectionSphereRadiusSquared", 25);
@@ -192,46 +201,77 @@ public class DataSpaceHandler : MonoBehaviour
         dataMappedTransparent.SetFloat("_SelectionSphereRadiusSquared", 25);
         dataMappedTransparent.SetVector("_SelectionSphereCenter", new Vector3(0.5f, 0.5f, 0.5f));
 
-        int count = 0;
+        count = 0;
         childCat1 = new List<GameObject>();
-        //do this if the data is IRIS, preparing for PCA
-        if (data.name == "IRIS")
+        //perform PCA if there is substring "PCA" in the name of the dataset
+        if (data.name.Contains("PCA"))
         {
-            for (int i = 0; i < lines.Length; i++)
+          for (int i = 0; i < lines.Length; i++)
             {
                 string[] attributes = lines[i].Split(',');
-                for (int j = 0; j < attributes.Length - 1; j++)
+				
+				//remove the /r from the last attribute
+                attributes[attributes.Length - 1] = attributes[attributes.Length - 1].Replace("\r", string.Empty);
+
+                //strDataset is just an string matrix of whole data, while dataset matrix is double without last two colums
+                for(int j = 0; j < attributes.Length; j++)
+                {
+                    strDataset[i, j] = attributes[j];
+                }
+
+                for (int j = 0; j < attributes.Length - 2; j++)
                 {
                     dataset[i, j] = Convert.ToDouble(attributes[j]);
                 }
+                //adding the classes in List to give specific color to each class
+                if(!classes.Contains(attributes[attributes.Length-1]))
+                {
+                    classes.Add(attributes[attributes.Length - 1]);
+                }
+                count++;
             }
+
+            //adding specific color accodring to each class
+            Color[] colorArray = new Color[classes.Count];
+            float r,g,b;
+            for (int k=0; k<classes.Count;k++)
+            {
+                r = UnityEngine.Random.Range(0.0f, 1.0f);
+                g = UnityEngine.Random.Range(0.0f, 1.0f);
+                b = UnityEngine.Random.Range(0.0f, 1.0f);
+                colorArray[k] = new Color(r,g,b);
+            }
+
+
             normData = normalization(dataset);
             alglib.covm(normData, out covarianceMatrix);
-            alglib.smatrixevd(covarianceMatrix, 4, 1, true, out eigenValueSym, out eigenVectorSym);
+            alglib.smatrixevd(covarianceMatrix, cols-2, 1, true, out eigenValueSym, out eigenVectorSym);
 
             eigenVectorMatrix = eigenVectorMatrixs(eigenVectorSym);
             transposedEigenVector = transposeMatrix(eigenVectorMatrix);
             reducedDataMatrix = MultiplyMatrix(dataset, transposedEigenVector);
+            reducedNormalizedData = normalization(reducedDataMatrix);
 
-            for (int i = 0; i < reducedDataMatrix.GetLength(0); i++)
+
+            for (int i = 0; i < reducedNormalizedData.GetLength(0); i++)
             {
+
                 GameObject dataPoint = Instantiate(dataObject);
                 dataPoint.transform.parent = gameObject.transform;
                 Vector3 dataPosition = new Vector3();
-
-                for (int j = 0; j < reducedDataMatrix.GetLength(1); j++)
+                for (int j = 0; j < reducedNormalizedData.GetLength(1); j++)
                 {
                     if (j == 0)
                     {
-                        dataPosition.x = (float)reducedDataMatrix[i, j] / (-10);
+                        dataPosition.x = (float)reducedNormalizedData[i, j];
                     }
                     else if (j == 1)
                     {
-                        dataPosition.y = (float)reducedDataMatrix[i, j] / (-10);
+                        dataPosition.y = (float)reducedNormalizedData[i, j];
                     }
                     else if (j == 2)
                     {
-                        dataPosition.z = (float)reducedDataMatrix[i, j] / (10);
+                        dataPosition.z = (float)reducedNormalizedData[i, j];
                     }
                     else
                     {
@@ -240,31 +280,34 @@ public class DataSpaceHandler : MonoBehaviour
                 }
                 dataPoint.transform.localPosition = dataPosition;
 
+                dataPositions.Add(dataPosition);
                 Mesh mesh = dataPoint.GetComponent<MeshFilter>().mesh;
                 Vector3[] vertices = mesh.vertices;
                 Color[] colors = new Color[vertices.Length];
+
+
                 for (int t = 0; t < vertices.Length; t++)
                 {
-                    if (i < 51)
+                    for(int z=0;z< classes.Count;z++)
                     {
-                        colors[t] = new Color(1, 0, 0);
-                        dataClasses.Add("setosa");
+                        if (strDataset[i, cols-1] == classes[z])
+                        {
+                            dataPoint.GetComponent<Renderer>().material.color = colorArray[z];
+                            colors[t] = colorArray[z];
+                            tempColor = colorArray[z];
+                        }
                     }
-                    else if (i < 101)
-                    {
-                        colors[t] = new Color(0, 1, 0);
-                        dataClasses.Add("versicolor");
-                    }
-                    else
-                    {
-                        colors[t] = new Color(0, 0, 1);
-                        dataClasses.Add("virginica");
-                    }
+                    
                 }
                 mesh.colors = colors;
                 childCat1.Add(dataPoint);
+                listOfColors.Add(tempColor);
 
-                count++;
+
+                dataPoint.AddComponent<TiledCubeVariables>();
+                dataPoint.GetComponent<TiledCubeVariables>().plane = planeBox;
+                dataPoint.GetComponent<TiledCubeVariables>().trackObj = trackObj;
+                dataPoint.GetComponent<TiledCubeVariables>().scatterplot = gameObject;
             }
         }
 
@@ -289,7 +332,6 @@ public class DataSpaceHandler : MonoBehaviour
 
                 //add the data position
                 dataPositions.Add(dataPosition);
-                dataClasses.Add(attributes[0]);
 
                 //set vertex color
                 Mesh mesh = dataPoint.GetComponent<MeshFilter>().mesh;
@@ -304,35 +346,13 @@ public class DataSpaceHandler : MonoBehaviour
                 }
                 mesh.colors = colors;
                 childCat1.Add(dataPoint);
+                listOfColors.Add(colors[0]);
 
                 count++;
             }
         }
-
-        //Debug.Log("Starting Creating Cubes");
-        createTiledCube(childCat1);
-
-        //set the rotation of cubes back to 0, when we rotate the whole scatterplot
-
-        //Rotate Tiled Cube Object
-        if (GameObject.FindGameObjectWithTag("DestroyTiledCube") != null)
-        {
-            rotateObject = GameObject.FindGameObjectWithTag("DestroyTiledCube");
-            rotateObject.transform.localRotation = Quaternion.identity;
-        }
-
-
-
-        //Rotate Cubes when no Tiled Cube Exists
-        else if (GameObject.FindGameObjectsWithTag("DestroyCubes") != null)
-        {
-            rotateObjects = GameObject.FindGameObjectsWithTag("DestroyCubes");
-            foreach (var x in rotateObjects)
-            {
-                x.transform.localRotation = Quaternion.identity;
-            }
-        }
-        //combine children
+        
+//        createTiledCube(childCat1);
 
         //Debug.Log(count);
     }
@@ -373,8 +393,9 @@ public class DataSpaceHandler : MonoBehaviour
                 index += objectsPerRun;
             }
             ret = tiledCube;
+            
         }
-        else
+       else
         {
             ret = createCubeObject(objects, gameObject);
         }
@@ -395,7 +416,7 @@ public class DataSpaceHandler : MonoBehaviour
         GameObject cube = new GameObject("Cube");
         cube.tag = "DestroyCubes";
         cube.transform.parent = parent.transform;
-
+        
 
         MeshFilter filter = cube.AddComponent<MeshFilter>();
         MeshRenderer renderer = cube.AddComponent<MeshRenderer>();
@@ -408,26 +429,6 @@ public class DataSpaceHandler : MonoBehaviour
         cube.transform.parent = parent.transform;
         cube.transform.localPosition = new Vector3(0, 0, 0);
         cube.transform.localScale = new Vector3(1, 1, 1);
-        // cube.SetActive(true);
-
-        //"transparent object" since unity has some draw problems
-        GameObject transCube = new GameObject("TransCubeCube");
-        transCube.tag = "DestroyCubes";
-        transCube.transform.parent = parent.transform;
-
-        MeshFilter filterTrans = transCube.AddComponent<MeshFilter>();
-        filterTrans.sharedMesh = filter.mesh;
-
-        renderer = transCube.AddComponent<MeshRenderer>();
-        renderer.material = dataMappedTransparent;
-
-        transCube.transform.parent = parent.transform;
-        transCube.transform.localPosition = new Vector3(0, 0, 0);
-        transCube.transform.localScale = new Vector3(1, 1, 1);
-        transCube.SetActive(true);
-
-        dataMappedTransparent.SetFloat("_InverseSelection", -1.0f);
-        dataMappedTransparent.SetFloat("_TargetAlpha", 0.2f);
         return cube;
     }
 
@@ -507,7 +508,7 @@ public class DataSpaceHandler : MonoBehaviour
             if (squaredDistance < squaredRad)
             {
                 count++;
-                string dataClass = dataClasses[i];
+                string dataClass = classes[i];
                 //insert class count
                 if (!selectedClasses.ContainsKey(dataClass))
                 {
@@ -543,30 +544,20 @@ public class DataSpaceHandler : MonoBehaviour
         counterData++;
         data = newData;
         resetMe();
+        listOfColors.Clear();
         this.Start();
     }
 
     public void resetMe()
     {
-        //Cube of cubes created when there are more than 65000 vertices
-        GameObject TiledCubeToDestroy;
-
-        GameObject[] CubesToDestroy;
-        //first destroy Tiled Cube (parent of Cubes)
-        TiledCubeToDestroy = GameObject.FindWithTag("DestroyTiledCube");
-        if (TiledCubeToDestroy != null)
-            Destroy(TiledCubeToDestroy);
-        // Destroy the cubes if tiledCube doesn't exist
-        else
+        ind = 0;
+        foreach (Transform child in transform)
         {
-            CubesToDestroy = GameObject.FindGameObjectsWithTag("DestroyCubes");
-            for (var i = 0; i < CubesToDestroy.Length; i++)
-                Destroy(CubesToDestroy[i]);
+            Destroy(child.gameObject);
         }
-
     }
 
-    //converts the IRIS eigen vector matrix to the proper one, since the function from the library does not do the proper work
+    //converts the data eigen vector matrix to the proper one, since the function from the library does not do the proper work
     static double[,] eigenVectorMatrixs(double[,] m)
     {
         int rows = m.GetLength(0);
@@ -646,64 +637,31 @@ public class DataSpaceHandler : MonoBehaviour
         int rows = x.GetLength(0);
         int cols = x.GetLength(1);
         double[,] normData = new double[rows, cols];
-        double[] min = { x[0, 0], x[0, 0], x[0, 0], x[0, 0] };
-        double[] max = { x[0, 0], x[0, 0], x[0, 0], x[0, 0] };
+        double[] min = new double[cols];
+        double[] max = new double[cols];
 
-
-        //min and max in first column
-        for (int i = 0; i < rows; i++)
+        for(int i = 0; i<cols;i++)
         {
-            if (min[0] > x[i, 0])
+            min[i] = x[0, 0];
+            max[i] = x[0, 0];
+        }
+
+        for(int i = 0; i<cols;i++)
+        {
+            for(int j=0;j<rows;j++)
             {
-                min[0] = x[i, 0];
-            }
-            if (max[0] < x[i, 0])
-            {
-                max[0] = x[i, 0];
+                if(min[i]>x[j,i])
+                {
+                    min[i] = x[j, i];
+                }
+                if (max[i] < x[j, i])
+                {
+                    max[i] = x[j, i];
+                }
             }
         }
 
-        //min and max in second column
-
-        for (int i = 0; i < rows; i++)
-        {
-            if (min[1] > x[i, 1])
-            {
-                min[1] = x[i, 1];
-            }
-            if (max[1] < x[i, 1])
-            {
-                max[1] = x[i, 1];
-            }
-        }
-
-        //min and max in third column
-
-        for (int i = 0; i < rows; i++)
-        {
-            if (min[2] > x[i, 2])
-            {
-                min[2] = x[i, 2];
-            }
-            if (max[2] < x[i, 2])
-            {
-                max[2] = x[i, 2];
-            }
-        }
-
-        //min and max in fourth column
-
-        for (int i = 0; i < rows; i++)
-        {
-            if (min[3] > x[i, 3])
-            {
-                min[3] = x[i, 3];
-            }
-            if (max[3] < x[i, 3])
-            {
-                max[3] = x[i, 3];
-            }
-        }
+       
 
         //normalize the data
 

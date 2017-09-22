@@ -57,7 +57,7 @@ public class MenuButtonController : MonoBehaviour {
 
     public void SelectDataModeSelected()
     {
-        Debug.Log("Add Mode Selected");
+        Debug.Log("Select Mode Selected");
         selectDataListeners.Invoke();
     }
 

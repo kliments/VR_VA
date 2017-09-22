@@ -1,10 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
 using VRTK;
-
+using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 [System.Serializable]
 public class PointerEventListener : MonoBehaviour {
+
+    //all the game objects
+    public List<GameObject> listObjects;
 
     //needd because as of 5.4 properties are not shown in the unity editor
     public MENU_ACTION defaultMenuAction = MENU_ACTION.SELECTDATA;
@@ -46,6 +50,7 @@ public class PointerEventListener : MonoBehaviour {
 
 public LayerMask layersToIgnoreAdd = Physics.IgnoreRaycastLayer;
     public LayerMask layersToIgnoreModify = Physics.IgnoreRaycastLayer;
+    public LayerMask layersToIgnoreSelect = Physics.IgnoreRaycastLayer;
 
     public Color addColor;
     public Color deleteColor;
@@ -279,13 +284,60 @@ public LayerMask layersToIgnoreAdd = Physics.IgnoreRaycastLayer;
     /// <param name="selectedObject">Creates new </param>
     private void selectDataMode(GameObject selectedObject)
     {
-        // Only Dataset Choosers will be affected
-        if (selectedObject.tag != "WallChooser")
+
+        if (selectedObject.tag == "WallChooser")
         {
-            return;
+            selectedObject.GetComponent<datasetChangerScript>().startTargetedAction();
         }
 
-        selectedObject.GetComponent<datasetChangerScript>().startTargetedAction();
+        else if(selectedObject.tag == "VisChooser")
+        {
+            selectedObject.GetComponent<VisualizationChangerScript>().startSelectedAction();
+        }
+
+        else if (selectedObject.name == "NextStep")
+        {
+            selectedObject.GetComponent<KMeansAlgorithm>().StartAlgorithm();
+        }
+
+        else if (selectedObject.name == "Play")
+        {
+            selectedObject.GetComponent<PlayScript>().buttonWasPressed = true;
+        }
+
+        else if (selectedObject.name == "Increase")
+        {
+            selectedObject.GetComponent<IncreaseDecrease>().kMeans.GetComponent<KMeansAlgorithm>().resetMe();
+            selectedObject.GetComponent<IncreaseDecrease>().kMeans.GetComponent<KMeansAlgorithm>().nrOfSpheres++;
+        }
+
+        else if (selectedObject.name == "Decrease")
+        {
+            selectedObject.GetComponent<IncreaseDecrease>().kMeans.GetComponent<KMeansAlgorithm>().resetMe();
+            selectedObject.GetComponent<IncreaseDecrease>().kMeans.GetComponent<KMeansAlgorithm>().nrOfSpheres--;
+        }
+
+        else if (selectedObject.name == "Reset")
+        {
+            SceneManager.LoadScene("MainScene");
+        }
+
+        else if (selectedObject.tag == "DataButton")
+        {
+            if(selectedObject.name == "Datasets")
+            {
+                selectedObject.GetComponent<ShowHideDatasets>().Toggle();
+            }
+            else if (selectedObject.name == "Viz Techniques")
+            {
+                selectedObject.GetComponent<ShowHideVisualizations>().Toggle();
+            }
+            else if (selectedObject.name == "K-means")
+            {
+                selectedObject.GetComponent<ShowHideButtons>().Toggle();
+            }
+        }
+
     }
     /// <summary>
     /// Starts or Ends the movement of a selected object by parenting it to the controller
@@ -428,7 +480,7 @@ public LayerMask layersToIgnoreAdd = Physics.IgnoreRaycastLayer;
     public void setSelectDataMode()
     {
         menuAction = MENU_ACTION.SELECTDATA;
-        GetComponent<VRTK_SimplePointer>().layersToIgnore = layersToIgnoreModify;
+        GetComponent<VRTK_SimplePointer>().layersToIgnore = layersToIgnoreSelect;
         pointer.pointerHitColor = selectDataColor;
         pointer.pointerMissColor = new Color(selectDataColor.r, selectDataColor.g, selectDataColor.b, 0.3f);
     }
