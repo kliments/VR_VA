@@ -1,0 +1,34 @@
+diff a/Assets/ChangeNrOfSpheres.cs b/Assets/ChangeNrOfSpheres.cs	(rejected hunks)
+@@ -0,0 +1,32 @@
++﻿using System.Collections;
++using System.Collections.Generic;
++using UnityEngine;
++
++public class ChangeNrOfSpheres : MonoBehaviour {
++
++    private TextMesh textMesh;
++    public GameObject kMeans;
++    private int nrOfSpheres;
++	// Use this for initialization
++	void Start () {
++        textMesh = GetComponent<TextMesh>();
++        nrOfSpheres = kMeans.GetComponent<KMeansAlgorithm>().nrOfSpheres;
++	}
++	
++	// Update is called once per frame
++	void Update ()
++    {
++        if(kMeans.GetComponent<KMeansAlgorithm>().nrOfSpheres < 2)
++        {
++            kMeans.GetComponent<KMeansAlgorithm>().nrOfSpheres = 2;
++            Debug.Log("Minimum border reached");
++        }
++        else if(kMeans.GetComponent<KMeansAlgorithm>().nrOfSpheres > 20)
++        {
++            kMeans.GetComponent<KMeansAlgorithm>().nrOfSpheres = 20;
++            Debug.Log("Maximum border reached");
++        }
++        nrOfSpheres = kMeans.GetComponent<KMeansAlgorithm>().nrOfSpheres;
++        textMesh.text = "K: " + nrOfSpheres.ToString();
++	}
++}

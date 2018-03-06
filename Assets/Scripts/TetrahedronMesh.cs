@@ -8,17 +8,18 @@ public class TetrahedronMesh : MonoBehaviour {
     private Vector3 A, B, C, D;
     private float OA, OB, OC, OD, AO1, BO1, A1O1, B1O1;
     MeshRenderer meshRenderer;
+    LineRenderer lineRenderer;
 
     public void Init(float[] data, Vector3 vector)
     {
-        meshRenderer = gameObject.GetComponent("MeshRenderer") as MeshRenderer;
+        meshRenderer = GetComponent<MeshRenderer>();
         if (meshRenderer == null)
         {
             gameObject.AddComponent<MeshRenderer>();
-            meshRenderer = gameObject.GetComponent("MeshRenderer") as MeshRenderer;
+            meshRenderer = GetComponent<MeshRenderer>();
         }
 
-        Mesh mesh = ((MeshFilter)GetComponent("MeshFilter")).mesh;
+        Mesh mesh = GetComponent<MeshFilter>().mesh;
         mesh.Clear();
         mesh.name = "Tetrahedron Mesh";
 
@@ -27,6 +28,7 @@ public class TetrahedronMesh : MonoBehaviour {
         center.y = data[1];
         center.z = data[2];
         transform.localPosition = center;
+        
 
         //calculation of coordinates of D
         D.x = center.x;
@@ -56,6 +58,23 @@ public class TetrahedronMesh : MonoBehaviour {
 
         //vertices
         Vector3[] vertices = new Vector3[4] {A, B, C, D};
+
+        //draw border lines
+        lineRenderer = GetComponent<LineRenderer>();
+        lineRenderer.transform.parent = gameObject.transform.parent;
+        lineRenderer.useWorldSpace = false;
+
+        lineRenderer.SetPosition(0, vertices[0]);
+        lineRenderer.SetPosition(1, vertices[1]);
+        lineRenderer.SetPosition(2, vertices[2]);
+        lineRenderer.SetPosition(3, vertices[0]);
+        lineRenderer.SetPosition(4, vertices[3]);
+        lineRenderer.SetPosition(5, vertices[1]);
+        lineRenderer.SetPosition(6, vertices[2]);
+        lineRenderer.SetPosition(7, vertices[3]);
+
+        lineRenderer.startWidth = 0.0005f;
+        lineRenderer.endWidth = 0.0005f;
 
         //triangles
         int[] tri = new int[12];

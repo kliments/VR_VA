@@ -8,19 +8,29 @@ public class TriangleMesh : MonoBehaviour {
 	private float x;
 	private float y;
 	private float z;
+    public Vector3[] vertices;
     MeshRenderer mMeshRenderer;
+    LineRenderer lineRenderer;
 
     // Use this for initialization
     public void Init (float[] data, Vector3 vector) {
-        mMeshRenderer = gameObject.GetComponent("MeshRenderer") as MeshRenderer;
+        mMeshRenderer = GetComponent<MeshRenderer>();
         if (mMeshRenderer == null)
         {
             gameObject.AddComponent<MeshRenderer>();
-            mMeshRenderer = gameObject.GetComponent("MeshRenderer") as MeshRenderer;
+            mMeshRenderer = GetComponent<MeshRenderer>();
         }
-
-
-        Mesh mesh = ((MeshFilter)GetComponent("MeshFilter")).mesh;
+        lineRenderer = gameObject.GetComponent("LineRenderer") as LineRenderer;
+        if (lineRenderer == null)
+        {
+            gameObject.AddComponent<LineRenderer>();
+            lineRenderer = GetComponent<LineRenderer>();
+        }
+		vector.x = data[0];
+		vector.y = data[1];
+		vector.z = data[2];
+		
+        Mesh mesh = GetComponent<MeshFilter>().mesh;
         mesh.Clear();
         mesh.name = "Triangle Mesh";
         transform.localPosition = new Vector3(vector.x, vector.y, vector.z);
@@ -30,11 +40,23 @@ public class TriangleMesh : MonoBehaviour {
         z = data[2];
 
 		//vertices
-		Vector3[] vertices = new Vector3[4]
+		vertices = new Vector3[4]
 		{
 			new Vector3(x,y,z), new Vector3( x - (x/2 * Mathf.Sqrt(3)),y - x/2 ,z), new Vector3(x,y+y,z), new Vector3(x + (z/2 * Mathf.Sqrt(3)),y - z/2 ,z)
 		};
 
+        lineRenderer.transform.parent = gameObject.transform.parent;
+        lineRenderer.useWorldSpace = false;
+
+        lineRenderer.SetPosition(0, vertices[3]);
+        lineRenderer.SetPosition(1, vertices[0]);
+        lineRenderer.SetPosition(2, vertices[2]);
+        lineRenderer.SetPosition(3, vertices[0]);
+        lineRenderer.SetPosition(4, vertices[1]);
+
+        lineRenderer.startWidth = 0.0005f;
+        lineRenderer.endWidth = 0.0005f;
+        
 		//triangles
 		int[] tri = new int[9];
 		tri[0] = 0;

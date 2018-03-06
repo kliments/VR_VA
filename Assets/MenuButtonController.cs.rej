@@ -1,0 +1,10 @@
+diff a/Assets/MenuButtonController.cs b/Assets/MenuButtonController.cs	(rejected hunks)
+@@ -57,7 +57,7 @@
+ 
+     public void SelectDataModeSelected()
+     {
+-        Debug.Log("Add Mode Selected");
++        Debug.Log("Select Mode Selected");
+         selectDataListeners.Invoke();
+     }
+ 
