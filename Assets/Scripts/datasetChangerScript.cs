@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using UnityEngine.UI;
 
 public class datasetChangerScript : MonoBehaviour
 {
@@ -95,15 +96,16 @@ public class datasetChangerScript : MonoBehaviour
     public void initText() { 
         myText = Instantiate(textPrefab);
         myText.transform.parent = this.transform;
-        myText.transform.localPosition = new Vector3(-0.461f, 0.31f, -0.6f);
-        myText.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
-        myText.transform.localScale = new Vector3(0.05f, 0.1f, 0.1f);
+        myText.transform.localPosition = new Vector3(0, 0, 0);
+        /*myText.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
+        myText.transform.localScale = new Vector3(0.05f, 0.1f, 0.1f);*/
 
         String value = myDataset.name;
         //remove the first 4 characters, 'PCA_'
         value = value.Remove(0, 4);
-
-        TextMesh mesher = myText.GetComponent<TextMesh>();
+        
+        Text mesher = myText.transform.GetChild(0).gameObject.GetComponent<Text>();
+        mesher.fontSize = 100;
         mesher.text = value;
 
     }
