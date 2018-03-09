@@ -13,9 +13,9 @@ public class ShowHideDatasets : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         //show only dataset buttons in the start of the application
-        if(this.name == "K-means")
+        if(this.name == "Datasets")
         {
-            wasHit = true;
+            //wasHit = true;
             GetComponent<Animator>().SetBool("selected", true);
         }
         if (buttons.Count == 0)

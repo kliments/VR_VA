@@ -13,7 +13,6 @@ public class SetToGround : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        Debug.Log("bla");
 		if(rigPosReset)
         {
             RemoveParenthoodFromRig();

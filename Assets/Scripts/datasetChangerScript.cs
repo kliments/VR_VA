@@ -16,6 +16,7 @@ public class datasetChangerScript : MonoBehaviour
     private GameObject mySprite;
 
     private GameObject parentViz;
+    public Transform wallBackground;
     public GameObject cubes;
     public GameObject pies;
     public GameObject triangles;
@@ -88,9 +89,18 @@ public class datasetChangerScript : MonoBehaviour
 
    
     // Use this for initialization
-    void Start() {
-        resetKmeans = GameObject.Find("parentKmeans").transform;
+    void Start()
+    {
         ground = GameObject.Find("Ground");
+        wallBackground = GameObject.Find("WallBackground").transform;
+        foreach(Transform child in wallBackground)
+        {
+            if(child.name == "parentKmeans")
+            {
+                resetKmeans = child;
+                break;
+            }
+        }
     }
 
     public void initText() { 
