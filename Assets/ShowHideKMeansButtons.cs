@@ -9,6 +9,7 @@ public class ShowHideKMeansButtons : MonoBehaviour {
     public GameObject parentButtons;
     public GameObject parentAlgorithms;
     public GameObject parentDBSCAN;
+    public GameObject algorithms;
     public bool wasHit;
     private int sizeOfList;
     public GameObject algorithmText;
@@ -33,44 +34,45 @@ public class ShowHideKMeansButtons : MonoBehaviour {
 
         if (wasHit)
         {
-            for (int i = 0; i < sizeOfList; i++)
-            {
-                buttons[i].SetActive(true);
-            }
-            parentAlgorithms.SetActive(false);
-            parentDBSCAN.SetActive(false);
+            
             
         }
         else
         {
-            for (int i = 0; i < sizeOfList; i++)
-            {
-                buttons[i].SetActive(false);
-            }
         }
     }
 
     public void Toggle()
     {
-        for (int i = 0; i < sizeOfList; i++)
-        {
-            buttons[i].SetActive(true);
-        }
         if (wasHit)
         {
             wasHit = false;
+            for (int i = 0; i < sizeOfList; i++)
+            {
+                buttons[i].SetActive(true);
+            }
+            //change the text of the Algorithms button to this one (either K-means or DBSCAN)
+            algorithmText.GetComponent<Text>().text = thisText;
+            algorithms.GetComponent<ShowHideAlgorithms>().wasHit = false;
+            parentButtons.SetActive(true);
+            parentAlgorithms.SetActive(false);
+            parentDBSCAN.SetActive(false);
         }
         else
         {
-            wasHit = true;
-            parentAlgorithms.GetComponent<Animator>().SetBool("selected", true);
-            //change the text of the Algorithms button to this one (either K-means or DBSCAN)
-            algorithmText.GetComponent<Text>().text = thisText;
+            wasHit = true;            
+            for (int i = 0; i < sizeOfList; i++)
+            {
+                buttons[i].SetActive(false);
+            }
+            parentButtons.SetActive(false);
+            parentAlgorithms.SetActive(true);
+            parentDBSCAN.SetActive(false);
         }
     }
 
     void OnEnable()
     {
-        wasHit = false;
+        wasHit = true;
     }
 }

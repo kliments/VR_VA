@@ -15,7 +15,7 @@ public class datasetChangerScript : MonoBehaviour
     private GameObject myText;
     private GameObject mySprite;
 
-    private GameObject parentViz;
+    public GameObject parentViz;
     public Transform wallBackground;
     public GameObject cubes;
     public GameObject pies;
@@ -41,14 +41,7 @@ public class datasetChangerScript : MonoBehaviour
             }
         }
 
-        parentViz = GameObject.Find("parentVisualizations");
-        foreach(Transform child in parentViz.transform)
-        {
-            if(child.gameObject.name == "DataSpaceButton")
-            {
-                scatterplot = child.gameObject.GetComponent<VisualizationChangerScript>().Scatterplot;
-            }
-        }
+        scatterplot = GameObject.Find("ScatterplotElements");
         cubes = FindObject(scatterplot, "DataSpace");
         pies = FindObject(scatterplot, "PieChartCtrl");
         triangles = FindObject(scatterplot, "Triangle");

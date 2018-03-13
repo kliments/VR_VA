@@ -6,8 +6,11 @@ public class ShowHideVisualizations : MonoBehaviour{
 
     public List<GameObject> buttons;
     public GameObject parentVis;
+    public GameObject data;
     public GameObject parentData;
+    public GameObject algorithms;
     public GameObject parentAlgorithms;
+    public GameObject parentKmeans;
     public bool wasHit;
     private int sizeOfList;
     // Use this for initialization
@@ -54,12 +57,17 @@ public class ShowHideVisualizations : MonoBehaviour{
         {
             wasHit = true;
             GetComponent<Animator>().SetBool("selected", true);
+            parentVis.SetActive(true);
         }
 
-        parentData.GetComponent<Animator>().SetBool("selected", false);
-        parentData.GetComponent<ShowHideDatasets>().wasHit = false;
+        data.GetComponent<Animator>().SetBool("selected", false);
+        data.GetComponent<ShowHideDatasets>().wasHit = false;
+        parentData.SetActive(false);
 
-        parentAlgorithms.GetComponent<Animator>().SetBool("selected", false);
-        parentAlgorithms.GetComponent<ShowHideAlgorithms>().wasHit = false;
+        algorithms.GetComponent<Animator>().SetBool("selected", false);
+        algorithms.GetComponent<ShowHideAlgorithms>().wasHit = false;
+        parentAlgorithms.SetActive(false);
+
+        parentKmeans.SetActive(false);
     }
 }
