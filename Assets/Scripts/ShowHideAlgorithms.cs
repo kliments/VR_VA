@@ -2,31 +2,29 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ShowHideVisualizations : MonoBehaviour{
-
+public class ShowHideAlgorithms : MonoBehaviour {
     public List<GameObject> buttons;
     public GameObject parentVis;
     public GameObject parentData;
     public GameObject parentAlgorithms;
     public bool wasHit;
     private int sizeOfList;
+
     // Use this for initialization
-    void Start()
+    void Start ()
     {
         if (buttons.Count == 0)
         {
-            foreach (Transform child in parentVis.transform)
+            foreach (Transform child in parentAlgorithms.transform)
             {
                 buttons.Add(child.gameObject);
             }
             sizeOfList = buttons.Count;
         }
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-
+	
+	// Update is called once per frame
+	void Update () {
         if (wasHit)
         {
             for (int i = 0; i < sizeOfList; i++)
@@ -59,7 +57,7 @@ public class ShowHideVisualizations : MonoBehaviour{
         parentData.GetComponent<Animator>().SetBool("selected", false);
         parentData.GetComponent<ShowHideDatasets>().wasHit = false;
 
-        parentAlgorithms.GetComponent<Animator>().SetBool("selected", false);
-        parentAlgorithms.GetComponent<ShowHideAlgorithms>().wasHit = false;
+        parentVis.GetComponent<Animator>().SetBool("selected", false);
+        parentVis.GetComponent<ShowHideVisualizations>().wasHit = false;
     }
 }

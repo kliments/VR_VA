@@ -7,7 +7,7 @@ public class ShowHideDatasets : MonoBehaviour {
     public List<GameObject> buttons;
     public GameObject parentData;
     public GameObject parentVis;
-    public GameObject parentKmeans;
+    public GameObject parentAlgorithms;
     public bool wasHit;
     private int sizeOfList;
 	// Use this for initialization
@@ -31,7 +31,6 @@ public class ShowHideDatasets : MonoBehaviour {
 	// Update is called once per frame
 	void Update()
     {
-        
 		if(wasHit)
         {
             for(int i = 0; i < sizeOfList; i++)
@@ -64,7 +63,7 @@ public class ShowHideDatasets : MonoBehaviour {
         parentVis.GetComponent<Animator>().SetBool("selected", false);
         parentVis.GetComponent<ShowHideVisualizations>().wasHit = false;
 
-        parentKmeans.GetComponent<Animator>().SetBool("selected", false);
-        parentKmeans.GetComponent<ShowHideButtons>().wasHit = false;
+        parentAlgorithms.GetComponent<Animator>().SetBool("selected", false);
+        parentAlgorithms.GetComponent<ShowHideAlgorithms>().wasHit = false;
     }
 }

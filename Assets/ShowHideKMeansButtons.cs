@@ -1,21 +1,25 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class ShowHideButtons : MonoBehaviour {
+public class ShowHideKMeansButtons : MonoBehaviour {
 
     public List<GameObject> buttons;
-    public GameObject parentData;
-    public GameObject parentVis;
-    public GameObject parentKmeans;
+    public GameObject parentButtons;
+    public GameObject parentAlgorithms;
+    public GameObject parentDBSCAN;
     public bool wasHit;
     private int sizeOfList;
+    public GameObject algorithmText;
+    public string thisText;
     // Use this for initialization
     void Start()
     {
+        thisText = transform.GetChild(0).transform.GetChild(0).GetComponent<Text>().text;
         if (buttons.Count == 0)
         {
-            foreach (Transform child in parentKmeans.transform)
+            foreach (Transform child in parentButtons.transform)
             {
                 buttons.Add(child.gameObject);
             }
@@ -33,6 +37,9 @@ public class ShowHideButtons : MonoBehaviour {
             {
                 buttons[i].SetActive(true);
             }
+            parentAlgorithms.SetActive(false);
+            parentDBSCAN.SetActive(false);
+            
         }
         else
         {
@@ -45,21 +52,25 @@ public class ShowHideButtons : MonoBehaviour {
 
     public void Toggle()
     {
+        for (int i = 0; i < sizeOfList; i++)
+        {
+            buttons[i].SetActive(true);
+        }
         if (wasHit)
         {
             wasHit = false;
-            GetComponent<Animator>().SetBool("selected", false);
         }
         else
         {
             wasHit = true;
-            GetComponent<Animator>().SetBool("selected", true);
+            parentAlgorithms.GetComponent<Animator>().SetBool("selected", true);
+            //change the text of the Algorithms button to this one (either K-means or DBSCAN)
+            algorithmText.GetComponent<Text>().text = thisText;
         }
+    }
 
-        parentVis.GetComponent<Animator>().SetBool("selected", false);
-        parentVis.GetComponent<ShowHideVisualizations>().wasHit = false;
-
-        parentData.GetComponent<Animator>().SetBool("selected", false);
-        parentData.GetComponent<ShowHideDatasets>().wasHit = false;
+    void OnEnable()
+    {
+        wasHit = false;
     }
 }

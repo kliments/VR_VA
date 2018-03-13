@@ -373,9 +373,17 @@ public LayerMask layersToIgnoreAdd = Physics.IgnoreRaycastLayer;
             {
                 selectedObject.GetComponent<ShowHideVisualizations>().Toggle();
             }
-            else if (selectedObject.name == "K-means")
+            else if (selectedObject.name == "Algorithms")
             {
-                selectedObject.GetComponent<ShowHideButtons>().Toggle();
+                selectedObject.GetComponent<ShowHideAlgorithms>().Toggle();
+            }
+        }
+
+        else if(selectedObject.tag == "AlgorithmButton")
+        {
+            if(selectedObject.name == "K-Means")
+            {
+                selectedObject.GetComponent<ShowHideKMeansButtons>().Toggle();
             }
         }
 
