@@ -70,6 +70,8 @@ public class ShowHideDatasets : MonoBehaviour {
 
         algorithms.GetComponent<Animator>().SetBool("selected", false);
         algorithms.GetComponent<ShowHideAlgorithms>().wasHit = false;
+        algorithms.GetComponent<ShowHideAlgorithms>().buttonText.text = algorithms.GetComponent<ShowHideAlgorithms>().thisText;
+
         parentAlgorithms.SetActive(false);
 
         parentKmeans.SetActive(false);

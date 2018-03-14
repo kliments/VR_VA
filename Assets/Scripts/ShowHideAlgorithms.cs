@@ -9,6 +9,7 @@ public class ShowHideAlgorithms : MonoBehaviour {
     public GameObject parentData;
     public GameObject parentAlgorithms;
     public GameObject parentKmeans;
+    public Text buttonText;
     public bool wasHit;
     private int sizeOfList;
     public string thisText;
@@ -16,6 +17,7 @@ public class ShowHideAlgorithms : MonoBehaviour {
     // Use this for initialization
     void Start ()
     {
+        buttonText = transform.GetChild(0).transform.GetChild(0).gameObject.GetComponent<Text>();
         thisText = transform.GetChild(0).transform.GetChild(0).GetComponent<Text>().text;
         if (buttons.Count == 0)
         {
@@ -41,8 +43,6 @@ public class ShowHideAlgorithms : MonoBehaviour {
     {
         if (!wasHit)
         {
-            //whenever button is clicked, return the normal text
-            transform.GetChild(0).transform.GetChild(0).gameObject.GetComponent<Text>().text = thisText;
             wasHit = true;
             GetComponent<Animator>().SetBool("selected", true);
 
@@ -54,8 +54,6 @@ public class ShowHideAlgorithms : MonoBehaviour {
         }
         else
         {
-            //whenever button is clicked, return the normal text
-            transform.GetChild(0).transform.GetChild(0).gameObject.GetComponent<Text>().text = thisText;
             wasHit = false;
             GetComponent<Animator>().SetBool("selected", false);
             
@@ -65,6 +63,9 @@ public class ShowHideAlgorithms : MonoBehaviour {
                 buttons[i].SetActive(false);
             }
         }
+
+        //change button text to "Algorithms"
+        buttonText.text = thisText;
 
         parentData.GetComponent<Animator>().SetBool("selected", false);
         parentData.GetComponent<ShowHideDatasets>().wasHit = false;
