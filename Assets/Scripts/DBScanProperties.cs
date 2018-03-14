@@ -22,7 +22,7 @@ public class DBScanProperties : MonoBehaviour {
 	void Update () {
 		if(clusterID>0 && !colorChanged)
         {
-            gameObject.GetComponent<MeshRenderer>().material.color = dbScanButton.GetComponent<DBScanAlgorithm>().pointsColor[clusterID];
+            gameObject.GetComponent<MeshRenderer>().material.color = dbScanButton.GetComponent<DBScanAlgorithm>().pointsColor[clusterID-1];
             colorChanged = true;
         }
 	}

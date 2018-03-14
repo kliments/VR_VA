@@ -30,14 +30,14 @@ public class DBScanAlgorithm : MonoBehaviour {
         clusterID = 1;
         UNCLASSIFIED = 0;
         NOISE = -1;
-        epsilon = 0.05f;
+        epsilon = 0.01f;
         minPts = 3;
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		
-	}
+
+    }
 
     public void StartDBSCAN()
     {
@@ -47,20 +47,30 @@ public class DBScanAlgorithm : MonoBehaviour {
             counter++;
         }
 
-        foreach(Transform dataPoint in dataVisuals.transform)
+        /*foreach(Transform dataPoint in dataVisuals.transform)
+        {*/
+        GameObject dataPoint = dataPoints[0];
+        dataPoints.Remove(dataPoint);
+        if(dataPoint.gameObject.GetComponent<DBScanProperties>() == null)
         {
-            if(dataPoint.gameObject.GetComponent<DBScanProperties>() == null)
-            {
-                dataPoint.gameObject.AddComponent<DBScanProperties>();
-            }
-            dataPoint.gameObject.GetComponent<DBScanProperties>().epsilon = epsilon;
+            dataPoint.gameObject.AddComponent<DBScanProperties>();
+        }
+        dataPoint.gameObject.GetComponent<DBScanProperties>().epsilon = epsilon;
 
-            //process points only once
-            if(dataPoint.gameObject.GetComponent<DBScanProperties>().clusterID == UNCLASSIFIED)
+        //process points only once
+        if(dataPoint.gameObject.GetComponent<DBScanProperties>().clusterID == UNCLASSIFIED)
+        {
+            if (ExpandCluster(dataVisuals.transform, dataPoint.gameObject, clusterID, epsilon, minPts))
             {
-                if (ExpandCluster(dataVisuals.transform, dataPoint.gameObject, clusterID, epsilon, minPts)) clusterID++;
+                clusterID++;
+                if(clusterID>20)
+                {
+                    Color color = Random.ColorHSV();
+                    pointsColor.Add(color);
+                }
             }
         }
+        //}
     }
 
     //find all datapoints
@@ -72,24 +82,40 @@ public class DBScanAlgorithm : MonoBehaviour {
             if (child.gameObject.name == "DataSpace" && child.gameObject.activeSelf)
             {
                 dataVisuals = child.gameObject;
+                foreach(Transform obj in dataVisuals.transform)
+                {
+                    dataPoints.Add(obj.gameObject);
+                }
                 return;
             }
 
             else if (child.gameObject.name == "PieChartCtrl" && child.gameObject.activeSelf)
             {
                 dataVisuals = child.gameObject;
+                foreach (GameObject obj in dataVisuals.transform)
+                {
+                    dataPoints.Add(obj);
+                }
                 return;
             }
 
             else if (child.gameObject.name == "Triangle" && child.gameObject.activeSelf)
             {
                 dataVisuals = child.gameObject;
+                foreach (GameObject obj in dataVisuals.transform)
+                {
+                    dataPoints.Add(obj);
+                }
                 return;
             }
 
             else if (child.gameObject.name == "Tetrahedron" && child.gameObject.activeSelf)
             {
                 dataVisuals = child.gameObject;
+                foreach (GameObject obj in dataVisuals.transform)
+                {
+                    dataPoints.Add(obj);
+                }
                 return;
             }
         }

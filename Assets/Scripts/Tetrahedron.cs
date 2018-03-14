@@ -250,6 +250,7 @@ public class Tetrahedron : MonoBehaviour
                 GameObject tetrahedron = Instantiate(dummy, Positions, Quaternion.AngleAxis(0, Vector3.up), transform);
                 TetrahedronMesh bar = tetrahedron.GetComponent<TetrahedronMesh>();
                 tetrahedron.AddComponent<PreviousStepProperties>();
+                tetrahedron.AddComponent<DBScanProperties>();
                 tetrahedron.GetComponent<MeshRenderer>().material = dataMappedMaterial;
 
                 bar.Init(dataPositions, Positions);
@@ -296,6 +297,7 @@ public class Tetrahedron : MonoBehaviour
                 GameObject tetrahedron = Instantiate(dummy, Positions, Quaternion.AngleAxis(0, Vector3.up), transform);
                 TetrahedronMesh bar = tetrahedron.GetComponent<TetrahedronMesh>();
                 tetrahedron.AddComponent<PreviousStepProperties>();
+                tetrahedron.AddComponent<DBScanProperties>();
                 Color color = new Color(float.Parse(attributes[4]), float.Parse(attributes[5]), float.Parse(attributes[6]), 1f);
 
                 bar.Init(dataPositions, Positions);

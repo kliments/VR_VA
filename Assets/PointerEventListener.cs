@@ -16,8 +16,8 @@ public class PointerEventListener : MonoBehaviour {
     //internal variable for the action to perform
     private MENU_ACTION menuAction= MENU_ACTION.SELECTDATA;
 
-    public GameObject kMeansButton, trianglesButton, tetrahedronButton;
-    public bool press,pressBack, pressTriangles, pressTetrahedrons = false;
+    public GameObject kMeansButton, trianglesButton, tetrahedronButton, dbscanButton;
+    public bool press,pressBack, pressTriangles, pressTetrahedrons, pressDBscan = false;
     //sets the menu action and the correct colors
     public MENU_ACTION MenuAction {
         get { return menuAction; }
@@ -148,6 +148,12 @@ public LayerMask layersToIgnoreAdd = Physics.IgnoreRaycastLayer;
         {
             pressTetrahedrons = false;
             tetrahedronButton.GetComponent<VisualizationChangerScript>().startSelectedAction();
+        }
+
+        if(pressDBscan)
+        {
+            pressDBscan = false;
+            dbscanButton.GetComponent<DBScanAlgorithm>().StartDBSCAN();
         }
 
     }

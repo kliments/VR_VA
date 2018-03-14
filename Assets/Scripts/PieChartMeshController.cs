@@ -124,6 +124,7 @@ public class PieChartMeshController : MonoBehaviour
                 GameObject pieChart = Instantiate(dummy, dataPosition, Quaternion.AngleAxis(0, Vector3.up), transform);
                 PieChartMesh bar = pieChart.GetComponent<PieChartMesh>();
                 pieChart.AddComponent<PreviousStepProperties>();
+                pieChart.AddComponent<DBScanProperties>();
                 bar.Init(dataPositions, 100, 0, 100, null, dataPosition);
                 bar.Draw(dataPositions);
                 bar.transform.localScale -= new Vector3(0.985F, 0.985F, 0.985F);
@@ -161,6 +162,7 @@ public class PieChartMeshController : MonoBehaviour
 
                 GameObject pieChart = Instantiate(dummy, Positions, Quaternion.AngleAxis(0, Vector3.up), transform);
                 pieChart.AddComponent<PreviousStepProperties>();
+                pieChart.AddComponent<DBScanProperties>();
                 PieChartMesh bar = pieChart.GetComponent<PieChartMesh>();
                 bar.Init(dataPositions, 100, 0, 100, null, Positions);
                 bar.Draw(dataPositions);

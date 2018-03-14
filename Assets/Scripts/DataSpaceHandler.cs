@@ -304,6 +304,7 @@ public class DataSpaceHandler : MonoBehaviour
                 listOfColors.Add(tempColor);
                 
                 dataPoint.AddComponent<PreviousStepProperties>();
+                dataPoint.AddComponent<DBScanProperties>();
                 dataPoint.GetComponent<TiledCubeVariables>().trackObj = trackObj;
             }
         }
@@ -345,6 +346,7 @@ public class DataSpaceHandler : MonoBehaviour
                 childCat1.Add(dataPoint);
                 listOfColors.Add(colors[0]);
                 dataPoint.AddComponent<PreviousStepProperties>();
+                dataPoint.AddComponent<DBScanProperties>();
                 count++;
             }
         }
