@@ -8,7 +8,7 @@ public class KMeansAlgorithm : MonoBehaviour {
     public GameObject sphere;
     private GameObject dataVisuals;
     public GameObject kMeansFinishedPlane;
-
+    public List<Color> spheresColor;
     private GameObject[] spheres;
 
     //offset for X and Z values, because the 0 coordinates of the local position from each data point is shifted from their parent to x=-0,581 and z=-0,63
@@ -366,8 +366,6 @@ public class KMeansAlgorithm : MonoBehaviour {
 
     void GenerateRandomSpheres()
     {
-        float r, g, b;
-        Color color;
         for (int i = 0; i < nrOfSpheres; i++)
         {
             GameObject newSphere = Instantiate(sphere, scatterplot);
@@ -376,11 +374,7 @@ public class KMeansAlgorithm : MonoBehaviour {
             //for X and Z it has to be between -0.6 and 0.6, cause coordinate 0.0 is in the center but not in the begining of the scatterplot (its shifted)
             Vector3 position = new Vector3(UnityEngine.Random.Range(-0.6f, 0.6f), UnityEngine.Random.Range(0.2f, 0.8f), UnityEngine.Random.Range(-0.6f, 0.6f));
             newSphere.transform.localPosition = position;
-            r = UnityEngine.Random.Range(0.0f, 1.0f);
-            g = UnityEngine.Random.Range(0.0f, 1.0f);
-            b = UnityEngine.Random.Range(0.0f, 1.0f);
-            color = new Color(r, g, b);
-            newSphere.GetComponent<MeshRenderer>().material.color = color;
+            newSphere.GetComponent<MeshRenderer>().material.color = spheresColor[i];
             newSphere.name = "sphere";
             newSphere.tag = "sphere";
         }

@@ -387,6 +387,11 @@ public LayerMask layersToIgnoreAdd = Physics.IgnoreRaycastLayer;
             }
         }
 
+        else if(selectedObject.name == "DBNextStep")
+        {
+            selectedObject.GetComponent<DBScanAlgorithm>().StartDBSCAN();
+        }
+
     }
     /// <summary>
     /// Starts or Ends the movement of a selected object by parenting it to the controller
