@@ -17,8 +17,7 @@ public class ShowHideAlgorithms : MonoBehaviour {
     // Use this for initialization
     void Start ()
     {
-        buttonText = transform.GetChild(0).transform.GetChild(0).gameObject.GetComponent<Text>();
-        thisText = transform.GetChild(0).transform.GetChild(0).GetComponent<Text>().text;
+        thisText = buttonText.text;
         if (buttons.Count == 0)
         {
             foreach (Transform child in parentAlgorithms.transform)

@@ -23,6 +23,9 @@ public class DBScanAlgorithm : MonoBehaviour {
     //counter for steps
     public int counter;
 
+    private List<List<GameObject>> neighbours;
+    private List<GameObject> corePoints;
+
     public int clusterID, UNCLASSIFIED, NOISE;
     // Use this for initialization
     void Start () {
@@ -30,9 +33,11 @@ public class DBScanAlgorithm : MonoBehaviour {
         clusterID = 1;
         UNCLASSIFIED = 0;
         NOISE = -1;
-        epsilon = 0.01f;
+        epsilon = 0.025f;
         minPts = 3;
-	}
+        corePoints = new List<GameObject>();
+        neighbours = new List<List<GameObject>>();
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -46,31 +51,109 @@ public class DBScanAlgorithm : MonoBehaviour {
             AssignDataPoints();
             counter++;
         }
-
-        /*foreach(Transform dataPoint in dataVisuals.transform)
-        {*/
-        GameObject dataPoint = dataPoints[0];
-        dataPoints.Remove(dataPoint);
-        if(dataPoint.gameObject.GetComponent<DBScanProperties>() == null)
+        if(dataPoints.Count == 0)
         {
-            dataPoint.gameObject.AddComponent<DBScanProperties>();
+            Debug.Log("DBScan finished in " + clusterID.ToString() + " steps!");
         }
-        dataPoint.gameObject.GetComponent<DBScanProperties>().epsilon = epsilon;
-
-        //process points only once
-        if(dataPoint.gameObject.GetComponent<DBScanProperties>().clusterID == UNCLASSIFIED)
-        {
-            if (ExpandCluster(dataVisuals.transform, dataPoint.gameObject, clusterID, epsilon, minPts))
+        else
+        {//check if there are any neighbours to expand, before trying to find another cluster
+            if (neighbours.Count == 0)
             {
-                clusterID++;
-                if(clusterID>20)
+                GameObject dataPoint = dataPoints[0];
+                if (dataPoint.gameObject.GetComponent<DBScanProperties>() == null)
                 {
-                    Color color = Random.ColorHSV();
-                    pointsColor.Add(color);
+                    dataPoint.gameObject.AddComponent<DBScanProperties>();
+                }
+
+                //process points only once
+                if (dataPoint.gameObject.GetComponent<DBScanProperties>().clusterID == UNCLASSIFIED)
+                {
+                    corePoints = RegionQuery(dataPoint, epsilon);
+                    if (corePoints.Count < minPts) //no core point
+                    {
+                        dataPoint.GetComponent<DBScanProperties>().clusterID = NOISE;
+                        corePoints = new List<GameObject>();
+                    }
+
+                    else
+                    {
+                        for (int i = 0; i < corePoints.Count; i++)
+                        {
+                            if (corePoints[i].GetComponent<DBScanProperties>() == null)
+                            {
+                                corePoints[i].AddComponent<DBScanProperties>();
+                            }
+                            corePoints[i].GetComponent<DBScanProperties>().epsilon = epsilon;
+                            corePoints[i].GetComponent<DBScanProperties>().clusterID = clusterID;
+                            dataPoints.Remove(corePoints[i]);
+                        }
+                        corePoints.Remove(dataPoint);
+                        List<GameObject> temp = new List<GameObject>();
+                        while (corePoints.Count > 0)
+                        {
+                            GameObject currentPoint = corePoints[0];
+                            List<GameObject> result = RegionQuery(currentPoint, epsilon);
+                            foreach (GameObject obj in result)
+                            {
+                                if (obj.GetComponent<DBScanProperties>().clusterID == UNCLASSIFIED || obj.GetComponent<DBScanProperties>().clusterID == NOISE)
+                                {
+                                    temp.Add(obj);
+                                    obj.GetComponent<DBScanProperties>().clusterID = clusterID;
+                                    obj.GetComponent<DBScanProperties>().epsilon = epsilon;
+                                    dataPoints.Remove(obj);
+                                }
+                            }
+                            corePoints.Remove(currentPoint);
+                        }
+                        neighbours.Add(temp);
+                    }
+                }
+                dataPoints.Remove(dataPoint);
+            }
+
+            //explore the neighbours, and their neighbours, and so on..
+            else
+            {
+                List<GameObject> currentNeighbours = neighbours[0];
+                List<GameObject> temp = new List<GameObject>();
+                while (currentNeighbours.Count > 0)
+                {
+                    GameObject currentPoint = currentNeighbours[0];
+                    List<GameObject> result = RegionQuery(currentPoint, epsilon);
+                    if (result.Count > 0)
+                    {
+                        foreach (GameObject obj in result)
+                        {
+                            if (obj.GetComponent<DBScanProperties>().clusterID == UNCLASSIFIED || obj.GetComponent<DBScanProperties>().clusterID == NOISE)
+                            {
+                                obj.GetComponent<DBScanProperties>().epsilon = epsilon;
+                                obj.GetComponent<DBScanProperties>().clusterID = clusterID;
+                                temp.Add(obj);
+                                dataPoints.Remove(obj);
+                            }
+                        }
+                    }
+                    currentNeighbours.Remove(currentPoint);
+                }
+
+                //add only if there are any new neighbours
+                if (temp.Count > 0)
+                {
+                    neighbours.Add(temp);
+                }
+                neighbours.RemoveAt(0);
+
+                if (neighbours.Count == 0)
+                {
+                    clusterID++;
+                    if (clusterID > 20)
+                    {
+                        Color color = Random.ColorHSV();
+                        pointsColor.Add(color);
+                    }
                 }
             }
         }
-        //}
     }
 
     //find all datapoints
@@ -121,52 +204,7 @@ public class DBScanAlgorithm : MonoBehaviour {
         }
     }
 
-    //Expand the cluster
-    private bool ExpandCluster(Transform dataPoints, GameObject p, int clusterID, float epsilon, int minPts)
-    {
-        List<GameObject> seeds = new List<GameObject>();
-        seeds = RegionQuery(p, epsilon);
-        if (seeds.Count < minPts) //no core point
-        {
-            p.GetComponent<DBScanProperties>().clusterID = NOISE;
-            return false;
-        }
-
-        else // enough to create a cluster
-        {
-            for (int i = 0; i < seeds.Count; i++)
-            {
-                if(seeds[i].GetComponent<DBScanProperties>() == null)
-                {
-                    seeds[i].AddComponent<DBScanProperties>();
-                }
-                seeds[i].GetComponent<DBScanProperties>().clusterID = clusterID;
-            }
-            seeds.Remove(p);
-            while(seeds.Count>0)
-            {
-                GameObject currentPoint = seeds[0];
-                List<GameObject> result = RegionQuery(currentPoint, epsilon);
-
-                //continue if it is a branch but not a leaf
-                if(result.Count >= minPts)
-                {
-                    for(int j = 0; j < result.Count; j++)
-                    {
-                        GameObject resultPoint = result[j];
-                        if (resultPoint.GetComponent<DBScanProperties>().clusterID == NOISE) resultPoint.GetComponent<DBScanProperties>().clusterID = clusterID;
-                        else if(resultPoint.GetComponent<DBScanProperties>().clusterID == UNCLASSIFIED)
-                        {
-                            resultPoint.GetComponent<DBScanProperties>().clusterID = clusterID;
-                            seeds.Add(resultPoint);
-                        }
-                    }
-                }
-                seeds.Remove(currentPoint);
-            }
-            return true;
-        }
-    }
+    
 
     //return all neighbours around the data point
     private List<GameObject> RegionQuery(GameObject obj, float eps)

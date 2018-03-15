@@ -25,5 +25,10 @@ public class DBScanProperties : MonoBehaviour {
             gameObject.GetComponent<MeshRenderer>().material.color = dbScanButton.GetComponent<DBScanAlgorithm>().pointsColor[clusterID-1];
             colorChanged = true;
         }
+
+        else if(clusterID == NOISE)
+        {
+            gameObject.GetComponent<MeshRenderer>().material.color = Color.black;
+        }
 	}
 }
