@@ -22,6 +22,10 @@ public class DBScanAlgorithm : MonoBehaviour {
     
     //counter for steps
     public int counter;
+    
+    //material for the mesh
+    public Material material;
+
 
     private List<List<GameObject>> neighbours;
     private List<GameObject> corePoints;
@@ -85,6 +89,8 @@ public class DBScanAlgorithm : MonoBehaviour {
                             }
                             corePoints[i].GetComponent<DBScanProperties>().epsilon = epsilon;
                             corePoints[i].GetComponent<DBScanProperties>().clusterID = clusterID;
+                            //corePoints[i].GetComponent<DBScanProperties>().mesh = mesh;
+                            corePoints[i].GetComponent<DBScanProperties>().refMat.CopyPropertiesFromMaterial(material);
                             dataPoints.Remove(corePoints[i]);
                         }
                         corePoints.Remove(dataPoint);
@@ -100,6 +106,8 @@ public class DBScanAlgorithm : MonoBehaviour {
                                     temp.Add(obj);
                                     obj.GetComponent<DBScanProperties>().clusterID = clusterID;
                                     obj.GetComponent<DBScanProperties>().epsilon = epsilon;
+                                    //obj.GetComponent<DBScanProperties>().mesh = mesh;
+                                    obj.GetComponent<DBScanProperties>().refMat.CopyPropertiesFromMaterial(material);
                                     dataPoints.Remove(obj);
                                 }
                             }
@@ -128,6 +136,8 @@ public class DBScanAlgorithm : MonoBehaviour {
                             {
                                 obj.GetComponent<DBScanProperties>().epsilon = epsilon;
                                 obj.GetComponent<DBScanProperties>().clusterID = clusterID;
+                                //obj.GetComponent<DBScanProperties>().mesh = mesh;
+                                obj.GetComponent<DBScanProperties>().refMat.CopyPropertiesFromMaterial(material);
                                 temp.Add(obj);
                                 dataPoints.Remove(obj);
                             }

@@ -1,10 +1,13 @@
 fileFormatVersion: 2
 guid: 26ffc6650fad8f94197be0bb2c2f9ff4
-timeCreated: 1521025906
+timeCreated: 1521118971
 licenseType: Free
 MonoImporter:
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+  - material: {fileID: 2100000, guid: f0dffc00b303d0340bef3cc929e37474, type: 2}
+  - dbScanButton: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
