@@ -11,6 +11,7 @@ public class ShowHideVisualizations : MonoBehaviour{
     public GameObject algorithms;
     public GameObject parentAlgorithms;
     public GameObject parentKmeans;
+    public GameObject parentDBScan;
     public bool wasHit;
     private int sizeOfList;
     // Use this for initialization
@@ -70,5 +71,6 @@ public class ShowHideVisualizations : MonoBehaviour{
         parentAlgorithms.SetActive(false);
 
         parentKmeans.SetActive(false);
+        parentDBScan.SetActive(false);
     }
 }

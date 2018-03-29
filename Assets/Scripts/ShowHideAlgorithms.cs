@@ -9,6 +9,7 @@ public class ShowHideAlgorithms : MonoBehaviour {
     public GameObject parentData;
     public GameObject parentAlgorithms;
     public GameObject parentKmeans;
+    public GameObject parentDBScan;
     public Text buttonText;
     public bool wasHit;
     private int sizeOfList;
@@ -30,12 +31,6 @@ public class ShowHideAlgorithms : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if (wasHit)
-        {
-        }
-        else
-        {
-        }
     }
 
     public void Toggle()
@@ -73,6 +68,7 @@ public class ShowHideAlgorithms : MonoBehaviour {
         parentVis.GetComponent<ShowHideVisualizations>().wasHit = false;
         
         parentKmeans.SetActive(false);
+        parentDBScan.SetActive(false);
 
     }
 }

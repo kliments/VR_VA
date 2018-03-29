@@ -343,13 +343,13 @@ public LayerMask layersToIgnoreAdd = Physics.IgnoreRaycastLayer;
 
         else if (selectedObject.name == "Increase")
         {
-            selectedObject.GetComponent<IncreaseDecrease>().kMeans.GetComponent<KMeansAlgorithm>().resetMe();
+            selectedObject.GetComponent<IncreaseDecrease>().kMeans.GetComponent<KMeansAlgorithm>().ResetMe();
             selectedObject.GetComponent<IncreaseDecrease>().kMeans.GetComponent<KMeansAlgorithm>().nrOfSpheres++;
         }
 
         else if (selectedObject.name == "Decrease")
         {
-            selectedObject.GetComponent<IncreaseDecrease>().kMeans.GetComponent<KMeansAlgorithm>().resetMe();
+            selectedObject.GetComponent<IncreaseDecrease>().kMeans.GetComponent<KMeansAlgorithm>().ResetMe();
             selectedObject.GetComponent<IncreaseDecrease>().kMeans.GetComponent<KMeansAlgorithm>().nrOfSpheres--;
         }
 
@@ -390,6 +390,10 @@ public LayerMask layersToIgnoreAdd = Physics.IgnoreRaycastLayer;
             if(selectedObject.name == "K-Means")
             {
                 selectedObject.GetComponent<ShowHideKMeansButtons>().Toggle();
+            }
+            else if(selectedObject.name == "DBScan")
+            {
+                selectedObject.GetComponent<ShowHideDBSCANAlgorithm>().Toggle();
             }
         }
 

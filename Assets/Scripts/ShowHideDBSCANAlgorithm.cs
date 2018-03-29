@@ -3,20 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ShowHideKMeansButtons : MonoBehaviour {
-
+public class ShowHideDBSCANAlgorithm : MonoBehaviour {
     public List<GameObject> buttons;
     public GameObject parentButtons;
     public GameObject parentAlgorithms;
-    public GameObject parentDBSCAN;
+    public GameObject parentKMeans;
     public GameObject algorithms;
+    public GameObject resetKMeans;
     public bool wasHit;
     private int sizeOfList;
     public GameObject algorithmText;
     public string thisText;
     // Use this for initialization
-    void Start()
-    {
+    void Start () {
         thisText = transform.GetChild(0).transform.GetChild(0).GetComponent<Text>().text;
         if (buttons.Count == 0)
         {
@@ -27,11 +26,11 @@ public class ShowHideKMeansButtons : MonoBehaviour {
             sizeOfList = buttons.Count;
         }
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-    }
+	
+	// Update is called once per frame
+	void Update () {
+		
+	}
 
     public void Toggle()
     {
@@ -50,7 +49,7 @@ public class ShowHideKMeansButtons : MonoBehaviour {
         }
         else
         {
-            wasHit = true;            
+            wasHit = true;
             for (int i = 0; i < sizeOfList; i++)
             {
                 buttons[i].SetActive(false);
@@ -58,7 +57,8 @@ public class ShowHideKMeansButtons : MonoBehaviour {
             parentButtons.SetActive(false);
             parentAlgorithms.SetActive(true);
         }
-        parentDBSCAN.SetActive(false);
+        parentKMeans.SetActive(false);
+        resetKMeans.GetComponent<KMeansAlgorithm>().ResetMe();
     }
 
     void OnEnable()

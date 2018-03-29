@@ -12,23 +12,18 @@ public class DBScanProperties : MonoBehaviour {
     public Mesh mesh;
     public Material refMat;
     private Material material;
-    public bool sizeDone;
-    private Vector3 sizeOfMesh;
     public GameObject dbScanButton;
     private int layerMask;
     private Vector3[] baseVertices;
-    private Vector3 fullSize;
     private Vector3 pos;
     private float radius;
     private Color color;
     
     // Use this for initialization
     void Start () {
-        radius = 0.0025f;
-        sizeDone = false;
-        dbScanButton = GameObject.Find("DBNextStep");
+        //starting radius to increase till epsilon
+        radius = 0f;
         layerMask = LayerMask.NameToLayer("Environment");
-        sizeOfMesh = new Vector3(0.0001f, 0.0001f, 0.0001f);
         mesh = new Mesh();
         refMat = new Material(Shader.Find("Transparent/Bumped Diffuse"));
     }
@@ -37,10 +32,11 @@ public class DBScanProperties : MonoBehaviour {
 	void Update () {
 		if(clusterID>0)
         {
-            fullSize.x = 1;
-            fullSize.y = 1;
-            fullSize.z = 1;
             pos = transform.position;
+            if(dbScanButton == null)
+            {
+                dbScanButton = GameObject.Find("DBNextStep");
+            }
             if (radius < dbScanButton.GetComponent<DBScanAlgorithm>().epsilon)
             {
                 GenerateSphere();
@@ -59,7 +55,7 @@ public class DBScanProperties : MonoBehaviour {
     {
         mesh.Clear();
 
-        radius += 0.005f;
+        radius += epsilon/5;
         // Longitude |||
         int nbLong = 24;
         // Latitude ---
@@ -161,5 +157,13 @@ public class DBScanProperties : MonoBehaviour {
         color = gameObject.GetComponent<MeshRenderer>().material.color;
         color.a = 0.1f;
         refMat.color = color;
+    }
+
+    public void ResetPoint()
+    {
+        radius = 0f;
+        clusterID = UNCLASSIFIED;
+        mesh.Clear();
+        gameObject.GetComponent<MeshRenderer>().material.color = gameObject.GetComponent<PreviousStepProperties>().originalColor;
     }
 }

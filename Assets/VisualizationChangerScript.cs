@@ -27,7 +27,8 @@ public class VisualizationChangerScript : MonoBehaviour {
 
 
     private int trnglCounter, ttrhdrnCounter = 0;
-    public Transform resetKmeans;
+    public GameObject resetKmeans;
+    public GameObject resetDBScan;
 
     private int vizLength;
     public void startSelectedAction()
@@ -35,15 +36,9 @@ public class VisualizationChangerScript : MonoBehaviour {
         ground.GetComponent<SetToGround>().rigPosReset = true;
         ground.GetComponent<SetToGround>().RemoveParenthoodFromRig();
 
-        foreach (Transform child in resetKmeans)
-        {
-            //Next Step button for K-means algorithm containing reset script
-            if(child.gameObject.name == "NextStep")
-            {
-                child.gameObject.GetComponent<KMeansAlgorithm>().resetMe();
-            }
-        }
-
+        resetKmeans.GetComponent<KMeansAlgorithm>().ResetMe();
+        resetDBScan.GetComponent<DBScanAlgorithm>().ResetMe();
+        
         vizLength = typeOfVisualization.Length;
         cubes = FindObject(Scatterplot, "DataSpace");
         pies = FindObject(Scatterplot, "PieChartCtrl");

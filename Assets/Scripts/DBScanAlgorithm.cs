@@ -7,6 +7,7 @@ public class DBScanAlgorithm : MonoBehaviour {
     public int minPts;
 
     public Transform scatterplot;
+    public GameObject resetKMeans;
 
     //current data points visualisation
     private GameObject dataVisuals;
@@ -26,7 +27,6 @@ public class DBScanAlgorithm : MonoBehaviour {
     //material for the mesh
     public Material material;
 
-
     private List<List<GameObject>> neighbours;
     private List<GameObject> corePoints;
 
@@ -37,7 +37,7 @@ public class DBScanAlgorithm : MonoBehaviour {
         clusterID = 1;
         UNCLASSIFIED = 0;
         NOISE = -1;
-        epsilon = 0.025f;
+        epsilon = 0.05f;
         minPts = 3;
         corePoints = new List<GameObject>();
         neighbours = new List<List<GameObject>>();
@@ -45,7 +45,6 @@ public class DBScanAlgorithm : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-
     }
 
     public void StartDBSCAN()
@@ -53,11 +52,12 @@ public class DBScanAlgorithm : MonoBehaviour {
         if(counter == 0)
         {
             AssignDataPoints();
+            ShuffleDataPoints();
             counter++;
         }
         if(dataPoints.Count == 0)
         {
-            Debug.Log("DBScan finished in " + clusterID.ToString() + " steps!");
+            Debug.Log("DBScan finished in " + (clusterID - 1).ToString() + " steps!");
         }
         else
         {//check if there are any neighbours to expand, before trying to find another cluster
@@ -179,37 +179,37 @@ public class DBScanAlgorithm : MonoBehaviour {
                 {
                     dataPoints.Add(obj.gameObject);
                 }
-                return;
+                break;
             }
 
             else if (child.gameObject.name == "PieChartCtrl" && child.gameObject.activeSelf)
             {
                 dataVisuals = child.gameObject;
-                foreach (GameObject obj in dataVisuals.transform)
+                foreach (Transform obj in dataVisuals.transform)
                 {
-                    dataPoints.Add(obj);
+                    dataPoints.Add(obj.gameObject);
                 }
-                return;
+                break;
             }
 
             else if (child.gameObject.name == "Triangle" && child.gameObject.activeSelf)
             {
                 dataVisuals = child.gameObject;
-                foreach (GameObject obj in dataVisuals.transform)
+                foreach (Transform obj in dataVisuals.transform)
                 {
-                    dataPoints.Add(obj);
+                    dataPoints.Add(obj.gameObject);
                 }
-                return;
+                break;
             }
 
             else if (child.gameObject.name == "Tetrahedron" && child.gameObject.activeSelf)
             {
                 dataVisuals = child.gameObject;
-                foreach (GameObject obj in dataVisuals.transform)
+                foreach (Transform obj in dataVisuals.transform)
                 {
-                    dataPoints.Add(obj);
+                    dataPoints.Add(obj.gameObject);
                 }
-                return;
+                break;
             }
         }
     }
@@ -234,5 +234,36 @@ public class DBScanAlgorithm : MonoBehaviour {
     {
         Vector3 vector = new Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
         return Mathf.Sqrt(vector.x * vector.x + vector.y * vector.y + vector.z * vector.z);
+    }
+
+    public void ResetMe()
+    {
+        if(dataVisuals !=null)
+        {
+            foreach (Transform obj in dataVisuals.transform)
+            {
+                obj.GetComponent<DBScanProperties>().ResetPoint();
+            }
+        }
+        clusterID = 1;
+        corePoints = new List<GameObject>();
+        neighbours = new List<List<GameObject>>();
+        dataPoints = new List<GameObject>();
+        counter = 0;
+    }
+
+    private void ShuffleDataPoints()
+    {
+
+        System.Random rng = new System.Random();
+        int n = dataPoints.Count;
+        while (n > 1)
+        {
+            n--;
+            int k = rng.Next(n + 1);
+            GameObject value = dataPoints[k];
+            dataPoints[k] = dataPoints[n];
+            dataPoints[n] = value;
+        }
     }
 }

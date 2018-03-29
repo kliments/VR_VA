@@ -5,6 +5,7 @@ using UnityEngine;
 public class KMeansAlgorithm : MonoBehaviour {
 
     public Transform scatterplot;
+    public GameObject resetDBScan;
     public GameObject sphere;
     private GameObject dataVisuals;
     public GameObject kMeansFinishedPlane;
@@ -100,7 +101,7 @@ public class KMeansAlgorithm : MonoBehaviour {
                 newPos[i] = spheres[i].transform.localPosition;
             }
             //if all are true, the IF statement won't happen again
-            allInPlace = allAreTrue(hasArrived);
+            allInPlace = AllAreTrue(hasArrived);
         }
 
         //check whether best clustering is found and execute code inside if yes
@@ -129,7 +130,7 @@ public class KMeansAlgorithm : MonoBehaviour {
                 }
             }
 
-            if(allAreTrue(numberOfPoints) && allAreTrue(posOfSpheres))
+            if(AllAreTrue(numberOfPoints) && AllAreTrue(posOfSpheres))
             {
                 Debug.Log("K-means clustering is finished in " + counter.ToString() + " steps!");
                 kMeansFinishedPlane.SetActive(true);
@@ -146,6 +147,7 @@ public class KMeansAlgorithm : MonoBehaviour {
         //only generate spheres the first time;
         if (counter == 0)
         {
+            resetDBScan.GetComponent<DBScanAlgorithm>().ResetMe();
             SetSizeOfArrays(nrOfSpheres);
             GenerateRandomSpheres();
             spheres = GameObject.FindGameObjectsWithTag("sphere");
@@ -421,7 +423,7 @@ public class KMeansAlgorithm : MonoBehaviour {
         }
     }
 
-    public void resetMe()
+    public void ResetMe()
     {
         ground.GetComponent<SetToGround>().rigPosReset = true;
         ground.GetComponent<SetToGround>().RemoveParenthoodFromRig();
@@ -438,20 +440,24 @@ public class KMeansAlgorithm : MonoBehaviour {
             }
             else
             {
-                //if(spheres[s] != null)
-                //{
-                    Destroy(spheres[s]);
-                //}
+                Destroy(spheres[s]);
             }
         }
-
+        if(dataVisuals != null)
+        {
+            foreach (Transform child in dataVisuals.transform)
+            {
+                child.GetComponent<MeshRenderer>().material.color = child.GetComponent<PreviousStepProperties>().originalColor;
+                child.GetComponent<PreviousStepProperties>().colorList = new List<Color>();
+            }
+        }
         changeColors = true;
         repositionSpheres = false;
         prevChangeColors = false;
         prevReposSpheres = false;
     }
 
-    public bool allAreTrue(bool[] array)
+    public bool AllAreTrue(bool[] array)
     {
         for (int i = 0; i < array.Length; i++)
         {

@@ -24,7 +24,8 @@ public class datasetChangerScript : MonoBehaviour
     public bool isSelected;
     public bool isHovered = false;
 
-    public Transform resetKmeans;
+    public GameObject resetKmeans;
+    public GameObject resetDBScan;
     public GameObject ground;
     private Animator anim;
 
@@ -32,14 +33,11 @@ public class datasetChangerScript : MonoBehaviour
     {
         ground.GetComponent<SetToGround>().rigPosReset = true;
         ground.GetComponent<SetToGround>().RemoveParenthoodFromRig();
-        //Next Step button for K-means algorithm containing reset script
-        foreach (Transform child in resetKmeans)
-        {
-            if(child.gameObject.name == "NextStep")
-            {
-                child.gameObject.GetComponent<KMeansAlgorithm>().resetMe();
-            }
-        }
+        //Reset the K-means algorithm in case the dataset is changed
+        resetKmeans.GetComponent<KMeansAlgorithm>().ResetMe();
+
+        //Reset the DBScan algorithm in case the dataset is changed
+        resetDBScan.GetComponent<DBScanAlgorithm>().ResetMe();
 
         scatterplot = GameObject.Find("ScatterplotElements");
         cubes = FindObject(scatterplot, "DataSpace");
@@ -90,10 +88,26 @@ public class datasetChangerScript : MonoBehaviour
         {
             if(child.name == "parentKmeans")
             {
-                resetKmeans = child;
-                break;
+                foreach(Transform childOfChild in child)
+                {
+                    if(childOfChild.name == "NextStep")
+                    {
+                        resetKmeans = childOfChild.gameObject;
+                    }
+                }
+            }
+            else if(child.name == "ParentDBSCAN")
+            {
+                foreach (Transform childOfChild in child)
+                {
+                    if (childOfChild.name == "DBNextStep")
+                    {
+                        resetDBScan = childOfChild.gameObject;
+                    }
+                }
             }
         }
+        Debug.Log("print sth");
     }
 
     public void initText() { 
