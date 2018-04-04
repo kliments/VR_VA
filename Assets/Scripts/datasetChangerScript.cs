@@ -90,7 +90,7 @@ public class datasetChangerScript : MonoBehaviour
             {
                 foreach(Transform childOfChild in child)
                 {
-                    if(childOfChild.name == "NextStep")
+                    if(childOfChild.name == "KMeansNextStep")
                     {
                         resetKmeans = childOfChild.gameObject;
                     }

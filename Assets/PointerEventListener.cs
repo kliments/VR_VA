@@ -315,54 +315,79 @@ public LayerMask layersToIgnoreAdd = Physics.IgnoreRaycastLayer;
     /// <param name="selectedObject">Creates new </param>
     private void selectDataMode(GameObject selectedObject)
     {
-
+        //change the dataset
         if (selectedObject.tag == "WallChooser")
         {
             selectedObject.GetComponent<datasetChangerScript>().startTargetedAction();
         }
-
+        //change the visualisation
         else if(selectedObject.tag == "VisChooser")
         {
             selectedObject.GetComponent<VisualizationChangerScript>().startSelectedAction();
         }
-
-        else if (selectedObject.name == "NextStep")
+        //start K-Means algorithm
+        else if (selectedObject.name == "KMeansNextStep")
         {
             selectedObject.GetComponent<KMeansAlgorithm>().StartAlgorithm();
         }
-
-        else if(selectedObject.name == "PreviousStep")
+        //previous step of K-Means algorithm
+        else if(selectedObject.name == "KMeansPrevStep")
         {
             selectedObject.GetComponent<PreviousStep>().obj.GetComponent<KMeansAlgorithm>().PreviousStep();
         }
-
-        else if (selectedObject.name == "Play")
+        //Play K-Means algorithm automatically
+        else if (selectedObject.name == "KMeansPlay")
         {
             selectedObject.GetComponent<PlayScript>().buttonWasPressed = true;
         }
-
-        else if (selectedObject.name == "Increase")
+        //Increase the number of spheres for K-Means
+        else if (selectedObject.name == "IncreaseSpheres")
         {
-            selectedObject.GetComponent<IncreaseDecrease>().kMeans.GetComponent<KMeansAlgorithm>().ResetMe();
-            selectedObject.GetComponent<IncreaseDecrease>().kMeans.GetComponent<KMeansAlgorithm>().nrOfSpheres++;
+            selectedObject.GetComponent<IncreaseDecrease>().IncreaseNrSpheres();
+        }
+        //Decrease the spheres for K-Means
+        else if (selectedObject.name == "DecreaseSpheres")
+        {
+            selectedObject.GetComponent<IncreaseDecrease>().DecreaseNrSpheres();
         }
 
-        else if (selectedObject.name == "Decrease")
+        //Start DBSCAN algorithm
+        else if (selectedObject.name == "DBNextStep")
         {
-            selectedObject.GetComponent<IncreaseDecrease>().kMeans.GetComponent<KMeansAlgorithm>().ResetMe();
-            selectedObject.GetComponent<IncreaseDecrease>().kMeans.GetComponent<KMeansAlgorithm>().nrOfSpheres--;
+            selectedObject.GetComponent<DBScanAlgorithm>().StartDBSCAN();
+        }
+        //Increase epsilon value
+        else if(selectedObject.name == "IncreaseEpsilon")
+        {
+            selectedObject.GetComponent<IncreaseDecrease>().IncreaseEpsilon();
+        }
+        //Decrease epsilon value
+        else if (selectedObject.name == "DecreaseEpsilon")
+        {
+            selectedObject.GetComponent<IncreaseDecrease>().DecreaseEpsilon();
+        }
+        //Increase minPts value
+        else if (selectedObject.name == "IncreaseMinPts")
+        {
+            selectedObject.GetComponent<IncreaseDecrease>().IncreaseMinPts();
+        }
+        //Decrease minPts value
+        else if (selectedObject.name == "DecreaseMinPts")
+        {
+            selectedObject.GetComponent<IncreaseDecrease>().DecreaseMinPts();
         }
 
+        //Reload the whole scene
         else if (selectedObject.name == "Reset")
         {
             SceneManager.LoadScene("MainScene");
         }
-
+        //Position the player back on the ground
         else if (selectedObject.name == "Ground")
         {
             selectedObject.GetComponent<SetToGround>().rigPosReset = true;
         }
-
+        //Position the player on the sphere
         else if(selectedObject.tag == "sphere")
         {
             selectedObject.GetComponent<MoveCameraToSphere>().calculate = true;
@@ -371,14 +396,17 @@ public LayerMask layersToIgnoreAdd = Physics.IgnoreRaycastLayer;
 
         else if (selectedObject.tag == "DataButton")
         {
+            //Show/Hide the dataset buttons
             if(selectedObject.name == "Datasets")
             {
                 selectedObject.GetComponent<ShowHideDatasets>().Toggle();
             }
+            //Show/Hide the visualzation buttons
             else if (selectedObject.name == "Viz Techniques")
             {
                 selectedObject.GetComponent<ShowHideVisualizations>().Toggle();
             }
+            //Show/Hide the algorithm buttons
             else if (selectedObject.name == "Algorithms")
             {
                 selectedObject.GetComponent<ShowHideAlgorithms>().Toggle();
@@ -387,19 +415,16 @@ public LayerMask layersToIgnoreAdd = Physics.IgnoreRaycastLayer;
 
         else if(selectedObject.tag == "AlgorithmButton")
         {
+            //Show/Hide the K-Means buttons
             if(selectedObject.name == "K-Means")
             {
                 selectedObject.GetComponent<ShowHideKMeansButtons>().Toggle();
             }
+            //Show/Hide the DBSCAN buttons
             else if(selectedObject.name == "DBScan")
             {
                 selectedObject.GetComponent<ShowHideDBSCANAlgorithm>().Toggle();
             }
-        }
-
-        else if(selectedObject.name == "DBNextStep")
-        {
-            selectedObject.GetComponent<DBScanAlgorithm>().StartDBSCAN();
         }
 
     }

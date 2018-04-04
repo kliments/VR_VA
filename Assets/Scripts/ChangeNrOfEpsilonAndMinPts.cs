@@ -21,6 +21,7 @@ public class ChangeNrOfEpsilonAndMinPts : MonoBehaviour {
     {
         epsilon = dbscan.GetComponent<DBScanAlgorithm>().epsilon;
         minPts = dbscan.GetComponent<DBScanAlgorithm>().minPts;
+        epsilon = (float)System.Math.Round(epsilon, 2);
         textMeshEpsilon.text = "ε: " + epsilon.ToString();
         textMeshMinPts.text = "minPts: " + minPts.ToString();
     }

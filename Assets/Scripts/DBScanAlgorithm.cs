@@ -57,7 +57,7 @@ public class DBScanAlgorithm : MonoBehaviour {
         }
         if(dataPoints.Count == 0)
         {
-            Debug.Log("DBScan finished in " + (clusterID - 1).ToString() + " steps!");
+            Debug.Log("DBScan finished in " + NrOfClusters(dataVisuals.transform).ToString() + " steps!");
         }
         else
         {//check if there are any neighbours to expand, before trying to find another cluster
@@ -265,5 +265,18 @@ public class DBScanAlgorithm : MonoBehaviour {
             dataPoints[k] = dataPoints[n];
             dataPoints[n] = value;
         }
+    }
+
+    private int NrOfClusters(Transform list)
+    {
+        int clusters = 0; ;
+        foreach(Transform obj in list)
+        {
+            if(clusters < obj.GetComponent<DBScanProperties>().clusterID)
+            {
+                clusters = obj.GetComponent<DBScanProperties>().clusterID;
+            }
+        }
+        return clusters;
     }
 }

@@ -73,6 +73,9 @@ public class KMeansAlgorithm : MonoBehaviour {
     public List<Vector3[]> stepPositions = new List<Vector3[]>();
 
     public GameObject ground;
+
+    //Used for reset, in case the Play button was pressed
+    public GameObject play;
     // Use this for initialization
     void Start () {
 
@@ -427,7 +430,7 @@ public class KMeansAlgorithm : MonoBehaviour {
     {
         ground.GetComponent<SetToGround>().rigPosReset = true;
         ground.GetComponent<SetToGround>().RemoveParenthoodFromRig();
-
+        play.GetComponent<PlayScript>().buttonWasPressed = false;
         movedSteps = 0;
         bestClusterFound = false;
         counter = 0;
