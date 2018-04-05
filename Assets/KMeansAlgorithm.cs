@@ -431,6 +431,7 @@ public class KMeansAlgorithm : MonoBehaviour {
         ground.GetComponent<SetToGround>().rigPosReset = true;
         ground.GetComponent<SetToGround>().RemoveParenthoodFromRig();
         play.GetComponent<PlayScript>().buttonWasPressed = false;
+        play.GetComponent<PlayScript>().StopRoutine();
         movedSteps = 0;
         bestClusterFound = false;
         counter = 0;

@@ -31,6 +31,9 @@ public class DBScanAlgorithm : MonoBehaviour {
     private List<GameObject> corePoints;
 
     public int clusterID, UNCLASSIFIED, NOISE;
+
+    public bool allClustersFound;
+    public GameObject playRoutine;
     // Use this for initialization
     void Start () {
         counter = 0;
@@ -41,6 +44,7 @@ public class DBScanAlgorithm : MonoBehaviour {
         minPts = 3;
         corePoints = new List<GameObject>();
         neighbours = new List<List<GameObject>>();
+        allClustersFound = false;
     }
 	
 	// Update is called once per frame
@@ -58,6 +62,9 @@ public class DBScanAlgorithm : MonoBehaviour {
         if(dataPoints.Count == 0)
         {
             Debug.Log("DBScan finished in " + NrOfClusters(dataVisuals.transform).ToString() + " steps!");
+            dbscanFinishedPlane.transform.GetChild(0).gameObject.GetComponent<TextMesh>().text = NrOfClusters(dataVisuals.transform).ToString() + " clusters found!";
+            dbscanFinishedPlane.SetActive(true);
+            allClustersFound = true;
         }
         else
         {//check if there are any neighbours to expand, before trying to find another cluster
@@ -250,6 +257,10 @@ public class DBScanAlgorithm : MonoBehaviour {
         neighbours = new List<List<GameObject>>();
         dataPoints = new List<GameObject>();
         counter = 0;
+        allClustersFound = false;
+        playRoutine.GetComponent<DBScanPlay>().play = false;
+        playRoutine.GetComponent<DBScanPlay>().StopRoutine();
+        dbscanFinishedPlane.SetActive(false);
     }
 
     private void ShuffleDataPoints()

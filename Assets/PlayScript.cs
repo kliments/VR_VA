@@ -26,7 +26,12 @@ public class PlayScript : MonoBehaviour {
     void StartRoutine()
     {
         //call the KMeansAlgorithm script every 1 seconds from the nextStepObj
-        StartCoroutine(KMeansRepeat());
+        StartCoroutine("KMeansRepeat");
+    }
+    
+    public void StopRoutine()
+    {
+        StopCoroutine("KMeansRepeat");
     }
 
     IEnumerator KMeansRepeat()
@@ -38,6 +43,6 @@ public class PlayScript : MonoBehaviour {
             nextStepObj.GetComponent<KMeansAlgorithm>().StartAlgorithm();
             yield return new WaitForSeconds(0.1f);
         }
-
     }
+    
 }

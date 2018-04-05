@@ -376,6 +376,10 @@ public LayerMask layersToIgnoreAdd = Physics.IgnoreRaycastLayer;
         {
             selectedObject.GetComponent<IncreaseDecrease>().DecreaseMinPts();
         }
+        else if (selectedObject.name == "DBScanPlay")
+        {
+            selectedObject.GetComponent<DBScanPlay>().play = true;
+        }
 
         //Reload the whole scene
         else if (selectedObject.name == "Reset")

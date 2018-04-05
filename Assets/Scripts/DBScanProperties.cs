@@ -18,7 +18,6 @@ public class DBScanProperties : MonoBehaviour {
     private Vector3 pos;
     private float radius;
     private Color color;
-    
     // Use this for initialization
     void Start () {
         //starting radius to increase till epsilon
