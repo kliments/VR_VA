@@ -10,7 +10,7 @@ public class KMeansAlgorithm : MonoBehaviour {
     private GameObject dataVisuals;
     public GameObject kMeansFinishedPlane;
     public List<Color> spheresColor;
-    private GameObject[] spheres;
+    private List<GameObject> spheres;
 
     //offset for X and Z values, because the 0 coordinates of the local position from each data point is shifted from their parent to x=-0,581 and z=-0,63
     private float xOffset = 0.581f;
@@ -153,7 +153,7 @@ public class KMeansAlgorithm : MonoBehaviour {
             resetDBScan.GetComponent<DBScanAlgorithm>().ResetMe();
             SetSizeOfArrays(nrOfSpheres);
             GenerateRandomSpheres();
-            spheres = GameObject.FindGameObjectsWithTag("sphere");
+            //spheres.AddRange(GameObject.FindGameObjectsWithTag("sphere"));
             Vector3[] copy1 = new Vector3[nrOfSpheres];
 
             for (int oP = 0; oP < nrOfSpheres; oP++)
@@ -172,11 +172,12 @@ public class KMeansAlgorithm : MonoBehaviour {
             {
                 newTotal[nT] = 0;
             }
+            counter++;
 
         }
 
         //if the next step is to change the colors of the data points related to the closest sphere
-        if (changeColors && allInPlace)
+        else if (changeColors && allInPlace)
         {
             ChangePointsColors();
             changeColors = false;
@@ -202,7 +203,7 @@ public class KMeansAlgorithm : MonoBehaviour {
 
     public void PreviousStep()
     {
-        if (movedSteps < 1 || counter<=0)
+        if (counter <= 1 || movedSteps < 0)
         {
             return;
         }
@@ -277,6 +278,7 @@ public class KMeansAlgorithm : MonoBehaviour {
 
             else if(prevChangeColors)
             {
+                //if it has more than one color
                 if (child.gameObject.GetComponent<PreviousStepProperties>().colorList.Count >= 2)
                     {
                         child.gameObject.GetComponent<PreviousStepProperties>().colorList.RemoveAt(child.gameObject.GetComponent<PreviousStepProperties>().colorList.Count - 1);
@@ -353,7 +355,7 @@ public class KMeansAlgorithm : MonoBehaviour {
         {
             dataPoints[a] = new List<GameObject>();
         }
-        spheres = new GameObject[i];
+        spheres = new List<GameObject>();
         distance = new float[i];
         newPos = new Vector3[i];
         oldPos = new Vector3[i];
@@ -375,7 +377,7 @@ public class KMeansAlgorithm : MonoBehaviour {
         {
             GameObject newSphere = Instantiate(sphere, scatterplot);
 
-            spheres[i] = newSphere;
+            spheres.Add(newSphere);
             //for X and Z it has to be between -0.6 and 0.6, cause coordinate 0.0 is in the center but not in the begining of the scatterplot (its shifted)
             Vector3 position = new Vector3(UnityEngine.Random.Range(-0.6f, 0.6f), UnityEngine.Random.Range(0.2f, 0.8f), UnityEngine.Random.Range(-0.6f, 0.6f));
             newSphere.transform.localPosition = position;
@@ -438,13 +440,15 @@ public class KMeansAlgorithm : MonoBehaviour {
         kMeansFinishedPlane.SetActive(false);
         for(int s = 0; s < nrOfSpheres; s++)
         {
-            if (spheres == null)
+            if (spheres == null || spheres.Count == 0)
             {
                 break;
             }
             else
             {
-                Destroy(spheres[s]);
+                GameObject temp = spheres[0];
+                spheres.RemoveAt(0);
+                Destroy(temp);
             }
         }
         if(dataVisuals != null)

@@ -7,6 +7,7 @@ public class DBScanProperties : MonoBehaviour {
     
     public int UNCLASSIFIED = 0;
     public int NOISE = -1;
+    public bool drawMeshAround;
     public int clusterID;
     public float epsilon;
     public Mesh mesh;
@@ -21,6 +22,7 @@ public class DBScanProperties : MonoBehaviour {
     // Use this for initialization
     void Start () {
         //starting radius to increase till epsilon
+        drawMeshAround = false;
         radius = 0f;
         layerMask = LayerMask.NameToLayer("Environment");
         mesh = new Mesh();
@@ -29,7 +31,7 @@ public class DBScanProperties : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if(clusterID>0)
+		if(drawMeshAround)
         {
             pos = transform.position;
             if(dbScanButton == null)
@@ -154,12 +156,13 @@ public class DBScanProperties : MonoBehaviour {
         gameObject.GetComponent<MeshRenderer>().material.color = dbScanButton.GetComponent<DBScanAlgorithm>().pointsColor[clusterID - 1];
         //material.CopyPropertiesFromMaterial(refMat);
         color = gameObject.GetComponent<MeshRenderer>().material.color;
-        color.a = 0.1f;
+        color.a = 0.05f;
         refMat.color = color;
     }
 
     public void ResetPoint()
     {
+        drawMeshAround = false;
         radius = 0f;
         clusterID = UNCLASSIFIED;
         mesh.Clear();

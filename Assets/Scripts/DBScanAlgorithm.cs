@@ -53,9 +53,11 @@ public class DBScanAlgorithm : MonoBehaviour {
 
     public void StartDBSCAN()
     {
+        //happens only once, in the beginning
         if(counter == 0)
         {
             AssignDataPoints();
+            PaintAllWhite();
             ShuffleDataPoints();
             counter++;
         }
@@ -88,6 +90,11 @@ public class DBScanAlgorithm : MonoBehaviour {
 
                     else
                     {
+                        dataPoint.GetComponent<DBScanProperties>().epsilon = epsilon;
+                        dataPoint.GetComponent<DBScanProperties>().clusterID = clusterID;
+                        dataPoint.GetComponent<DBScanProperties>().drawMeshAround = true;
+
+                        List<GameObject> temp = new List<GameObject>();
                         for (int i = 0; i < corePoints.Count; i++)
                         {
                             if (corePoints[i].GetComponent<DBScanProperties>() == null)
@@ -96,30 +103,12 @@ public class DBScanAlgorithm : MonoBehaviour {
                             }
                             corePoints[i].GetComponent<DBScanProperties>().epsilon = epsilon;
                             corePoints[i].GetComponent<DBScanProperties>().clusterID = clusterID;
-                            //corePoints[i].GetComponent<DBScanProperties>().mesh = mesh;
+                            corePoints[i].GetComponent<MeshRenderer>().material.color = pointsColor[clusterID - 1];
                             corePoints[i].GetComponent<DBScanProperties>().refMat.CopyPropertiesFromMaterial(material);
+                            temp.Add(corePoints[i]);
                             dataPoints.Remove(corePoints[i]);
                         }
                         corePoints.Remove(dataPoint);
-                        List<GameObject> temp = new List<GameObject>();
-                        while (corePoints.Count > 0)
-                        {
-                            GameObject currentPoint = corePoints[0];
-                            List<GameObject> result = RegionQuery(currentPoint, epsilon);
-                            foreach (GameObject obj in result)
-                            {
-                                if (obj.GetComponent<DBScanProperties>().clusterID == UNCLASSIFIED || obj.GetComponent<DBScanProperties>().clusterID == NOISE)
-                                {
-                                    temp.Add(obj);
-                                    obj.GetComponent<DBScanProperties>().clusterID = clusterID;
-                                    obj.GetComponent<DBScanProperties>().epsilon = epsilon;
-                                    //obj.GetComponent<DBScanProperties>().mesh = mesh;
-                                    obj.GetComponent<DBScanProperties>().refMat.CopyPropertiesFromMaterial(material);
-                                    dataPoints.Remove(obj);
-                                }
-                            }
-                            corePoints.Remove(currentPoint);
-                        }
                         neighbours.Add(temp);
                     }
                 }
@@ -134,6 +123,9 @@ public class DBScanAlgorithm : MonoBehaviour {
                 while (currentNeighbours.Count > 0)
                 {
                     GameObject currentPoint = currentNeighbours[0];
+                    currentPoint.GetComponent<DBScanProperties>().epsilon = epsilon;
+                    currentPoint.GetComponent<DBScanProperties>().clusterID = clusterID;
+                    currentPoint.GetComponent<DBScanProperties>().drawMeshAround = true;
                     List<GameObject> result = RegionQuery(currentPoint, epsilon);
                     if (result.Count > 0)
                     {
@@ -143,7 +135,7 @@ public class DBScanAlgorithm : MonoBehaviour {
                             {
                                 obj.GetComponent<DBScanProperties>().epsilon = epsilon;
                                 obj.GetComponent<DBScanProperties>().clusterID = clusterID;
-                                //obj.GetComponent<DBScanProperties>().mesh = mesh;
+                                obj.GetComponent<MeshRenderer>().material.color = pointsColor[clusterID - 1];
                                 obj.GetComponent<DBScanProperties>().refMat.CopyPropertiesFromMaterial(material);
                                 temp.Add(obj);
                                 dataPoints.Remove(obj);
@@ -229,7 +221,7 @@ public class DBScanAlgorithm : MonoBehaviour {
         List<GameObject> nghbrs = new List<GameObject>();
         foreach(Transform child in dataVisuals.transform)
         {
-            if (Distance(child.transform.position, obj.transform.position) <= epsilon)
+            if (Distance(child.transform.position, obj.transform.position) <= epsilon && child.gameObject.GetComponent<DBScanProperties>().clusterID <= 0)
             {
                 nghbrs.Add(child.gameObject);
             }
@@ -275,6 +267,14 @@ public class DBScanAlgorithm : MonoBehaviour {
             GameObject value = dataPoints[k];
             dataPoints[k] = dataPoints[n];
             dataPoints[n] = value;
+        }
+    }
+
+    private void PaintAllWhite()
+    {
+        foreach(GameObject obj in dataPoints)
+        {
+            obj.GetComponent<MeshRenderer>().material.color = Color.white;
         }
     }
 
