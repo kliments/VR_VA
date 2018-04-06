@@ -32,6 +32,8 @@ public class DBScanAlgorithm : MonoBehaviour {
 
     public int clusterID, UNCLASSIFIED, NOISE;
 
+    public bool euclDist;
+
     public bool allClustersFound;
     public GameObject playRoutine;
     // Use this for initialization
@@ -42,6 +44,7 @@ public class DBScanAlgorithm : MonoBehaviour {
         NOISE = -1;
         epsilon = 0.05f;
         minPts = 3;
+        euclDist = false;
         corePoints = new List<GameObject>();
         neighbours = new List<List<GameObject>>();
         allClustersFound = false;
@@ -61,7 +64,7 @@ public class DBScanAlgorithm : MonoBehaviour {
             ShuffleDataPoints();
             counter++;
         }
-        if(dataPoints.Count == 0)
+        if(dataPoints.Count == 0 && neighbours.Count == 0)
         {
             Debug.Log("DBScan finished in " + NrOfClusters(dataVisuals.transform).ToString() + " steps!");
             dbscanFinishedPlane.transform.GetChild(0).gameObject.GetComponent<TextMesh>().text = NrOfClusters(dataVisuals.transform).ToString() + " clusters found!";
@@ -81,7 +84,7 @@ public class DBScanAlgorithm : MonoBehaviour {
                 //process points only once
                 if (dataPoint.gameObject.GetComponent<DBScanProperties>().clusterID == UNCLASSIFIED)
                 {
-                    corePoints = RegionQuery(dataPoint, epsilon);
+                    corePoints = RegionQuery(dataPoint, epsilon, euclDist);
                     if (corePoints.Count < minPts) //no core point
                     {
                         dataPoint.GetComponent<DBScanProperties>().clusterID = NOISE;
@@ -115,7 +118,7 @@ public class DBScanAlgorithm : MonoBehaviour {
                 dataPoints.Remove(dataPoint);
             }
 
-            //explore the neighbours, and their neighbours, and so on..
+            //explore the neighbours' neighbours
             else
             {
                 List<GameObject> currentNeighbours = neighbours[0];
@@ -126,7 +129,7 @@ public class DBScanAlgorithm : MonoBehaviour {
                     currentPoint.GetComponent<DBScanProperties>().epsilon = epsilon;
                     currentPoint.GetComponent<DBScanProperties>().clusterID = clusterID;
                     currentPoint.GetComponent<DBScanProperties>().drawMeshAround = true;
-                    List<GameObject> result = RegionQuery(currentPoint, epsilon);
+                    List<GameObject> result = RegionQuery(currentPoint, epsilon, euclDist);
                     if (result.Count > 0)
                     {
                         foreach (GameObject obj in result)
@@ -171,7 +174,7 @@ public class DBScanAlgorithm : MonoBehaviour {
         foreach(Transform child in scatterplot)
         {
             //Finding the current visualization
-            if (child.gameObject.name == "DataSpace" && child.gameObject.activeSelf)
+            if (child.gameObject.tag == "coordinatesData" && child.gameObject.activeSelf)
             {
                 dataVisuals = child.gameObject;
                 foreach(Transform obj in dataVisuals.transform)
@@ -180,59 +183,48 @@ public class DBScanAlgorithm : MonoBehaviour {
                 }
                 break;
             }
-
-            else if (child.gameObject.name == "PieChartCtrl" && child.gameObject.activeSelf)
-            {
-                dataVisuals = child.gameObject;
-                foreach (Transform obj in dataVisuals.transform)
-                {
-                    dataPoints.Add(obj.gameObject);
-                }
-                break;
-            }
-
-            else if (child.gameObject.name == "Triangle" && child.gameObject.activeSelf)
-            {
-                dataVisuals = child.gameObject;
-                foreach (Transform obj in dataVisuals.transform)
-                {
-                    dataPoints.Add(obj.gameObject);
-                }
-                break;
-            }
-
-            else if (child.gameObject.name == "Tetrahedron" && child.gameObject.activeSelf)
-            {
-                dataVisuals = child.gameObject;
-                foreach (Transform obj in dataVisuals.transform)
-                {
-                    dataPoints.Add(obj.gameObject);
-                }
-                break;
-            }
         }
     }
 
-    
-
     //return all neighbours around the data point
-    private List<GameObject> RegionQuery(GameObject obj, float eps)
+    private List<GameObject> RegionQuery(GameObject obj, float eps, bool euclDist)
     {
         List<GameObject> nghbrs = new List<GameObject>();
         foreach(Transform child in dataVisuals.transform)
         {
-            if (Distance(child.transform.position, obj.transform.position) <= epsilon && child.gameObject.GetComponent<DBScanProperties>().clusterID <= 0)
+            if(euclDist)
             {
-                nghbrs.Add(child.gameObject);
+                if (EucledianDistance(child.transform.position, obj.transform.position) <= epsilon && child.gameObject.GetComponent<DBScanProperties>().clusterID <= 0)
+                {
+                    if (child != obj)
+                    {
+                        nghbrs.Add(child.gameObject);
+                    }
+                }
+            }
+            else
+            {
+                if (ManhattanDistance(child.transform.position, obj.transform.position) <= epsilon && child.gameObject.GetComponent<DBScanProperties>().clusterID <= 0)
+                {
+                    if (child != obj)
+                    {
+                        nghbrs.Add(child.gameObject);
+                    }
+                }
             }
         }
         return nghbrs;
     }
 
-    private float Distance(Vector3 a, Vector3 b)
+    private float EucledianDistance(Vector3 a, Vector3 b)
     {
-        Vector3 vector = new Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
+        Vector3 vector = new Vector3(Mathf.Abs(a.x - b.x), Mathf.Abs(a.y - b.y), Mathf.Abs(a.z - b.z));
         return Mathf.Sqrt(vector.x * vector.x + vector.y * vector.y + vector.z * vector.z);
+    }
+
+    private float ManhattanDistance(Vector3 a, Vector3 b)
+    {
+        return (Mathf.Abs(a.x - b.x) + Mathf.Abs(a.y - b.y) + Mathf.Abs(a.z - b.z));
     }
 
     public void ResetMe()

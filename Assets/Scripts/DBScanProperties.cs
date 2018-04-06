@@ -17,13 +17,15 @@ public class DBScanProperties : MonoBehaviour {
     private int layerMask;
     private Vector3[] baseVertices;
     private Vector3 pos;
-    private float radius;
+    private float radiusSphere;
+    private float sizeDiamond;
     private Color color;
     // Use this for initialization
     void Start () {
         //starting radius to increase till epsilon
         drawMeshAround = false;
-        radius = 0f;
+        radiusSphere = 0f;
+        sizeDiamond = 0f;
         layerMask = LayerMask.NameToLayer("Environment");
         mesh = new Mesh();
         refMat = new Material(Shader.Find("Transparent/Bumped Diffuse"));
@@ -38,9 +40,14 @@ public class DBScanProperties : MonoBehaviour {
             {
                 dbScanButton = GameObject.Find("DBNextStep");
             }
-            if (radius < dbScanButton.GetComponent<DBScanAlgorithm>().epsilon)
+            if (radiusSphere < epsilon && dbScanButton.GetComponent<DBScanAlgorithm>().euclDist)
             {
                 GenerateSphere();
+                SetColor();
+            }
+            else if (sizeDiamond < epsilon && !dbScanButton.GetComponent<DBScanAlgorithm>().euclDist)
+            {
+                GenerateManhattanDiamond();
                 SetColor();
             }
             Graphics.DrawMesh(mesh, pos, Quaternion.identity, refMat, layerMask);
@@ -56,7 +63,7 @@ public class DBScanProperties : MonoBehaviour {
     {
         mesh.Clear();
 
-        radius += epsilon/5;
+        radiusSphere += epsilon/5;
         // Longitude |||
         int nbLong = 24;
         // Latitude ---
@@ -67,7 +74,7 @@ public class DBScanProperties : MonoBehaviour {
         float _pi = Mathf.PI;
         float _2pi = _pi * 2f;
 
-        vertices[0] = Vector3.up * radius;
+        vertices[0] = Vector3.up * radiusSphere;
         for (int lat = 0; lat < nbLat; lat++)
         {
             float a1 = _pi * (float)(lat + 1) / (nbLat + 1);
@@ -80,10 +87,10 @@ public class DBScanProperties : MonoBehaviour {
                 float sin2 = Mathf.Sin(a2);
                 float cos2 = Mathf.Cos(a2);
 
-                vertices[lon + lat * (nbLong + 1) + 1] = new Vector3(sin1 * cos2, cos1, sin1 * sin2) * radius;
+                vertices[lon + lat * (nbLong + 1) + 1] = new Vector3(sin1 * cos2, cos1, sin1 * sin2) * radiusSphere;
             }
         }
-        vertices[vertices.Length - 1] = Vector3.up * -radius;
+        vertices[vertices.Length - 1] = Vector3.up * -radiusSphere;
         #endregion
 
         #region Normales		
@@ -151,6 +158,36 @@ public class DBScanProperties : MonoBehaviour {
         mesh.RecalculateBounds();
     }
 
+    private void GenerateManhattanDiamond()
+    {
+        sizeDiamond += epsilon / 5;
+        Vector3 A = new Vector3();
+        Vector3 B = new Vector3();
+        Vector3 C = new Vector3();
+        Vector3 D = new Vector3();
+        Vector3 E = new Vector3();
+        Vector3 F = new Vector3();
+        mesh.Clear();
+
+        #region Vertices
+        A.x -= sizeDiamond;
+        B.y += sizeDiamond;
+        C.x += sizeDiamond;
+        D.y -= sizeDiamond;
+        E.z -= sizeDiamond;
+        F.z += sizeDiamond;
+        Vector3[] vertices = new Vector3[6] { A, B, C, D, E, F };
+        #endregion
+        
+        #region Triangles
+        int[] triangles = new int[24] {0,1,5,4,1,0,4,0,3,0,5,3,5,1,2,2,1,4,5,2,3,2,4,3};
+        #endregion
+
+        mesh.vertices = vertices;
+        mesh.triangles = triangles;
+        mesh.RecalculateBounds();
+    }
+
     private void SetColor()
     {
         gameObject.GetComponent<MeshRenderer>().material.color = dbScanButton.GetComponent<DBScanAlgorithm>().pointsColor[clusterID - 1];
@@ -163,7 +200,8 @@ public class DBScanProperties : MonoBehaviour {
     public void ResetPoint()
     {
         drawMeshAround = false;
-        radius = 0f;
+        radiusSphere = 0f;
+        sizeDiamond = 0f;
         clusterID = UNCLASSIFIED;
         mesh.Clear();
         gameObject.GetComponent<MeshRenderer>().material.color = gameObject.GetComponent<PreviousStepProperties>().originalColor;
