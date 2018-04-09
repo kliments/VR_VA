@@ -356,6 +356,11 @@ public LayerMask layersToIgnoreAdd = Physics.IgnoreRaycastLayer;
         {
             selectedObject.GetComponent<DBScanAlgorithm>().StartDBSCAN();
         }
+        //Go back one step in DBSCAN algorithm
+        else if (selectedObject.name == "DBPreviousStep")
+        {
+            selectedObject.GetComponent<DBPrevious>().dbSCAN.GetComponent<DBScanAlgorithm>().DBBackwards();
+        }
         //Increase epsilon value
         else if(selectedObject.name == "IncreaseEpsilon")
         {

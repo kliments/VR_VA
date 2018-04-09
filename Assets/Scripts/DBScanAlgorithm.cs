@@ -30,9 +30,14 @@ public class DBScanAlgorithm : MonoBehaviour {
     private List<List<GameObject>> neighbours;
     private List<GameObject> corePoints;
 
-    public int clusterID, UNCLASSIFIED, NOISE;
+    public int clusterID, UNCLASSIFIED, NOISE, tempClusterID;
 
+    //Eucledian distance if true, if not then Manhattan
     public bool euclDist;
+
+    //list of steps, used for backward dbscan
+    private List<string> steps;
+    private List<List<GameObject>> processedPoints;
 
     public bool allClustersFound;
     public GameObject playRoutine;
@@ -44,10 +49,12 @@ public class DBScanAlgorithm : MonoBehaviour {
         NOISE = -1;
         epsilon = 0.05f;
         minPts = 3;
-        euclDist = false;
+        euclDist = true;
         corePoints = new List<GameObject>();
         neighbours = new List<List<GameObject>>();
         allClustersFound = false;
+        steps = new List<string>();
+        processedPoints = new List<List<GameObject>>();
     }
 	
 	// Update is called once per frame
@@ -63,13 +70,15 @@ public class DBScanAlgorithm : MonoBehaviour {
             PaintAllWhite();
             ShuffleDataPoints();
             counter++;
+            steps.Add("firstStep");
         }
-        if(dataPoints.Count == 0 && neighbours.Count == 0)
+        else if(dataPoints.Count == 0 && neighbours.Count == 0)
         {
             Debug.Log("DBScan finished in " + NrOfClusters(dataVisuals.transform).ToString() + " steps!");
             dbscanFinishedPlane.transform.GetChild(0).gameObject.GetComponent<TextMesh>().text = NrOfClusters(dataVisuals.transform).ToString() + " clusters found!";
             dbscanFinishedPlane.SetActive(true);
             allClustersFound = true;
+            steps.Add("finish");
         }
         else
         {//check if there are any neighbours to expand, before trying to find another cluster
@@ -84,11 +93,14 @@ public class DBScanAlgorithm : MonoBehaviour {
                 //process points only once
                 if (dataPoint.gameObject.GetComponent<DBScanProperties>().clusterID == UNCLASSIFIED)
                 {
+                    List<GameObject> temp = new List<GameObject>();
                     corePoints = RegionQuery(dataPoint, epsilon, euclDist);
                     if (corePoints.Count < minPts) //no core point
                     {
                         dataPoint.GetComponent<DBScanProperties>().clusterID = NOISE;
                         corePoints = new List<GameObject>();
+                        //necessary for previous steps
+                        steps.Add("noise");
                     }
 
                     else
@@ -96,8 +108,9 @@ public class DBScanAlgorithm : MonoBehaviour {
                         dataPoint.GetComponent<DBScanProperties>().epsilon = epsilon;
                         dataPoint.GetComponent<DBScanProperties>().clusterID = clusterID;
                         dataPoint.GetComponent<DBScanProperties>().drawMeshAround = true;
+                        steps.Add("ptHaveNbrs");
 
-                        List<GameObject> temp = new List<GameObject>();
+                        temp = new List<GameObject>();
                         for (int i = 0; i < corePoints.Count; i++)
                         {
                             if (corePoints[i].GetComponent<DBScanProperties>() == null)
@@ -112,8 +125,12 @@ public class DBScanAlgorithm : MonoBehaviour {
                             dataPoints.Remove(corePoints[i]);
                         }
                         corePoints.Remove(dataPoint);
-                        neighbours.Add(temp);
+                        neighbours.Add(corePoints);
+                        processedPoints.Insert(processedPoints.Count, copyList(corePoints));
                     }
+                    temp = new List<GameObject>();
+                    temp.Add(dataPoint);
+                    processedPoints.Insert(processedPoints.Count, copyList(temp));
                 }
                 dataPoints.Remove(dataPoint);
             }
@@ -122,6 +139,7 @@ public class DBScanAlgorithm : MonoBehaviour {
             else
             {
                 List<GameObject> currentNeighbours = neighbours[0];
+                processedPoints.Insert(processedPoints.Count, copyList(currentNeighbours));
                 List<GameObject> temp = new List<GameObject>();
                 while (currentNeighbours.Count > 0)
                 {
@@ -152,6 +170,8 @@ public class DBScanAlgorithm : MonoBehaviour {
                 if (temp.Count > 0)
                 {
                     neighbours.Add(temp);
+                    processedPoints.Insert(processedPoints.Count, copyList(temp));
+                    steps.Add("haveNbrs");
                 }
                 neighbours.RemoveAt(0);
 
@@ -163,9 +183,89 @@ public class DBScanAlgorithm : MonoBehaviour {
                         Color color = Random.ColorHSV();
                         pointsColor.Add(color);
                     }
+                    steps.Add("noNbrs");
                 }
             }
         }
+    }
+    
+    //Backward step of DBSCAN algorithm
+    public void DBBackwards()
+    {
+        int currentStep = steps.Count - 1;
+        if(steps.Count <=0)
+        {
+            return;
+        }
+        if (steps[currentStep] == "firstStep")
+        {
+            ReturnOriginalColor();
+            counter--;
+            steps.RemoveAt(currentStep);
+        }
+        else if (steps[currentStep] == "noise")
+        {
+            GameObject current = processedPoints[processedPoints.Count - 1][0];
+            current.GetComponent<DBScanProperties>().clusterID = UNCLASSIFIED;
+            current.GetComponent<MeshRenderer>().material.color = Color.white;
+            dataPoints.Insert(0, current);
+            processedPoints.RemoveAt(processedPoints.Count - 1);
+            steps.RemoveAt(currentStep);
+        }
+        else if (steps[currentStep] == "ptHaveNbrs")
+        {
+            GameObject current = processedPoints[processedPoints.Count - 1][0];
+            current.GetComponent<DBScanProperties>().clusterID = UNCLASSIFIED;
+            current.GetComponent<DBScanProperties>().drawMeshAround = false;
+            current.GetComponent<DBScanProperties>().ResetPoint();
+            current.GetComponent<MeshRenderer>().material.color = Color.white;
+            processedPoints.RemoveAt(processedPoints.Count - 1);
+            foreach (GameObject obj in processedPoints[processedPoints.Count -1])
+            {
+                obj.GetComponent<DBScanProperties>().clusterID = UNCLASSIFIED;
+                obj.GetComponent<MeshRenderer>().material.color = Color.white;
+            }
+            dataPoints.Insert(0, current);
+            processedPoints.RemoveAt(processedPoints.Count - 1);
+            steps.RemoveAt(currentStep);
+            neighbours = new List<List<GameObject>>();
+        }
+        else if(steps[currentStep] == "haveNbrs")
+        {
+            foreach (GameObject obj in processedPoints[processedPoints.Count - 1])
+            {
+                obj.GetComponent<DBScanProperties>().clusterID = UNCLASSIFIED;
+                obj.GetComponent<MeshRenderer>().material.color = Color.white;
+            }
+            processedPoints.RemoveAt(processedPoints.Count - 1);
+            foreach (GameObject obj in processedPoints[processedPoints.Count - 1])
+            {
+                tempClusterID = obj.GetComponent<DBScanProperties>().clusterID;
+                obj.GetComponent<DBScanProperties>().ResetPoint();
+                obj.GetComponent<DBScanProperties>().clusterID = tempClusterID;
+                obj.GetComponent<MeshRenderer>().material.color = pointsColor[tempClusterID - 1];
+            }
+            neighbours = new List<List<GameObject>>();
+            neighbours.Add(processedPoints[processedPoints.Count - 1]);
+            processedPoints.RemoveAt(processedPoints.Count - 1);
+            steps.RemoveAt(currentStep);
+        }
+        else if (steps[currentStep] == "noNbrs")
+        {
+            foreach (GameObject obj in processedPoints[processedPoints.Count - 1])
+            {
+                tempClusterID = obj.GetComponent<DBScanProperties>().clusterID;
+                obj.GetComponent<DBScanProperties>().ResetPoint();
+                obj.GetComponent<DBScanProperties>().clusterID = tempClusterID;
+                obj.GetComponent<MeshRenderer>().material.color = pointsColor[tempClusterID - 1];
+            }
+            neighbours = new List<List<GameObject>>();
+            neighbours.Add(processedPoints[processedPoints.Count - 1]);
+            processedPoints.RemoveAt(processedPoints.Count - 1);
+            steps.RemoveAt(currentStep);
+            clusterID--;
+        }
+
     }
 
     //find all datapoints
@@ -245,6 +345,8 @@ public class DBScanAlgorithm : MonoBehaviour {
         playRoutine.GetComponent<DBScanPlay>().play = false;
         playRoutine.GetComponent<DBScanPlay>().StopRoutine();
         dbscanFinishedPlane.SetActive(false);
+        steps = new List<string>();
+        processedPoints = new List<List<GameObject>>();
     }
 
     private void ShuffleDataPoints()
@@ -270,6 +372,14 @@ public class DBScanAlgorithm : MonoBehaviour {
         }
     }
 
+    private void ReturnOriginalColor()
+    {
+        foreach(Transform obj in dataVisuals.transform)
+        {
+            obj.GetComponent<MeshRenderer>().material.color = obj.GetComponent<PreviousStepProperties>().originalColor;
+        }
+    }
+
     private int NrOfClusters(Transform list)
     {
         int clusters = 0; ;
@@ -281,5 +391,11 @@ public class DBScanAlgorithm : MonoBehaviour {
             }
         }
         return clusters;
+    }
+
+    private List<GameObject> copyList(List<GameObject> listToCopy)
+    {
+        List<GameObject> temp = new List<GameObject>(listToCopy);
+        return temp;
     }
 }
