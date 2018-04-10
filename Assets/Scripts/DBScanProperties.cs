@@ -10,9 +10,9 @@ public class DBScanProperties : MonoBehaviour {
     public bool drawMeshAround;
     public int clusterID;
     public float epsilon;
+    //mesh to be drawn
     public Mesh mesh;
     public Material refMat;
-    private Material material;
     public GameObject dbScanButton;
     private int layerMask;
     private Vector3[] baseVertices;
@@ -20,6 +20,7 @@ public class DBScanProperties : MonoBehaviour {
     private float radiusSphere;
     private float sizeDiamond;
     private Color color;
+
     // Use this for initialization
     void Start () {
         //starting radius to increase till epsilon

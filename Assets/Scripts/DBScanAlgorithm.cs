@@ -99,6 +99,7 @@ public class DBScanAlgorithm : MonoBehaviour {
                     {
                         dataPoint.GetComponent<DBScanProperties>().clusterID = NOISE;
                         corePoints = new List<GameObject>();
+                        RemoveWireFrame(dataPoint);
                         //necessary for previous steps
                         steps.Add("noise");
                     }
@@ -160,6 +161,7 @@ public class DBScanAlgorithm : MonoBehaviour {
                                 obj.GetComponent<DBScanProperties>().refMat.CopyPropertiesFromMaterial(material);
                                 temp.Add(obj);
                                 dataPoints.Remove(obj);
+                                AddWireFrame(obj);
                             }
                         }
                     }
@@ -334,6 +336,7 @@ public class DBScanAlgorithm : MonoBehaviour {
             foreach (Transform obj in dataVisuals.transform)
             {
                 obj.GetComponent<DBScanProperties>().ResetPoint();
+                RemoveWireFrame(obj.gameObject);
             }
         }
         clusterID = 1;
@@ -369,6 +372,12 @@ public class DBScanAlgorithm : MonoBehaviour {
         foreach(GameObject obj in dataPoints)
         {
             obj.GetComponent<MeshRenderer>().material.color = Color.white;
+
+            //only for cubes
+            if(obj.name.Contains("Cube"))
+            {
+                AddWireFrame(obj);
+            }
         }
     }
 
@@ -397,5 +406,25 @@ public class DBScanAlgorithm : MonoBehaviour {
     {
         List<GameObject> temp = new List<GameObject>(listToCopy);
         return temp;
+    }
+
+    private void AddWireFrame(GameObject obj)
+    {
+        //line renderer for drawing the Lines on the edges of the cube
+        if (obj.GetComponent<LineRenderer>() == null)
+        {
+            obj.AddComponent<LineRenderer>();
+        }
+        if (obj.GetComponent<DrawWiredCube>() == null)
+        {
+            obj.AddComponent<DrawWiredCube>();
+        }
+        obj.GetComponent<DrawWiredCube>().DrawWire();
+    }
+
+    private void RemoveWireFrame(GameObject obj)
+    {
+        Destroy(obj.GetComponent<LineRenderer>());
+        Destroy(obj.GetComponent<DrawWiredCube>());
     }
 }
