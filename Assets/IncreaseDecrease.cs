@@ -1,11 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class IncreaseDecrease : MonoBehaviour {
 
     public GameObject kMeans;
     public GameObject dbScan;
+    public Text text;
 	// Use this for initialization
 	void Start () {
 		
@@ -20,12 +22,14 @@ public class IncreaseDecrease : MonoBehaviour {
     {
         kMeans.GetComponent<KMeansAlgorithm>().ResetMe();
         kMeans.GetComponent<KMeansAlgorithm>().nrOfSpheres++;
+        text.text = "K: " + kMeans.GetComponent<KMeansAlgorithm>().nrOfSpheres.ToString();
     }
 
     public void DecreaseNrSpheres()
     {
         kMeans.GetComponent<KMeansAlgorithm>().ResetMe();
         kMeans.GetComponent<KMeansAlgorithm>().nrOfSpheres--;
+        text.text = "K: " + kMeans.GetComponent<KMeansAlgorithm>().nrOfSpheres.ToString();
     }
 
     public void IncreaseEpsilon()

@@ -135,7 +135,7 @@ public class VisualizationChangerScript : MonoBehaviour {
                 if(trnglCounter == 0)
                 {
                     trnglCounter++;
-                    triangles.GetComponent<Triangle>().data = myDataset;
+                    triangles.GetComponent<Triangle>().data = data(ChooserElementsContainer);
                     triangles.SetActive(true);
                 }
                 else
@@ -171,7 +171,7 @@ public class VisualizationChangerScript : MonoBehaviour {
                 if(ttrhdrnCounter == 0)
                 {
                     ttrhdrnCounter++;
-                    tetrahedrons.GetComponent<Tetrahedron>().data = myDataset;
+                    tetrahedrons.GetComponent<Tetrahedron>().data = data(ChooserElementsContainer);
                     tetrahedrons.SetActive(true);
                 }
                 else

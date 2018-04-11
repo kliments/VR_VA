@@ -279,6 +279,7 @@ public class DataSpaceHandler : MonoBehaviour
                     }
                 }
                 dataPoint.transform.localPosition = dataPosition;
+                dataPoint.transform.localScale = new Vector3(0.007f, 0.007f, 0.007f);
                 dataPoint.GetComponent<MeshRenderer>().material = dataMappedMaterial;
                 dataPositions.Add(dataPosition);
                 Mesh mesh = dataPoint.GetComponent<MeshFilter>().mesh;

@@ -43,10 +43,10 @@ public class Triangle : MonoBehaviour {
             dummy.AddComponent<TriangleMesh>();
         }
         parent.SetActive(true);
-        if (counterData == 0)
+        /*if (counterData == 0)
         {
             data = FindObjectOfType<datasetChooserWallScript>().datasets[0];
-        }
+        }*/
         
         string[] lines = data.text.Split('\n');
         string[] attr = lines[0].Split(',');

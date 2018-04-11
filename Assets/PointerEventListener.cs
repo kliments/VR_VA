@@ -3,6 +3,7 @@ using System.Collections;
 using VRTK;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 [System.Serializable]
 public class PointerEventListener : MonoBehaviour {
@@ -384,6 +385,12 @@ public LayerMask layersToIgnoreAdd = Physics.IgnoreRaycastLayer;
         else if (selectedObject.name == "DBScanPlay")
         {
             selectedObject.GetComponent<DBScanPlay>().play = true;
+        }
+
+        //Reload the whole scene
+        else if (selectedObject.name == "ShowHideMirror")
+        {
+            selectedObject.GetComponent<ShowHideMirror>().ToggleMirror();
         }
 
         //Reload the whole scene

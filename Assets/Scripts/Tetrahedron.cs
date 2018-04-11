@@ -143,10 +143,10 @@ public class Tetrahedron : MonoBehaviour
         {
             dummy.AddComponent<TetrahedronMesh>();
         }
-        if (counterData == 0)
+        /*if (counterData == 0)
         {
             data = FindObjectOfType<datasetChooserWallScript>().datasets[0];
-        }
+        }*/
 
         string[] lines = data.text.Split('\n');
         string[] attr = lines[0].Split(',');
