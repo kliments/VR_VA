@@ -10,6 +10,7 @@ public class datasetChangerScript : MonoBehaviour
     public GameObject textPrefab;
     public GameObject scatterplot;
     public GameObject spriteGraph;
+    public GameObject buttonText;
 
     private float lastActivation = 0;
     private GameObject myText;
@@ -152,7 +153,7 @@ public class datasetChangerScript : MonoBehaviour
             GetComponent<Animator>().SetBool("selected", false);
         }
 
-        if(isHovered)
+        /*if(isHovered)
         {
             mySprite.SetActive(true);
             isHovered = false;
@@ -160,7 +161,7 @@ public class datasetChangerScript : MonoBehaviour
         else
         {
             mySprite.SetActive(false);
-        }
+        }*/
 	}
 
     public static GameObject FindObject(GameObject parent, string name)
@@ -174,5 +175,11 @@ public class datasetChangerScript : MonoBehaviour
             }
         }
         return null;
+    }
+
+    public void ChangeText(string text)
+    {
+        text = text.Remove(0, 4);
+        buttonText.transform.GetChild(0).GetComponent<Text>().text = text;
     }
 }
