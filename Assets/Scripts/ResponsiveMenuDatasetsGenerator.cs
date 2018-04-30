@@ -5,6 +5,8 @@ using UnityEngine;
 public class ResponsiveMenuDatasetsGenerator : MonoBehaviour {
     public GameObject chooserPrefab;
     public TextAsset[] datasets;
+    public GameObject primaryMenu;
+    public bool datasetPressed;
 
     private float x, y, z;
     private int counter;
@@ -38,18 +40,23 @@ public class ResponsiveMenuDatasetsGenerator : MonoBehaviour {
             if (i == 0)
             {
                 element.GetComponent<Animator>().SetBool("selected", true);
-                element.GetComponent<datasetChangerScript>().isSelected = true;
             }
             else
             {
                 element.GetComponent<Animator>().SetBool("selected", false);
-                element.GetComponent<datasetChangerScript>().isSelected = false;
             }
         }
+        datasetPressed = false;
     }
 	
 	// Update is called once per frame
 	void Update () {
-		
+		if(datasetPressed)
+        {
+            datasetPressed = false;
+            gameObject.SetActive(false);
+            primaryMenu.SetActive(true);
+        }
 	}
+    
 }

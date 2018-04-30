@@ -54,8 +54,8 @@ public class datasetChangerScript : MonoBehaviour
                 d.GetComponent<Animator>().SetBool("selected", false);
                 d.GetComponent<datasetChangerScript>().isSelected = false;
             }
-            this.GetComponent <datasetChangerScript>().isSelected = true;
-            this.GetComponent<Animator>().SetBool("selected", true);
+            isSelected = true;
+            GetComponent<Animator>().SetBool("selected", true);
             anim = GetComponent<Animator>();
             //FindObjectOfType<axisMenueScript>().resetMenue();
             //FindObjectOfType<pcLoaderScript>().resetMe();
@@ -144,7 +144,11 @@ public class datasetChangerScript : MonoBehaviour
 	
 	// Update is called once per frame
 	void Update() {
-	    if(isSelected)
+	}
+
+    private void OnEnable()
+    {
+        if (isSelected)
         {
             GetComponent<Animator>().SetBool("selected", true);
         }
@@ -152,17 +156,7 @@ public class datasetChangerScript : MonoBehaviour
         {
             GetComponent<Animator>().SetBool("selected", false);
         }
-
-        /*if(isHovered)
-        {
-            mySprite.SetActive(true);
-            isHovered = false;
-        }
-        else
-        {
-            mySprite.SetActive(false);
-        }*/
-	}
+    }
 
     public static GameObject FindObject(GameObject parent, string name)
     {

@@ -193,6 +193,11 @@ public class VisualizationChangerScript : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
+
+    }
+
+    private void OnEnable()
+    {
         if (isSelected)
         {
             GetComponent<Animator>().SetBool("selected", true);
@@ -201,7 +206,6 @@ public class VisualizationChangerScript : MonoBehaviour {
         {
             GetComponent<Animator>().SetBool("selected", false);
         }
-
     }
 
     public static GameObject FindObject(GameObject parent, string name)
