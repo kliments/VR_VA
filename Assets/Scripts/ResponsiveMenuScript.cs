@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class ResponsiveMenuScript : MonoBehaviour {
-    public bool isShown;
+    public bool isShown, increaseDecrease;
     SteamVR_TrackedObject trackedObj;
-    SteamVR_Controller.Device device;
-    public GameObject pointer;
-
+    public SteamVR_Controller.Device device;
+    public GameObject pointer, datasetParent;
+    private GameObject currentButton;
     private bool wasTouched;
-    public GameObject datasetParent;
 	// Use this for initialization
 	void Start () {
         isShown = true;
+        increaseDecrease = false;
         trackedObj = transform.parent.GetComponent<SteamVR_TrackedObject>();
         device = SteamVR_Controller.Input((int)trackedObj.index);
     }
@@ -42,10 +42,30 @@ public class ResponsiveMenuScript : MonoBehaviour {
 
             if(device.GetPressDown(SteamVR_Controller.ButtonMask.Touchpad))
             {
+                //only if pointer is at a button
                 if(pointer.GetComponent<PointerScript>().pointerCollides)
                 {
-                    GameObject currentButton = pointer.GetComponent<PointerScript>().collider;
+                    currentButton = pointer.GetComponent<PointerScript>().collider;
                     currentButton.GetComponent<UniversalButtonScript>().Press();
+                }
+            }
+
+            else if(device.GetPress(SteamVR_Controller.ButtonMask.Touchpad))
+            {
+                //only if pointer is at a increase or Decrease button
+                currentButton = pointer.GetComponent<PointerScript>().collider;
+                if(currentButton.tag == "increaseDecrease")
+                {
+                    currentButton.GetComponent<UniversalButtonScript>().Press();
+                }
+            }
+            //cancel all invoke calls for increasing/decreasing
+            else if(device.GetPressUp(SteamVR_Controller.ButtonMask.Touchpad))
+            {
+                if(increaseDecrease)
+                {
+                    increaseDecrease = false;
+                    currentButton.GetComponent<UniversalButtonScript>().CancelAllCalls();
                 }
             }
         }

@@ -9,6 +9,8 @@ public class UniversalButtonScript : MonoBehaviour {
     public bool isHover, isPress, toChange;
     private MeshRenderer meshRenderer;
     public Material onHoverMaterial, defaultMaterial;
+    public ResponsiveMenuScript controller;
+    private GameObject increaseDecreseObj;
 
     // Use this for initialization
 	void Start () {
@@ -19,6 +21,8 @@ public class UniversalButtonScript : MonoBehaviour {
         meshRenderer = GetComponent<MeshRenderer>();
         defaultMaterial = meshRenderer.material;
         onHoverMaterial = Resources.Load("Materials/OnHoverMaterial", typeof(Material)) as Material;
+        controller = (ResponsiveMenuScript)FindObjectOfType(typeof(ResponsiveMenuScript));
+        increaseDecreseObj = new GameObject();
     }
 	
 	// Update is called once per frame
@@ -149,7 +153,32 @@ public class UniversalButtonScript : MonoBehaviour {
             //increase or decrease number of spheres
             if(this.name == "NrOfSpheres")
             {
-                //
+                increaseDecreseObj = this.gameObject;
+                controller.increaseDecrease = true;
+                Vector2 pos = controller.device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
+                if (pos.y >= 0f)
+                {
+                    if (IsInvoking("DecreaseNrSpheres"))
+                    {
+                        CancelInvoke("DecreaseNrSpheres");
+                    }
+
+                    if (!IsInvoking("IncreaseNrSpheres"))
+                    {
+                        InvokeRepeating("IncreaseNrSpheres", 0, 1f);
+                    }
+                }
+                else if (pos.y < 0f)
+                {
+                    if (IsInvoking("IncreaseNrSpheres"))
+                    {
+                        CancelInvoke("IncreaseNrSpheres");
+                    }
+                    if (!IsInvoking("DecreaseNrSpheres"))
+                    {
+                        InvokeRepeating("DecreaseNrSpheres", 0, 1f);
+                    }
+                }
             }
             else if(this.name == "Step Backward")
             {
@@ -169,11 +198,35 @@ public class UniversalButtonScript : MonoBehaviour {
         {
             if(this.name == "epsilon")
             {
-                //
+                increaseDecreseObj = this.gameObject;
+                controller.increaseDecrease = true;
+                Vector2 pos = controller.device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
+                if (pos.y >= 0f)
+                {
+                    if (IsInvoking("DecreaseEpsilon")) CancelInvoke("DecreaseEpsilon");
+                    if (!IsInvoking("IncreaseEpsilon")) InvokeRepeating("IncreaseEpsilon", 0, 1f);
+                }
+                else if (pos.y < 0f)
+                {
+                    if (IsInvoking("IncreaseEpsilon")) CancelInvoke("IncreaseEpsilon");
+                    if (!IsInvoking("DecreaseEpsilon")) InvokeRepeating("DecreaseEpsilon", 0, 1f);
+                }
             }
             else if(this.name == "minPts")
             {
-                //
+                increaseDecreseObj = this.gameObject;
+                controller.increaseDecrease = true;
+                Vector2 pos = controller.device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
+                if (pos.y >= 0f)
+                {
+                    if (IsInvoking("DecreaseMinPts")) CancelInvoke("DecreaseMinPts");
+                    if (!IsInvoking("IncreaseMinPts")) InvokeRepeating("IncreaseMinPts", 0, 1f);
+                }
+                else if (pos.y < 0f)
+                {
+                    if (IsInvoking("IncreaseMinPts")) CancelInvoke("IncreaseMinPts");
+                    if (!IsInvoking("DecreaseMinPts")) InvokeRepeating("DecreaseMinPts", 0, 1f);
+                }
             }
             else if(this.name == "StepBackward")
             {
@@ -189,6 +242,41 @@ public class UniversalButtonScript : MonoBehaviour {
             }
         }
         
+    }
+
+    void IncreaseNrSpheres()
+    {
+        increaseDecreseObj.GetComponent<IncreaseDecrease>().IncreaseNrSpheres();
+    }
+
+    void DecreaseNrSpheres()
+    {
+        increaseDecreseObj.GetComponent<IncreaseDecrease>().DecreaseNrSpheres();
+    }
+
+    void IncreaseEpsilon()
+    {
+        increaseDecreseObj.GetComponent<IncreaseDecrease>().IncreaseEpsilon();
+    }
+
+    void DecreaseEpsilon()
+    {
+        increaseDecreseObj.GetComponent<IncreaseDecrease>().DecreaseEpsilon();
+    }
+
+    void IncreaseMinPts()
+    {
+        increaseDecreseObj.GetComponent<IncreaseDecrease>().IncreaseMinPts();
+    }
+
+    void DecreaseMinPts()
+    {
+        increaseDecreseObj.GetComponent<IncreaseDecrease>().DecreaseMinPts();
+    }
+
+    public void CancelAllCalls()
+    {
+        CancelInvoke();
     }
     
 }
