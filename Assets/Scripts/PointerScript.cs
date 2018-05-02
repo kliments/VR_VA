@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PointerScript : MonoBehaviour {
-
+    public bool pointerCollides;
+    public GameObject collider;
 	// Use this for initialization
 	void Start () {
-		
+        pointerCollides = false;
 	}
 	
 	// Update is called once per frame
@@ -16,10 +17,11 @@ public class PointerScript : MonoBehaviour {
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log(other.name);
         if(other.gameObject.GetComponent<UniversalButtonScript>() != null)
         {
             other.gameObject.GetComponent<UniversalButtonScript>().isHover = true;
+            pointerCollides = true;
+            collider = other.gameObject;
         }
     }
 
@@ -28,6 +30,7 @@ public class PointerScript : MonoBehaviour {
         if(other.gameObject.GetComponent<UniversalButtonScript>() != null)
         {
             other.gameObject.GetComponent<UniversalButtonScript>().isHover = false;
+            pointerCollides = false;
         }
     }
 }

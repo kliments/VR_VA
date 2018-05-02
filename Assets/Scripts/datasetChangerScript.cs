@@ -17,7 +17,7 @@ public class datasetChangerScript : MonoBehaviour
     private GameObject mySprite;
 
     public GameObject parentViz;
-    public Transform wallBackground;
+    public Transform responsiveMenu;
     public GameObject cubes;
     public GameObject pies;
     public GameObject triangles;
@@ -84,31 +84,30 @@ public class datasetChangerScript : MonoBehaviour
     void Start()
     {
         ground = GameObject.Find("Ground");
-        wallBackground = GameObject.Find("WallBackground").transform;
-        foreach(Transform child in wallBackground)
+        responsiveMenu = GameObject.Find("ResponsiveMenu").transform;
+        foreach(Transform child in responsiveMenu)
         {
-            if(child.name == "parentKmeans")
+            if(child.name == "KMeansParent")
             {
                 foreach(Transform childOfChild in child)
                 {
-                    if(childOfChild.name == "KMeansNextStep")
+                    if(childOfChild.name == "K-Means Step Forward")
                     {
                         resetKmeans = childOfChild.gameObject;
                     }
                 }
             }
-            else if(child.name == "ParentDBSCAN")
+            else if(child.name == "DBSCANParent")
             {
                 foreach (Transform childOfChild in child)
                 {
-                    if (childOfChild.name == "DBNextStep")
+                    if (childOfChild.name == "DBScan Step Forward")
                     {
                         resetDBScan = childOfChild.gameObject;
                     }
                 }
             }
         }
-        Debug.Log("print sth");
     }
 
     public void initText() { 

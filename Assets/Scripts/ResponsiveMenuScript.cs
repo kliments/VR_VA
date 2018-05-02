@@ -9,15 +9,12 @@ public class ResponsiveMenuScript : MonoBehaviour {
     public GameObject pointer;
 
     private bool wasTouched;
-    private Vector2 startValue;
     public GameObject datasetParent;
 	// Use this for initialization
 	void Start () {
         isShown = true;
         trackedObj = transform.parent.GetComponent<SteamVR_TrackedObject>();
         device = SteamVR_Controller.Input((int)trackedObj.index);
-        wasTouched = false;
-        startValue = new Vector2();
     }
 	
 	// Update is called once per frame
@@ -30,6 +27,7 @@ public class ResponsiveMenuScript : MonoBehaviour {
 
         if (isShown)
         {
+            //for moving pointer around when touching the touchpad
             if (device.GetTouch(SteamVR_Controller.ButtonMask.Touchpad))
             {
                 Vector2 touchPos = device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
@@ -41,6 +39,15 @@ public class ResponsiveMenuScript : MonoBehaviour {
                 }
                 pointer.transform.localPosition = newPos;
             }
+
+            if(device.GetPressDown(SteamVR_Controller.ButtonMask.Touchpad))
+            {
+                if(pointer.GetComponent<PointerScript>().pointerCollides)
+                {
+                    GameObject currentButton = pointer.GetComponent<PointerScript>().collider;
+                    currentButton.GetComponent<UniversalButtonScript>().Press();
+                }
+            }
         }
     }
 
@@ -48,12 +55,17 @@ public class ResponsiveMenuScript : MonoBehaviour {
     {
         if(isShown)
         {
-            transform.GetChild(0).gameObject.SetActive(false);
+            foreach(Transform child in transform)
+            {
+                child.gameObject.SetActive(false);
+            }
             isShown = false;
         }
         else
         {
+            //show the pointer and the primary menu
             transform.GetChild(0).gameObject.SetActive(true);
+            transform.GetChild(1).gameObject.SetActive(true);
             isShown = true;
         }
     }

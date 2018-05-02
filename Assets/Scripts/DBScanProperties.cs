@@ -13,7 +13,7 @@ public class DBScanProperties : MonoBehaviour {
     //mesh to be drawn
     public Mesh mesh;
     public Material refMat;
-    public GameObject dbScanButton;
+    public DBScanAlgorithm dbScanButton;
     private int layerMask;
     private Vector3[] baseVertices;
     private Vector3 pos;
@@ -39,7 +39,7 @@ public class DBScanProperties : MonoBehaviour {
             pos = transform.position;
             if(dbScanButton == null)
             {
-                dbScanButton = GameObject.Find("DBNextStep");
+                dbScanButton = (DBScanAlgorithm)FindObjectOfType(typeof(DBScanAlgorithm));
             }
             if (radiusSphere < epsilon && dbScanButton.GetComponent<DBScanAlgorithm>().euclDist)
             {

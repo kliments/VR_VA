@@ -15,7 +15,6 @@ public class VisualizationChangerScript : MonoBehaviour {
     private GameObject pies;
     private GameObject triangles;
     private GameObject tetrahedrons;
-    public GameObject parent;
     public GameObject ground;
 
     private GameObject[] visualizationss;
@@ -57,7 +56,7 @@ public class VisualizationChangerScript : MonoBehaviour {
             }
             this.GetComponent<VisualizationChangerScript>().isSelected = true;
             this.GetComponent<Animator>().SetBool("selected", true);
-            if (this.name == "DataSpaceButton")
+            if (this.name == "CubesButton")
             {
                 if (pies.activeSelf)
                 {
@@ -82,7 +81,7 @@ public class VisualizationChangerScript : MonoBehaviour {
                 this.GetComponent<Animator>().SetBool("selected", true);
 
             }
-            else if (this.name == "PieChartCtrlButton")
+            else if (this.name == "PieChartsButton")
             {
                 if (cubes.activeSelf)
                 {
@@ -109,7 +108,7 @@ public class VisualizationChangerScript : MonoBehaviour {
                 this.GetComponent<Animator>().SetBool("selected", true);
 
             }
-            else if (this.name == "TriangleButton")
+            else if (this.name == "TrianglesButton")
             {
                 if (cubes.activeSelf)
                 {
@@ -145,7 +144,7 @@ public class VisualizationChangerScript : MonoBehaviour {
                 }
                 this.GetComponent<Animator>().SetBool("selected", true);
             }
-            else if (this.name == "TetrahedronButton")
+            else if (this.name == "TetrahedronsButton")
             {
                 if (cubes.activeSelf)
                 {

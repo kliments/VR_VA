@@ -66,6 +66,7 @@ public class DBScanAlgorithm : MonoBehaviour {
         //happens only once, in the beginning
         if(counter == 0)
         {
+            resetKMeans.GetComponent<KMeansAlgorithm>().ResetMe();
             AssignDataPoints();
             PaintAllWhite();
             ShuffleDataPoints();
@@ -337,6 +338,8 @@ public class DBScanAlgorithm : MonoBehaviour {
             {
                 obj.GetComponent<DBScanProperties>().ResetPoint();
                 RemoveWireFrame(obj.gameObject);
+                obj.GetComponent<MeshRenderer>().material.color = obj.GetComponent<PreviousStepProperties>().originalColor;
+                obj.GetComponent<PreviousStepProperties>().colorList = new List<Color>();
             }
         }
         clusterID = 1;

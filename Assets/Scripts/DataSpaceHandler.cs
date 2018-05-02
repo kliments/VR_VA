@@ -172,7 +172,7 @@ public class DataSpaceHandler : MonoBehaviour
         //
         if (counterData == 0)
         {
-            data = FindObjectOfType<datasetChooserWallScript>().datasets[0];
+            data = FindObjectOfType<ResponsiveMenuDatasetsGenerator>().datasets[0];
         }
         string[] lines = data.text.Split('\n');
         string[] attr = lines[0].Split(',');
