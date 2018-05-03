@@ -39,8 +39,8 @@ public class ResponsiveMenuScript : MonoBehaviour {
                 }
                 pointer.transform.localPosition = newPos;
             }
-
-            if(device.GetPressDown(SteamVR_Controller.ButtonMask.Touchpad))
+            //when touchpad press on button but not increasing or decreasing 
+            if(device.GetPressDown(SteamVR_Controller.ButtonMask.Touchpad) && !increaseDecrease)
             {
                 //only if pointer is at a button
                 if(pointer.GetComponent<PointerScript>().pointerCollides)

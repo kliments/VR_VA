@@ -10,7 +10,7 @@ public class UniversalButtonScript : MonoBehaviour {
     private MeshRenderer meshRenderer;
     public Material onHoverMaterial, defaultMaterial;
     public ResponsiveMenuScript controller;
-    private GameObject increaseDecreseObj;
+    private IncreaseDecrease increaseDecreseObj;
 
     // Use this for initialization
 	void Start () {
@@ -22,12 +22,12 @@ public class UniversalButtonScript : MonoBehaviour {
         defaultMaterial = meshRenderer.material;
         onHoverMaterial = Resources.Load("Materials/OnHoverMaterial", typeof(Material)) as Material;
         controller = (ResponsiveMenuScript)FindObjectOfType(typeof(ResponsiveMenuScript));
-        increaseDecreseObj = new GameObject();
     }
 	
 	// Update is called once per frame
 	void Update () {
-        if(isHover)
+        //if hover and not increasing or decreasing
+        if(isHover && !controller.increaseDecrease)
         {
             //if it is supposed to be changed and button is not selected before
             if(toChange && !GetComponent<Animator>().GetBool("selected"))
@@ -153,7 +153,7 @@ public class UniversalButtonScript : MonoBehaviour {
             //increase or decrease number of spheres
             if(this.name == "NrOfSpheres")
             {
-                increaseDecreseObj = this.gameObject;
+                increaseDecreseObj = GetComponent<IncreaseDecrease>();
                 controller.increaseDecrease = true;
                 Vector2 pos = controller.device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
                 if (pos.y >= 0f)
@@ -198,7 +198,7 @@ public class UniversalButtonScript : MonoBehaviour {
         {
             if(this.name == "epsilon")
             {
-                increaseDecreseObj = this.gameObject;
+                increaseDecreseObj = GetComponent<IncreaseDecrease>();
                 controller.increaseDecrease = true;
                 Vector2 pos = controller.device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
                 if (pos.y >= 0f)
@@ -214,7 +214,7 @@ public class UniversalButtonScript : MonoBehaviour {
             }
             else if(this.name == "minPts")
             {
-                increaseDecreseObj = this.gameObject;
+                increaseDecreseObj = GetComponent<IncreaseDecrease>();
                 controller.increaseDecrease = true;
                 Vector2 pos = controller.device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
                 if (pos.y >= 0f)
@@ -227,6 +227,10 @@ public class UniversalButtonScript : MonoBehaviour {
                     if (IsInvoking("IncreaseMinPts")) CancelInvoke("IncreaseMinPts");
                     if (!IsInvoking("DecreaseMinPts")) InvokeRepeating("DecreaseMinPts", 0, 1f);
                 }
+            }
+            else if(this.name == "EucledianManhattan")
+            {
+                GetComponent<ToggleEucledianManhattan>().Toggle();
             }
             else if(this.name == "StepBackward")
             {
@@ -246,32 +250,32 @@ public class UniversalButtonScript : MonoBehaviour {
 
     void IncreaseNrSpheres()
     {
-        increaseDecreseObj.GetComponent<IncreaseDecrease>().IncreaseNrSpheres();
+        increaseDecreseObj.IncreaseNrSpheres();
     }
 
     void DecreaseNrSpheres()
     {
-        increaseDecreseObj.GetComponent<IncreaseDecrease>().DecreaseNrSpheres();
+        increaseDecreseObj.DecreaseNrSpheres();
     }
 
     void IncreaseEpsilon()
     {
-        increaseDecreseObj.GetComponent<IncreaseDecrease>().IncreaseEpsilon();
+        increaseDecreseObj.IncreaseEpsilon();
     }
 
     void DecreaseEpsilon()
     {
-        increaseDecreseObj.GetComponent<IncreaseDecrease>().DecreaseEpsilon();
+        increaseDecreseObj.DecreaseEpsilon();
     }
 
     void IncreaseMinPts()
     {
-        increaseDecreseObj.GetComponent<IncreaseDecrease>().IncreaseMinPts();
+        increaseDecreseObj.IncreaseMinPts();
     }
 
     void DecreaseMinPts()
     {
-        increaseDecreseObj.GetComponent<IncreaseDecrease>().DecreaseMinPts();
+        increaseDecreseObj.DecreaseMinPts();
     }
 
     public void CancelAllCalls()

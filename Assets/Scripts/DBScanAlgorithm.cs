@@ -24,9 +24,6 @@ public class DBScanAlgorithm : MonoBehaviour {
     //counter for steps
     public int counter;
     
-    //material for the mesh
-    public Material material;
-
     private List<List<GameObject>> neighbours;
     private List<GameObject> corePoints;
 
@@ -49,7 +46,7 @@ public class DBScanAlgorithm : MonoBehaviour {
         NOISE = -1;
         epsilon = 0.05f;
         minPts = 3;
-        euclDist = true;
+        euclDist = false;
         corePoints = new List<GameObject>();
         neighbours = new List<List<GameObject>>();
         allClustersFound = false;
@@ -69,7 +66,7 @@ public class DBScanAlgorithm : MonoBehaviour {
             resetKMeans.GetComponent<KMeansAlgorithm>().ResetMe();
             AssignDataPoints();
             PaintAllWhite();
-            ShuffleDataPoints();
+            //ShuffleDataPoints();
             counter++;
             steps.Add("firstStep");
         }
@@ -122,7 +119,6 @@ public class DBScanAlgorithm : MonoBehaviour {
                             corePoints[i].GetComponent<DBScanProperties>().epsilon = epsilon;
                             corePoints[i].GetComponent<DBScanProperties>().clusterID = clusterID;
                             corePoints[i].GetComponent<MeshRenderer>().material.color = pointsColor[clusterID - 1];
-                            corePoints[i].GetComponent<DBScanProperties>().refMat.CopyPropertiesFromMaterial(material);
                             temp.Add(corePoints[i]);
                             dataPoints.Remove(corePoints[i]);
                         }
@@ -159,10 +155,13 @@ public class DBScanAlgorithm : MonoBehaviour {
                                 obj.GetComponent<DBScanProperties>().epsilon = epsilon;
                                 obj.GetComponent<DBScanProperties>().clusterID = clusterID;
                                 obj.GetComponent<MeshRenderer>().material.color = pointsColor[clusterID - 1];
-                                obj.GetComponent<DBScanProperties>().refMat.CopyPropertiesFromMaterial(material);
                                 temp.Add(obj);
                                 dataPoints.Remove(obj);
-                                AddWireFrame(obj);
+                                //only for cubes
+                                if(obj.name.Contains("cube"))
+                                {
+                                    AddWireFrame(obj);
+                                }
                             }
                         }
                     }
@@ -337,7 +336,10 @@ public class DBScanAlgorithm : MonoBehaviour {
             foreach (Transform obj in dataVisuals.transform)
             {
                 obj.GetComponent<DBScanProperties>().ResetPoint();
-                RemoveWireFrame(obj.gameObject);
+                if (obj.name.Contains("cube"))
+                {
+                    RemoveWireFrame(obj.gameObject);
+                }
                 obj.GetComponent<MeshRenderer>().material.color = obj.GetComponent<PreviousStepProperties>().originalColor;
                 obj.GetComponent<PreviousStepProperties>().colorList = new List<Color>();
             }

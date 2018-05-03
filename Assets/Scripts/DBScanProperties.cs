@@ -20,6 +20,7 @@ public class DBScanProperties : MonoBehaviour {
     private float radiusSphere;
     private float sizeDiamond;
     private Color color;
+    private MaterialPropertyBlock blockColor;
 
     // Use this for initialization
     void Start () {
@@ -29,6 +30,7 @@ public class DBScanProperties : MonoBehaviour {
         sizeDiamond = 0f;
         layerMask = LayerMask.NameToLayer("Environment");
         mesh = new Mesh();
+        blockColor = new MaterialPropertyBlock();
         refMat = new Material(Shader.Find("Transparent/Bumped Diffuse"));
     }
 	
@@ -52,7 +54,6 @@ public class DBScanProperties : MonoBehaviour {
                 SetColor();
             }
             Graphics.DrawMesh(mesh, pos, Quaternion.identity, refMat, layerMask);
-
         }
         else if(clusterID == NOISE)
         {
@@ -193,7 +194,7 @@ public class DBScanProperties : MonoBehaviour {
     {
         gameObject.GetComponent<MeshRenderer>().material.color = dbScanButton.GetComponent<DBScanAlgorithm>().pointsColor[clusterID - 1];
         //material.CopyPropertiesFromMaterial(refMat);
-        color = gameObject.GetComponent<MeshRenderer>().material.color;
+        color = dbScanButton.GetComponent<DBScanAlgorithm>().pointsColor[clusterID - 1];
         color.a = 0.05f;
         refMat.color = color;
     }
@@ -205,6 +206,8 @@ public class DBScanProperties : MonoBehaviour {
         sizeDiamond = 0f;
         clusterID = UNCLASSIFIED;
         mesh.Clear();
-        gameObject.GetComponent<MeshRenderer>().material.color = gameObject.GetComponent<PreviousStepProperties>().originalColor;
+        gameObject.GetComponent<MeshRenderer>().material.color = GetComponent<PreviousStepProperties>().originalColor;
+        color = new Color();
+        refMat.color = new Color();
     }
 }
