@@ -46,7 +46,7 @@ public class DBScanAlgorithm : MonoBehaviour {
         NOISE = -1;
         epsilon = 0.05f;
         minPts = 3;
-        euclDist = false;
+        euclDist = true;
         corePoints = new List<GameObject>();
         neighbours = new List<List<GameObject>>();
         allClustersFound = false;
@@ -66,7 +66,7 @@ public class DBScanAlgorithm : MonoBehaviour {
             resetKMeans.GetComponent<KMeansAlgorithm>().ResetMe();
             AssignDataPoints();
             PaintAllWhite();
-            //ShuffleDataPoints();
+            ShuffleDataPoints();
             counter++;
             steps.Add("firstStep");
         }

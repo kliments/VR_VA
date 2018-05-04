@@ -7,11 +7,12 @@ public class DBScanProperties : MonoBehaviour {
     
     public int UNCLASSIFIED = 0;
     public int NOISE = -1;
-    public bool drawMeshAround;
+    public bool drawMeshAround, drawSphere;
     public int clusterID;
     public float epsilon;
     //mesh to be drawn
-    public Mesh mesh;
+    public Mesh sphereMesh;
+    public Mesh diamondMesh;
     public Material refMat;
     public DBScanAlgorithm dbScanButton;
     private int layerMask;
@@ -26,10 +27,12 @@ public class DBScanProperties : MonoBehaviour {
     void Start () {
         //starting radius to increase till epsilon
         drawMeshAround = false;
+        drawSphere = true;
         radiusSphere = 0f;
         sizeDiamond = 0f;
         layerMask = LayerMask.NameToLayer("Environment");
-        mesh = new Mesh();
+        sphereMesh = new Mesh();
+        diamondMesh = new Mesh();
         blockColor = new MaterialPropertyBlock();
         refMat = new Material(Shader.Find("Transparent/Bumped Diffuse"));
     }
@@ -53,7 +56,14 @@ public class DBScanProperties : MonoBehaviour {
                 GenerateManhattanDiamond();
                 SetColor();
             }
-            Graphics.DrawMesh(mesh, pos, Quaternion.identity, refMat, layerMask);
+            if(drawSphere)
+            {
+                Graphics.DrawMesh(sphereMesh, pos, Quaternion.identity, refMat, layerMask);
+            }
+            else
+            {
+                Graphics.DrawMesh(diamondMesh, pos, Quaternion.identity, refMat, layerMask);
+            }
         }
         else if(clusterID == NOISE)
         {
@@ -63,7 +73,7 @@ public class DBScanProperties : MonoBehaviour {
 
     private void GenerateSphere()
     {
-        mesh.Clear();
+        sphereMesh.Clear();
 
         radiusSphere += epsilon/5;
         // Longitude |||
@@ -152,12 +162,14 @@ public class DBScanProperties : MonoBehaviour {
         }
         #endregion
 
-        mesh.vertices = vertices;
-        mesh.normals = normales;
-        mesh.uv = uvs;
-        mesh.triangles = triangles;
+        sphereMesh.vertices = vertices;
+        sphereMesh.normals = normales;
+        sphereMesh.uv = uvs;
+        sphereMesh.triangles = triangles;
 
-        mesh.RecalculateBounds();
+        sphereMesh.RecalculateBounds();
+
+        drawSphere = true;
     }
 
     private void GenerateManhattanDiamond()
@@ -169,7 +181,7 @@ public class DBScanProperties : MonoBehaviour {
         Vector3 D = new Vector3();
         Vector3 E = new Vector3();
         Vector3 F = new Vector3();
-        mesh.Clear();
+        diamondMesh.Clear();
 
         #region Vertices
         A.x -= sizeDiamond;
@@ -185,9 +197,10 @@ public class DBScanProperties : MonoBehaviour {
         int[] triangles = new int[24] {0,1,5,4,1,0,4,0,3,0,5,3,5,1,2,2,1,4,5,2,3,2,4,3};
         #endregion
 
-        mesh.vertices = vertices;
-        mesh.triangles = triangles;
-        mesh.RecalculateBounds();
+        diamondMesh.vertices = vertices;
+        diamondMesh.triangles = triangles;
+        diamondMesh.RecalculateBounds();
+        drawSphere = false;
     }
 
     private void SetColor()
@@ -202,10 +215,14 @@ public class DBScanProperties : MonoBehaviour {
     public void ResetPoint()
     {
         drawMeshAround = false;
+        drawSphere = true;
         radiusSphere = 0f;
         sizeDiamond = 0f;
         clusterID = UNCLASSIFIED;
-        mesh.Clear();
+        sphereMesh.Clear();
+        sphereMesh = new Mesh();
+        diamondMesh.Clear();
+        diamondMesh = new Mesh();
         gameObject.GetComponent<MeshRenderer>().material.color = GetComponent<PreviousStepProperties>().originalColor;
         color = new Color();
         refMat.color = new Color();

@@ -11,7 +11,7 @@ public class ToggleEucledianManhattan : MonoBehaviour {
 	void Start () {
         distance = (DBScanAlgorithm)FindObjectOfType(typeof(DBScanAlgorithm));
         eucledian = false;
-        text.text = "Manhattan";
+        text.text = "Eucledian";
 	}
 	
 	// Update is called once per frame
