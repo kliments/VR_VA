@@ -15,7 +15,7 @@ public class PointerEventListener : MonoBehaviour {
     public MENU_ACTION defaultMenuAction = MENU_ACTION.SELECTDATA;
 
     //internal variable for the action to perform
-    private MENU_ACTION menuAction= MENU_ACTION.SELECTDATA;
+    public MENU_ACTION menuAction= MENU_ACTION.SELECTDATA;
 
     public GameObject kMeansButton, trianglesButton, tetrahedronButton, dbscanButton;
     public bool press,pressBack, pressTriangles, pressTetrahedrons, pressDBscan = false;

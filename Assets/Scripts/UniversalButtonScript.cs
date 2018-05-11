@@ -4,13 +4,14 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class UniversalButtonScript : MonoBehaviour {
-    public GameObject primaryParent, datasetParent, vizParent, algorithmParent, kmeansParent, dbscanParent;
+    public GameObject primaryMenu,primaryParent, datasetParent, vizParent, algorithmParent, kmeansParent, dbscanParent;
     private Transform responsiveMenu;
     public bool isHover, isPress, toChange;
     private MeshRenderer meshRenderer;
     public Material onHoverMaterial, defaultMaterial;
     public ResponsiveMenuScript controller;
     private IncreaseDecrease increaseDecreseObj;
+    private PointerEventListener ptEvtLsnr;
 
     // Use this for initialization
 	void Start () {
@@ -22,6 +23,8 @@ public class UniversalButtonScript : MonoBehaviour {
         defaultMaterial = meshRenderer.material;
         onHoverMaterial = Resources.Load("Materials/OnHoverMaterial", typeof(Material)) as Material;
         controller = (ResponsiveMenuScript)FindObjectOfType(typeof(ResponsiveMenuScript));
+        primaryMenu = GameObject.Find("MenusParent");
+        ptEvtLsnr = (PointerEventListener)FindObjectOfType(typeof(PointerEventListener));
     }
 	
 	// Update is called once per frame
@@ -30,7 +33,7 @@ public class UniversalButtonScript : MonoBehaviour {
         if(isHover && !controller.increaseDecrease)
         {
             //if it is supposed to be changed and button is not selected before
-            if(toChange && !GetComponent<Animator>().GetBool("selected"))
+            if(toChange)
             {
                 toChange = false;
                 meshRenderer.material = onHoverMaterial;
@@ -50,11 +53,11 @@ public class UniversalButtonScript : MonoBehaviour {
     {
         if(isPress)
         {
-            GetComponent<Animator>().SetBool("selected", true);
+            //GetComponent<Animator>().SetBool("selected", true);
         }
         else
         {
-            GetComponent<Animator>().SetBool("selected", false);
+            //GetComponent<Animator>().SetBool("selected", false);
         }
     }
 
@@ -94,10 +97,10 @@ public class UniversalButtonScript : MonoBehaviour {
     {
         foreach (Transform child in gameObject.transform.parent)
         {
-            child.gameObject.GetComponent<Animator>().SetBool("selected", false);
+            //child.gameObject.GetComponent<Animator>().SetBool("selected", false);
             child.gameObject.GetComponent<UniversalButtonScript>().isPress = false;
         }
-        GetComponent<Animator>().SetBool("selected", true);
+        //GetComponent<Animator>().SetBool("selected", true);
         isPress = true;
         isHover = false;
         RespectiveButtonRespectiveFunction();
@@ -243,6 +246,27 @@ public class UniversalButtonScript : MonoBehaviour {
             else if(this.name == "Play")
             {
                 GetComponent<DBScanPlay>().play = true;
+            }
+        }
+
+        //Controls Menu functionalities
+        else if(transform.parent.gameObject.name == "ControlsMenu")
+        {
+            if(this.name == "Move")
+            {
+                ptEvtLsnr.setMoveMode();
+            }
+            else if(this.name == "Scale")
+            {
+                ptEvtLsnr.setScalingMode();
+            }
+            else if(this.name == "Rotate")
+            {
+                ptEvtLsnr.setRotationMode();
+            }
+            else if(this.name == "Select")
+            {
+                ptEvtLsnr.setSelectDataMode();
             }
         }
         

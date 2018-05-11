@@ -13,8 +13,8 @@ public class ResponsiveMenuDatasetsGenerator : MonoBehaviour {
     // Use this for initialization
     void Start () {
         x = -0.24f;
-        y = 0.1691731f;
-        z = 0.0286f;
+        y = 0;
+        z = 0;
         counter = 0;
         GameObject element;
         for (int i = 0; i < datasets.Length; i++)
