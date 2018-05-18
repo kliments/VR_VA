@@ -51,11 +51,9 @@ public class VisualizationChangerScript : MonoBehaviour {
             lastActivation = Time.time;
             foreach (VisualizationChangerScript v in FindObjectsOfType<VisualizationChangerScript>())
             {
-                v.GetComponent<Animator>().SetBool("selected", false);
                 v.GetComponent<VisualizationChangerScript>().isSelected = false;
             }
             this.GetComponent<VisualizationChangerScript>().isSelected = true;
-            this.GetComponent<Animator>().SetBool("selected", true);
             if (this.name == "CubesButton")
             {
                 if (pies.activeSelf)
@@ -78,7 +76,6 @@ public class VisualizationChangerScript : MonoBehaviour {
                 }
                 cubes.SetActive(true);
                 cubes.GetComponent<DataSpaceHandler>().changeDatafile(myDataset);
-                this.GetComponent<Animator>().SetBool("selected", true);
 
             }
             else if (this.name == "PieChartsButton")
@@ -105,7 +102,6 @@ public class VisualizationChangerScript : MonoBehaviour {
 
                 pies.SetActive(true);
                 pies.GetComponent<PieChartMeshController>().changeDatafile(myDataset);
-                this.GetComponent<Animator>().SetBool("selected", true);
 
             }
             else if (this.name == "TrianglesButton")
@@ -142,7 +138,6 @@ public class VisualizationChangerScript : MonoBehaviour {
                     triangles.SetActive(true);
                     triangles.GetComponent<Triangle>().changeDatafile(myDataset);
                 }
-                this.GetComponent<Animator>().SetBool("selected", true);
             }
             else if (this.name == "TetrahedronsButton")
             {
@@ -178,7 +173,6 @@ public class VisualizationChangerScript : MonoBehaviour {
                     tetrahedrons.SetActive(true);
                     tetrahedrons.GetComponent<Tetrahedron>().changeDatafile(myDataset);
                 }
-                this.GetComponent<Animator>().SetBool("selected", true);
             }
             lastActivation = Time.time;
         }
@@ -194,18 +188,7 @@ public class VisualizationChangerScript : MonoBehaviour {
     {
 
     }
-
-    private void OnEnable()
-    {
-        if (isSelected)
-        {
-            GetComponent<Animator>().SetBool("selected", true);
-        }
-        else
-        {
-            GetComponent<Animator>().SetBool("selected", false);
-        }
-    }
+    
 
     public static GameObject FindObject(GameObject parent, string name)
     {
@@ -225,7 +208,7 @@ public class VisualizationChangerScript : MonoBehaviour {
         TextAsset myData;
         foreach(Transform t in parent)
         {
-            if (t.gameObject.GetComponent<Animator>().GetBool("selected") || t.gameObject.GetComponent<datasetChangerScript>().isSelected == true)
+            if (t.gameObject.GetComponent<datasetChangerScript>().isSelected == true)
                 {
                 myData = t.gameObject.GetComponent<datasetChangerScript>().myDataset;
                 return myData;

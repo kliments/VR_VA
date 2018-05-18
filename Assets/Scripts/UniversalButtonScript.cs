@@ -5,13 +5,15 @@ using UnityEngine.SceneManagement;
 
 public class UniversalButtonScript : MonoBehaviour {
     public GameObject primaryMenu,primaryParent, datasetParent, vizParent, algorithmParent, kmeansParent, dbscanParent;
-    private Transform responsiveMenu;
-    public bool isHover, isPress, toChange;
-    private MeshRenderer meshRenderer;
     public Material onHoverMaterial, defaultMaterial;
     public ResponsiveMenuScript controller;
+    public bool isHover, isPress, toChange;
+    private Transform responsiveMenu;
+    private MeshRenderer meshRenderer;
     private IncreaseDecrease increaseDecreseObj;
     private PointerEventListener ptEvtLsnr;
+    private BackButtonMenu menusParent;
+    private SwapBetweenMenus swapScript;
 
     // Use this for initialization
 	void Start () {
@@ -25,6 +27,8 @@ public class UniversalButtonScript : MonoBehaviour {
         controller = (ResponsiveMenuScript)FindObjectOfType(typeof(ResponsiveMenuScript));
         primaryMenu = GameObject.Find("MenusParent");
         ptEvtLsnr = (PointerEventListener)FindObjectOfType(typeof(PointerEventListener));
+        menusParent = (BackButtonMenu)FindObjectOfType(typeof(BackButtonMenu));
+        swapScript = (SwapBetweenMenus)FindObjectOfType(typeof(SwapBetweenMenus));
     }
 	
 	// Update is called once per frame
@@ -37,6 +41,10 @@ public class UniversalButtonScript : MonoBehaviour {
             {
                 toChange = false;
                 meshRenderer.material = onHoverMaterial;
+                if(GetComponent<RotateDatasetButton>() != null)
+                {
+                    GetComponent<RotateDatasetButton>().isHovered = true;
+                }
             }
         }
         else
@@ -44,22 +52,16 @@ public class UniversalButtonScript : MonoBehaviour {
             if (meshRenderer.material != defaultMaterial)
             {
                 meshRenderer.material = defaultMaterial;
-                toChange = true;
+
+                if (GetComponent<RotateDatasetButton>() != null)
+                {
+                    GetComponent<RotateDatasetButton>().isHovered = false;
+                }
             }
+            toChange = true;
         }
 	}
-
-    private void OnEnable()
-    {
-        if(isPress)
-        {
-            //GetComponent<Animator>().SetBool("selected", true);
-        }
-        else
-        {
-            //GetComponent<Animator>().SetBool("selected", false);
-        }
-    }
+    
 
     void FindParents()
     {
@@ -97,10 +99,8 @@ public class UniversalButtonScript : MonoBehaviour {
     {
         foreach (Transform child in gameObject.transform.parent)
         {
-            //child.gameObject.GetComponent<Animator>().SetBool("selected", false);
             child.gameObject.GetComponent<UniversalButtonScript>().isPress = false;
         }
-        //GetComponent<Animator>().SetBool("selected", true);
         isPress = true;
         isHover = false;
         RespectiveButtonRespectiveFunction();
@@ -112,16 +112,31 @@ public class UniversalButtonScript : MonoBehaviour {
         if (this.name == "Datasets")
         {
             GetComponent<ShowOrHideDatasets>().ButtonPressed();
+            if(menusParent.previousMenus[menusParent.previousMenus.Count-1] != datasetParent)
+            {
+                menusParent.previousMenus.Add(datasetParent);
+                swapScript.dontShowControlsMenu = true;
+            }
         }
         //show the visualizations buttons
         else if (this.name == "Visualizations")
         {
             GetComponent<ShowOrHideVisualizations>().ButtonPressed();
+            if (menusParent.previousMenus[menusParent.previousMenus.Count - 1] != vizParent)
+            {
+                menusParent.previousMenus.Add(vizParent);
+                swapScript.dontShowControlsMenu = true;
+            }
         }
         //show the algorithms buttons
         else if (this.name == "Algorithms")
         {
             GetComponent<ShowOrHideAlgorithms>().ButtonPressed();
+            if (menusParent.previousMenus[menusParent.previousMenus.Count - 1] != algorithmParent)
+            {
+                menusParent.previousMenus.Add(algorithmParent);
+                swapScript.dontShowControlsMenu = true;
+            }
         }
         //toggle between showing or hiding the mirror
         else if (this.name == "ShowHideMirror")
@@ -137,13 +152,11 @@ public class UniversalButtonScript : MonoBehaviour {
         else if (transform.parent == datasetParent.transform)
         {
             GetComponent<datasetChangerScript>().startTargetedAction();
-            GetComponent<ShowOrHidePrimaryMenu>().ButtonPressed();
         }
         //change to proper visualization
         else if (transform.parent == vizParent.transform)
         {
             GetComponent<VisualizationChangerScript>().startSelectedAction();
-            GetComponent<ShowOrHidePrimaryMenu>().ButtonPressed();
         }
         //show the proper algorithm buttons
         else if(transform.parent == algorithmParent.transform)
@@ -154,7 +167,7 @@ public class UniversalButtonScript : MonoBehaviour {
         else if(transform.parent == kmeansParent.transform)
         {
             //increase or decrease number of spheres
-            if(this.name == "NrOfSpheres")
+            if (this.name == "NrOfSpheres")
             {
                 increaseDecreseObj = GetComponent<IncreaseDecrease>();
                 controller.increaseDecrease = true;
@@ -199,7 +212,7 @@ public class UniversalButtonScript : MonoBehaviour {
         //DBSCAN buttons functionalities
         else if(transform.parent == dbscanParent.transform)
         {
-            if(this.name == "epsilon")
+            if (this.name == "epsilon")
             {
                 increaseDecreseObj = GetComponent<IncreaseDecrease>();
                 controller.increaseDecrease = true;
@@ -306,5 +319,13 @@ public class UniversalButtonScript : MonoBehaviour {
     {
         CancelInvoke();
     }
-    
+
+    private void OnEnable()
+    {
+        if(meshRenderer.material != defaultMaterial)
+        {
+            meshRenderer.material = defaultMaterial;
+        }
+    }
+
 }

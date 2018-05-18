@@ -16,12 +16,6 @@ public class ShowHideDatasets : MonoBehaviour {
     private int sizeOfList;
 	// Use this for initialization
 	void Start () {
-        //show only dataset buttons in the start of the application
-        if(this.name == "Datasets")
-        {
-            //wasHit = true;
-            GetComponent<Animator>().SetBool("selected", true);
-        }
         if (buttons.Count == 0)
         {
             foreach (Transform child in parentData.transform)
@@ -56,20 +50,16 @@ public class ShowHideDatasets : MonoBehaviour {
         if(wasHit)
         {
             wasHit = false;
-            GetComponent<Animator>().SetBool("selected", false);
         }
         else
         {
             wasHit = true;
-            GetComponent<Animator>().SetBool("selected", true);
             parentData.SetActive(true);
         }
-
-        visualizations.GetComponent<Animator>().SetBool("selected", false);
+        
         visualizations.GetComponent<ShowHideVisualizations>().wasHit = false;
         parentVisualizations.SetActive(false);
-
-        algorithms.GetComponent<Animator>().SetBool("selected", false);
+        
         algorithms.GetComponent<ShowHideAlgorithms>().wasHit = false;
         algorithms.GetComponent<ShowHideAlgorithms>().buttonText.text = algorithms.GetComponent<ShowHideAlgorithms>().thisText;
 

@@ -38,7 +38,6 @@ public class ShowHideAlgorithms : MonoBehaviour {
         if (!wasHit)
         {
             wasHit = true;
-            GetComponent<Animator>().SetBool("selected", true);
 
             parentAlgorithms.SetActive(true);
             for (int i = 0; i < sizeOfList; i++)
@@ -49,7 +48,6 @@ public class ShowHideAlgorithms : MonoBehaviour {
         else
         {
             wasHit = false;
-            GetComponent<Animator>().SetBool("selected", false);
             
             parentAlgorithms.SetActive(false);
             for (int i = 0; i < sizeOfList; i++)
@@ -60,11 +58,9 @@ public class ShowHideAlgorithms : MonoBehaviour {
 
         //change button text to "Algorithms"
         buttonText.text = thisText;
-
-        parentData.GetComponent<Animator>().SetBool("selected", false);
+        
         parentData.GetComponent<ShowHideDatasets>().wasHit = false;
-
-        parentVis.GetComponent<Animator>().SetBool("selected", false);
+        
         parentVis.GetComponent<ShowHideVisualizations>().wasHit = false;
         
         parentKmeans.SetActive(false);

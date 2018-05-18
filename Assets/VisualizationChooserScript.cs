@@ -15,12 +15,11 @@ public class VisualizationChooserScript : MonoBehaviour {
             child.name = names[i] + "Button";
             if (child.name == "DataSpaceButton")
             {
-                child.GetComponent<Animator>().SetBool("selected", true);
                 child.GetComponent<VisualizationChangerScript>().isSelected = true;
             }
             else
             {
-                child.GetComponent<Animator>().SetBool("selected", false);
+
             }
             //element.transform.localRotation = Quaternion.identity;
             //element.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);

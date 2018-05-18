@@ -28,7 +28,6 @@ public class datasetChangerScript : MonoBehaviour
     public GameObject resetKmeans;
     public GameObject resetDBScan;
     public GameObject ground;
-    private Animator anim;
 
     public void startTargetedAction()
     {
@@ -51,12 +50,9 @@ public class datasetChangerScript : MonoBehaviour
             lastActivation = Time.time;
             foreach(datasetChangerScript d in FindObjectsOfType<datasetChangerScript>())
             {
-                d.GetComponent<Animator>().SetBool("selected", false);
                 d.GetComponent<datasetChangerScript>().isSelected = false;
             }
             isSelected = true;
-            GetComponent<Animator>().SetBool("selected", true);
-            anim = GetComponent<Animator>();
             //FindObjectOfType<axisMenueScript>().resetMenue();
             //FindObjectOfType<pcLoaderScript>().resetMe();
             if (cubes.activeSelf)
@@ -144,18 +140,7 @@ public class datasetChangerScript : MonoBehaviour
 	// Update is called once per frame
 	void Update() {
 	}
-
-    private void OnEnable()
-    {
-        if (isSelected)
-        {
-            GetComponent<Animator>().SetBool("selected", true);
-        }
-        else
-        {
-            GetComponent<Animator>().SetBool("selected", false);
-        }
-    }
+    
 
     public static GameObject FindObject(GameObject parent, string name)
     {

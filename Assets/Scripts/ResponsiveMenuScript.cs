@@ -7,31 +7,31 @@ public class ResponsiveMenuScript : MonoBehaviour {
     SteamVR_TrackedObject trackedObj;
     public SteamVR_Controller.Device device;
     public GameObject pointer, datasetParent;
-    private GameObject currentButton;
-    private bool wasTouched;
     public bool isActive;
-    private bool moveAndResize;
-    private Vector3 inactivePos, activePos, inactiveScale, activeScale;
-	// Use this for initialization
-	void Start () {
+    private bool wasTouched, moveAndResize;
+    private GameObject currentButton;
+    private Vector3 inactivePos, activePos, inactiveScale, activeScale, actualPos;
+    private Vector2 oldPos, newPos;
+    // Use this for initialization
+    void Start () {
         isShown = true;
         increaseDecrease = false;
         trackedObj = transform.parent.transform.parent.GetComponent<SteamVR_TrackedObject>();
         device = SteamVR_Controller.Input((int)trackedObj.index);
-        moveAndResize = false;
         inactiveScale = new Vector3(0.7f, 0.7f, 0.7f);
         activeScale = new Vector3(1, 1, 1);
+        actualPos = new Vector3();
         AssignValues();
     }
 	
 	// Update is called once per frame
 	void Update () {
-        if(isActive)
+        if (isActive)
         {
-            if(moveAndResize)
+            if (moveAndResize)
             {
                 gameObject.transform.localScale = Vector3.Lerp(gameObject.transform.localScale, inactiveScale, Time.deltaTime * 10f);
-                gameObject.transform.localPosition =  Vector3.Lerp(gameObject.transform.localPosition, inactivePos, Time.deltaTime * 10f);
+                gameObject.transform.localPosition = Vector3.Lerp(gameObject.transform.localPosition, inactivePos, Time.deltaTime * 10f);
                 if (Vector3.Distance(gameObject.transform.localPosition, inactivePos) < 0.00005f)
                 {
                     //no more moving or resizing needed
@@ -39,49 +39,10 @@ public class ResponsiveMenuScript : MonoBehaviour {
                     gameObject.transform.localPosition = inactivePos;
                 }
             }
-
-        //for moving pointer around when touching the touchpad
-            if (device.GetTouch(SteamVR_Controller.ButtonMask.Touchpad))
-            {
-                Vector2 touchPos = device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
-                Vector3 newPos = NormalizedValues(touchPos);
-                //limit the movement in Z position for every submenu except Datasets submenu
-                newPos.z = 0f;
-                pointer.transform.localPosition = newPos;
-            }
-            //when touchpad press on button but not increasing or decreasing 
-            if (device.GetPressDown(SteamVR_Controller.ButtonMask.Touchpad) && !increaseDecrease)
-            {
-                //only if pointer is at a button
-                if (pointer.GetComponent<PointerScript>().pointerCollides)
-                {
-                    currentButton = pointer.GetComponent<PointerScript>().collider;
-                    currentButton.GetComponent<UniversalButtonScript>().Press();
-                }
-            }
-
-            else if (device.GetPress(SteamVR_Controller.ButtonMask.Touchpad))
-            {
-                //only if pointer is at a increase or Decrease button
-                currentButton = pointer.GetComponent<PointerScript>().collider;
-                if (currentButton.tag == "increaseDecrease")
-                {
-                    currentButton.GetComponent<UniversalButtonScript>().Press();
-                }
-            }
-            //cancel all invoke calls for increasing/decreasing
-            else if (device.GetPressUp(SteamVR_Controller.ButtonMask.Touchpad))
-            {
-                if (increaseDecrease)
-                {
-                    increaseDecrease = false;
-                    currentButton.GetComponent<UniversalButtonScript>().CancelAllCalls();
-                }
-            }
         }
         else
         {
-            if(moveAndResize)
+            if (moveAndResize)
             {
                 gameObject.transform.localScale = Vector3.Lerp(gameObject.transform.localScale, activeScale, Time.deltaTime * 10f);
                 gameObject.transform.localPosition = Vector3.Lerp(gameObject.transform.localPosition, activePos, Time.deltaTime * 10f);
@@ -91,6 +52,63 @@ public class ResponsiveMenuScript : MonoBehaviour {
                     moveAndResize = false;
                     gameObject.transform.localPosition = activePos;
                 }
+            }
+        }
+        if (device.GetTouchDown(SteamVR_Controller.ButtonMask.Touchpad))
+        {
+            newPos = device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
+            oldPos = newPos;
+        }
+        //for moving pointer around when touching the touchpad
+        if (device.GetTouch(SteamVR_Controller.ButtonMask.Touchpad))
+        {
+            oldPos = newPos;
+            newPos = device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
+            Vector2 difference = newPos - oldPos;
+            if(Mathf.Abs(difference.x) > 0.01f)
+            {
+                actualPos.x = difference.x * 0.1f;
+                actualPos.z = 0;
+                actualPos.y = 0;
+                if (pointer.transform.localPosition.x < -0.28f && difference.x < 0)
+                {
+                    actualPos.x = 0;
+                }
+
+                if (pointer.transform.localPosition.x > 0.28f && difference.x > 0)
+                {
+                    actualPos.x = 0;
+                }
+                pointer.transform.localPosition += actualPos;
+            }
+        }
+        //when touchpad press on button but not increasing or decreasing 
+        if (device.GetPressDown(SteamVR_Controller.ButtonMask.Touchpad) && !increaseDecrease)
+        {
+            //only if pointer is at a button
+            if (pointer.GetComponent<PointerScript>().pointerCollides)
+            {
+                currentButton = pointer.GetComponent<PointerScript>().collider;
+                currentButton.GetComponent<UniversalButtonScript>().Press();
+            }
+        }
+
+        else if (device.GetPress(SteamVR_Controller.ButtonMask.Touchpad))
+        {
+            //only if pointer is at a increase or Decrease button
+            currentButton = pointer.GetComponent<PointerScript>().collider;
+            if (currentButton.tag == "increaseDecrease")
+            {
+                currentButton.GetComponent<UniversalButtonScript>().Press();
+            }
+        }
+        //cancel all invoke calls for increasing/decreasing
+        else if (device.GetPressUp(SteamVR_Controller.ButtonMask.Touchpad))
+        {
+            if (increaseDecrease)
+            {
+                increaseDecrease = false;
+                currentButton.GetComponent<UniversalButtonScript>().CancelAllCalls();
             }
         }
     }

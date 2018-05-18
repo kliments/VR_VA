@@ -52,20 +52,16 @@ public class ShowHideVisualizations : MonoBehaviour{
         if (wasHit)
         {
             wasHit = false;
-            GetComponent<Animator>().SetBool("selected", false);
         }
         else
         {
             wasHit = true;
-            GetComponent<Animator>().SetBool("selected", true);
             parentVis.SetActive(true);
         }
-
-        data.GetComponent<Animator>().SetBool("selected", false);
+        
         data.GetComponent<ShowHideDatasets>().wasHit = false;
         parentData.SetActive(false);
-
-        algorithms.GetComponent<Animator>().SetBool("selected", false);
+        
         algorithms.GetComponent<ShowHideAlgorithms>().wasHit = false;
         algorithms.GetComponent<ShowHideAlgorithms>().buttonText.text = algorithms.GetComponent<ShowHideAlgorithms>().thisText;
         parentAlgorithms.SetActive(false);

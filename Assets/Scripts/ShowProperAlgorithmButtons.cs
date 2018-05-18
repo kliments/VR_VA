@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class ShowProperAlgorithmButtons : MonoBehaviour {
     public GameObject kMeansParent, dbScanParent, responsiveMenu, algorithmsParent;
+    private BackButtonMenu backButton;
 	// Use this for initialization
 	void Start () {
         responsiveMenu = GameObject.Find("ResponsiveMenu");
@@ -13,6 +14,7 @@ public class ShowProperAlgorithmButtons : MonoBehaviour {
             else if (child.gameObject.name == "KMeansParent") kMeansParent = child.gameObject;
             else if (child.gameObject.name == "DBSCANParent") dbScanParent = child.gameObject;
         }
+        backButton = (BackButtonMenu)FindObjectOfType(typeof(BackButtonMenu));
 	}
 	
 	// Update is called once per frame
@@ -26,10 +28,12 @@ public class ShowProperAlgorithmButtons : MonoBehaviour {
         if (this.name == "K-Means")
         {
             kMeansParent.SetActive(true);
+            backButton.previousMenus.Add(kMeansParent);
         }
         else
         {
             dbScanParent.SetActive(true);
+            backButton.previousMenus.Add(dbScanParent);
         }
     }
 }

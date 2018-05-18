@@ -6,10 +6,10 @@ public class SwapBetweenMenus : MonoBehaviour {
     public GameObject menu1, menu2;
     SteamVR_TrackedObject trackedObj;
     public SteamVR_Controller.Device device;
+    public bool dontShowControlsMenu;
     private float threshold;
     private Vector2 oldPos, newPos;
     private bool primaryShown;
-    public bool menuIsActive;
     // Use this for initialization
     void Start () {
         trackedObj = transform.parent.GetComponent<SteamVR_TrackedObject>();
@@ -17,33 +17,52 @@ public class SwapBetweenMenus : MonoBehaviour {
         oldPos = new Vector2(0,0);
         newPos = new Vector2();
         threshold = 0.1f;
-        primaryShown = true;
-        menuIsActive = true;
+        primaryShown = false;
+        dontShowControlsMenu = false;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (device.GetTouch(SteamVR_Controller.ButtonMask.Touchpad))
+        if(menu2.activeSelf)
         {
-            oldPos = newPos;
-            newPos = device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
-            if (newPos.y > oldPos.y + threshold && primaryShown)
+
+            if(device.GetTouchDown(SteamVR_Controller.ButtonMask.Touchpad))
             {
-                Debug.Log("primary menu shown");
-                menu1.GetComponent<ResponsiveMenuScript>().Reposition();
-                menu2.GetComponent<ResponsiveMenuScript>().Reposition();
-                //oldPos = newPos;
-                primaryShown = false;
+                newPos = device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
+                oldPos = newPos;
             }
-            else if (newPos.y < oldPos.y - threshold && !primaryShown)
+            if (device.GetTouch(SteamVR_Controller.ButtonMask.Touchpad))
             {
-                Debug.Log("secondary menu shown");
-                menu1.GetComponent<ResponsiveMenuScript>().Reposition();
-                menu2.GetComponent<ResponsiveMenuScript>().Reposition();
-                //oldPos = newPos;
-                primaryShown = true;
+                oldPos = newPos;
+                newPos = device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
+                if (newPos.y > oldPos.y + threshold && primaryShown)
+                {
+                    Debug.Log("primary menu shown");
+                    menu1.GetComponent<ResponsiveMenuScript>().Reposition();
+                    menu2.GetComponent<ResponsiveMenuScript>().Reposition();
+                    //oldPos = newPos;
+                    primaryShown = false;
+                }
+                else if (newPos.y < oldPos.y - threshold && !primaryShown)
+                {
+                    Debug.Log("secondary menu shown");
+                    menu1.GetComponent<ResponsiveMenuScript>().Reposition();
+                    menu2.GetComponent<ResponsiveMenuScript>().Reposition();
+                    //oldPos = newPos;
+                    primaryShown = true;
+                }
             }
         }
+        //hide Controls Menu if user in Responsive menu
+        if (dontShowControlsMenu && menu2.activeSelf)
+        {
+            menu2.SetActive(false);
+        }
+        else if(!dontShowControlsMenu && !menu2.activeSelf)
+        {
+            menu2.SetActive(true);
+        }
     }
+    
 }

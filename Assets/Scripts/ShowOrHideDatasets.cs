@@ -5,7 +5,8 @@ using UnityEngine;
 public class ShowOrHideDatasets : MonoBehaviour {
     public GameObject datasetsParent, primaryMenuParent, responsiveMenu;
 	// Use this for initialization
-	void Start () {
+	void Start ()
+    {
         primaryMenuParent = GameObject.Find("PrimaryMenuParent");
         responsiveMenu = GameObject.Find("ResponsiveMenu");
         foreach (Transform child in responsiveMenu.transform)

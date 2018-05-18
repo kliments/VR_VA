@@ -26,11 +26,9 @@ public class datasetChooserWallScript : MonoBehaviour {
             element.GetComponent<datasetChangerScript>().spriteChanger(i + 1);
             if (i == 0)
             {
-                element.GetComponent<Animator>().SetBool("selected", true);
                 element.GetComponent<datasetChangerScript>().isSelected = true;
             }else
             {
-                element.GetComponent<Animator>().SetBool("selected", false);
                 element.GetComponent<datasetChangerScript>().isSelected = false;
             }
         }
