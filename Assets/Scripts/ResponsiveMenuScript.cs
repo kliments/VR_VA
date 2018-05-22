@@ -62,12 +62,14 @@ public class ResponsiveMenuScript : MonoBehaviour {
         //for moving pointer around when touching the touchpad
         if (device.GetTouch(SteamVR_Controller.ButtonMask.Touchpad))
         {
+            currentButton = pointer.GetComponent<PointerScript>().collider;
             oldPos = newPos;
             newPos = device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
             Vector2 difference = newPos - oldPos;
             if(Mathf.Abs(difference.x) > 0.01f)
             {
                 actualPos.x = difference.x * 0.1f;
+                
                 actualPos.z = 0;
                 actualPos.y = 0;
                 if (pointer.transform.localPosition.x < -0.28f && difference.x < 0)
@@ -81,6 +83,23 @@ public class ResponsiveMenuScript : MonoBehaviour {
                 }
                 pointer.transform.localPosition += actualPos;
             }
+            if (currentButton.tag == "increaseDecrease")
+            {
+                if (Mathf.Abs(difference.y) > 0.05f)
+                {
+                    currentButton.GetComponent<UniversalButtonScript>().difference = difference.y;
+                    currentButton.GetComponent<UniversalButtonScript>().Press();
+                    increaseDecrease = true;
+                }
+            }
+        }
+        else
+        {
+            if(increaseDecrease)
+            {
+                increaseDecrease = false;
+                currentButton.GetComponent<UniversalButtonScript>().CancelAllCalls();
+            }
         }
         //when touchpad press on button but not increasing or decreasing 
         if (device.GetPressDown(SteamVR_Controller.ButtonMask.Touchpad) && !increaseDecrease)
@@ -93,7 +112,7 @@ public class ResponsiveMenuScript : MonoBehaviour {
             }
         }
 
-        else if (device.GetPress(SteamVR_Controller.ButtonMask.Touchpad))
+        /*else if (device.GetPress(SteamVR_Controller.ButtonMask.Touchpad))
         {
             //only if pointer is at a increase or Decrease button
             currentButton = pointer.GetComponent<PointerScript>().collider;
@@ -110,7 +129,7 @@ public class ResponsiveMenuScript : MonoBehaviour {
                 increaseDecrease = false;
                 currentButton.GetComponent<UniversalButtonScript>().CancelAllCalls();
             }
-        }
+        }*/
     }
 
     private void ToggleResponsiveMenu()

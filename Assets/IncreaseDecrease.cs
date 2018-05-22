@@ -8,9 +8,10 @@ public class IncreaseDecrease : MonoBehaviour {
     public GameObject kMeans;
     public GameObject dbScan;
     public Text text;
+    public float difference;
 	// Use this for initialization
 	void Start () {
-		
+        difference = 0;
 	}
 	
 	// Update is called once per frame

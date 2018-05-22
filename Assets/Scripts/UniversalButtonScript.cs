@@ -8,6 +8,7 @@ public class UniversalButtonScript : MonoBehaviour {
     public Material onHoverMaterial, defaultMaterial;
     public ResponsiveMenuScript controller;
     public bool isHover, isPress, toChange;
+    public float difference;
     private Transform responsiveMenu;
     private MeshRenderer meshRenderer;
     private IncreaseDecrease increaseDecreseObj;
@@ -172,30 +173,17 @@ public class UniversalButtonScript : MonoBehaviour {
             if (this.name == "NrOfSpheres")
             {
                 increaseDecreseObj = GetComponent<IncreaseDecrease>();
-                controller.increaseDecrease = true;
+                //controller.increaseDecrease = true;
                 Vector2 pos = controller.device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
-                if (pos.y >= 0f)
+                if (difference > 0f)
                 {
-                    if (IsInvoking("DecreaseNrSpheres"))
-                    {
-                        CancelInvoke("DecreaseNrSpheres");
-                    }
-
-                    if (!IsInvoking("IncreaseNrSpheres"))
-                    {
-                        InvokeRepeating("IncreaseNrSpheres", 0, 1f);
-                    }
+                    if (IsInvoking("DecreaseNrSpheres")) CancelInvoke("DecreaseNrSpheres");
+                    if (!IsInvoking("IncreaseNrSpheres")) InvokeRepeating("IncreaseNrSpheres", 0, 0.2f);
                 }
-                else if (pos.y < 0f)
+                else if (difference < 0f)
                 {
-                    if (IsInvoking("IncreaseNrSpheres"))
-                    {
-                        CancelInvoke("IncreaseNrSpheres");
-                    }
-                    if (!IsInvoking("DecreaseNrSpheres"))
-                    {
-                        InvokeRepeating("DecreaseNrSpheres", 0, 1f);
-                    }
+                    if (IsInvoking("IncreaseNrSpheres")) CancelInvoke("IncreaseNrSpheres");
+                    if (!IsInvoking("DecreaseNrSpheres")) InvokeRepeating("DecreaseNrSpheres", 0, 0.2f);
                 }
             }
             else if(this.name == "Step Backward")
@@ -217,17 +205,17 @@ public class UniversalButtonScript : MonoBehaviour {
             if (this.name == "epsilon")
             {
                 increaseDecreseObj = GetComponent<IncreaseDecrease>();
-                controller.increaseDecrease = true;
+                //controller.increaseDecrease = true;
                 Vector2 pos = controller.device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
-                if (pos.y >= 0f)
+                if (difference > 0f)
                 {
                     if (IsInvoking("DecreaseEpsilon")) CancelInvoke("DecreaseEpsilon");
-                    if (!IsInvoking("IncreaseEpsilon")) InvokeRepeating("IncreaseEpsilon", 0, 1f);
+                    if (!IsInvoking("IncreaseEpsilon")) InvokeRepeating("IncreaseEpsilon", 0, 0.2f);
                 }
-                else if (pos.y < 0f)
+                else if (difference < 0f)
                 {
                     if (IsInvoking("IncreaseEpsilon")) CancelInvoke("IncreaseEpsilon");
-                    if (!IsInvoking("DecreaseEpsilon")) InvokeRepeating("DecreaseEpsilon", 0, 1f);
+                    if (!IsInvoking("DecreaseEpsilon")) InvokeRepeating("DecreaseEpsilon", 0, 0.2f);
                 }
             }
             else if(this.name == "minPts")
@@ -235,15 +223,15 @@ public class UniversalButtonScript : MonoBehaviour {
                 increaseDecreseObj = GetComponent<IncreaseDecrease>();
                 controller.increaseDecrease = true;
                 Vector2 pos = controller.device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
-                if (pos.y >= 0f)
+                if (difference > 0f)
                 {
                     if (IsInvoking("DecreaseMinPts")) CancelInvoke("DecreaseMinPts");
-                    if (!IsInvoking("IncreaseMinPts")) InvokeRepeating("IncreaseMinPts", 0, 1f);
+                    if (!IsInvoking("IncreaseMinPts")) InvokeRepeating("IncreaseMinPts", 0, 0.2f);
                 }
-                else if (pos.y < 0f)
+                else if (difference < 0f)
                 {
                     if (IsInvoking("IncreaseMinPts")) CancelInvoke("IncreaseMinPts");
-                    if (!IsInvoking("DecreaseMinPts")) InvokeRepeating("DecreaseMinPts", 0, 1f);
+                    if (!IsInvoking("DecreaseMinPts")) InvokeRepeating("DecreaseMinPts", 0, 0.2f);
                 }
             }
             else if(this.name == "EucledianManhattan")
