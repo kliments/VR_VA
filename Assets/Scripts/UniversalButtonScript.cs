@@ -152,11 +152,13 @@ public class UniversalButtonScript : MonoBehaviour {
         else if (transform.parent == datasetParent.transform)
         {
             GetComponent<datasetChangerScript>().startTargetedAction();
+            GetComponent<DatasetSelectedSpriteToggle>().ShowSprite();
         }
         //change to proper visualization
         else if (transform.parent == vizParent.transform)
         {
             GetComponent<VisualizationChangerScript>().startSelectedAction();
+            GetComponent<VisualizationSelectedSpriteToggle>().ShowSprite();
         }
         //show the proper algorithm buttons
         else if(transform.parent == algorithmParent.transform)
@@ -322,7 +324,7 @@ public class UniversalButtonScript : MonoBehaviour {
 
     private void OnEnable()
     {
-        if(meshRenderer.material != defaultMaterial)
+        if(meshRenderer!=null && meshRenderer.material != defaultMaterial)
         {
             meshRenderer.material = defaultMaterial;
         }

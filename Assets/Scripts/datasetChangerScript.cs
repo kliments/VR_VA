@@ -9,12 +9,10 @@ public class datasetChangerScript : MonoBehaviour
     public TextAsset myDataset;
     public GameObject textPrefab;
     public GameObject scatterplot;
-    public GameObject spriteGraph;
     public GameObject buttonText;
 
     private float lastActivation = 0;
     private GameObject myText;
-    private GameObject mySprite;
 
     public GameObject parentViz;
     public Transform responsiveMenu;
@@ -28,6 +26,7 @@ public class datasetChangerScript : MonoBehaviour
     public GameObject resetKmeans;
     public GameObject resetDBScan;
     public GameObject ground;
+    public Sprite datasetSelected;
 
     public void startTargetedAction()
     {
@@ -122,20 +121,7 @@ public class datasetChangerScript : MonoBehaviour
         mesher.text = value;
 
     }
-
-    public void spriteChanger(int i)
-    {
-        mySprite = Instantiate(spriteGraph);
-        mySprite.transform.parent = this.transform;
-
-        mySprite.transform.localPosition = new Vector3(-0.006f, -0.095f, -0.6f);
-        mySprite.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
-        mySprite.transform.localScale = new Vector3(0.2f, 0.4f, 0.2f);
-
-        mySprite.GetComponent<SpriteRenderer>().sprite = Resources.Load(i.ToString(), typeof(Sprite)) as Sprite;
-        mySprite.SetActive(false);
-
-    }
+    
 	
 	// Update is called once per frame
 	void Update() {

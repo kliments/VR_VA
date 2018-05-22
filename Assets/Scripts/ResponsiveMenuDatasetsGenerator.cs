@@ -8,9 +8,11 @@ public class ResponsiveMenuDatasetsGenerator : MonoBehaviour {
     public TextAsset[] datasets;
     public GameObject primaryMenu;
 
+    public Sprite spr;
     private float x, y, z;
     // Use this for initialization
     void Start () {
+        spr = new Sprite();
         x = -0.24f;
         y = 0;
         z = 0;
@@ -29,7 +31,8 @@ public class ResponsiveMenuDatasetsGenerator : MonoBehaviour {
             element.transform.localScale = scale;
             element.GetComponent<datasetChangerScript>().ChangeText(datasets[i].name);
             datasetButtons.Add(element);
-            //element.GetComponent<datasetChangerScript>().spriteChanger(i + 1);
+            int s = i + 1;
+            element.GetComponent<RotateDatasetButton>().mySprite = Resources.Load<Sprite>(s.ToString());
         }
 
     }

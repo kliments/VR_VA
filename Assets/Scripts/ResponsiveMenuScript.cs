@@ -165,11 +165,11 @@ public class ResponsiveMenuScript : MonoBehaviour {
     {
         if(gameObject.name == "ResponsiveMenu")
         {
-            inactivePos = new Vector3(0f, -0.03f, 0.3f);
+            inactivePos = new Vector3(0f, -0.03f, 0.235f);
         }
         else
         {
-            inactivePos = new Vector3(0f, -0.03f, 0f);
+            inactivePos = new Vector3(0f, -0.03f, 0.065f);
         }
         activePos = new Vector3(0, 0, 0.15f);
     }

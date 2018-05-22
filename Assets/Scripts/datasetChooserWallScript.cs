@@ -23,7 +23,6 @@ public class datasetChooserWallScript : MonoBehaviour {
             element.transform.localRotation = rot;
             element.transform.localScale = scale;
             element.GetComponent<datasetChangerScript>().initText();
-            element.GetComponent<datasetChangerScript>().spriteChanger(i + 1);
             if (i == 0)
             {
                 element.GetComponent<datasetChangerScript>().isSelected = true;

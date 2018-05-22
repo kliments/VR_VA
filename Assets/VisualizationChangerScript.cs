@@ -16,6 +16,7 @@ public class VisualizationChangerScript : MonoBehaviour {
     private GameObject triangles;
     private GameObject tetrahedrons;
     public GameObject ground;
+    public Sprite visualizationSelected;
 
     private GameObject[] visualizationss;
     private int cube = 0;

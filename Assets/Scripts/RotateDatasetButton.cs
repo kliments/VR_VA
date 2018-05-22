@@ -7,6 +7,9 @@ public class RotateDatasetButton : MonoBehaviour {
     private ResponsiveMenuDatasetsGenerator datasetGenerator;
     public List<GameObject> leftSideButtons, rightSideButtons;
     private List<GameObject> allButtons;
+    private Quaternion originalRotation;
+    public GameObject sprite;
+    public Sprite mySprite;
     // Use this for initialization
     void Start () {
         datasetGenerator = (ResponsiveMenuDatasetsGenerator)FindObjectOfType(typeof(ResponsiveMenuDatasetsGenerator));
@@ -16,14 +19,18 @@ public class RotateDatasetButton : MonoBehaviour {
         AssignAccordinglyButtons();
         toChange = false;
         toChangeBack = true;
+        originalRotation = transform.rotation;
+        sprite = GameObject.Find("PCAProjectionSprite");
     }
 	
 	// Update is called once per frame
 	void Update () {
 		if(isHovered && toChangeBack)
         {
-           transform.Rotate(new Vector3(0, 0, 0));
-            if(leftSideButtons.Count != 0)
+            //rotate to be visible
+            transform.localRotation = Quaternion.Euler(0, 0, 0);
+            sprite.GetComponent<SpriteRenderer>().sprite = mySprite;
+            if (leftSideButtons.Count != 0)
             {
                 foreach (GameObject obj in leftSideButtons)
                 {
@@ -42,7 +49,8 @@ public class RotateDatasetButton : MonoBehaviour {
         }
         else if(!isHovered && toChange)
         {
-            transform.Rotate(new Vector3(0, 0, -90));
+            //rotate back to not visible
+            transform.localRotation = Quaternion.Euler(0, 0, -90);
             if (leftSideButtons.Count != 0)
             {
                 foreach (GameObject obj in leftSideButtons)
