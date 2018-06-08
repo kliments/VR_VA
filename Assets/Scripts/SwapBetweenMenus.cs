@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class SwapBetweenMenus : MonoBehaviour {
-    public GameObject menu1, menu2;
+    public GameObject menu1, menu2, pipelineSprite, controlsSprite;
     SteamVR_TrackedObject trackedObj;
     public SteamVR_Controller.Device device;
     public bool dontShowControlsMenu;
     private float threshold;
     private Vector2 oldPos, newPos;
-    private bool primaryShown;
+    public bool primaryShown;
     // Use this for initialization
     void Start () {
         trackedObj = transform.parent.GetComponent<SteamVR_TrackedObject>();
@@ -17,7 +17,7 @@ public class SwapBetweenMenus : MonoBehaviour {
         oldPos = new Vector2(0,0);
         newPos = new Vector2();
         threshold = 0.1f;
-        primaryShown = false;
+        primaryShown = true;
         dontShowControlsMenu = false;
     }
 
@@ -36,21 +36,31 @@ public class SwapBetweenMenus : MonoBehaviour {
             {
                 oldPos = newPos;
                 newPos = device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
-                if (newPos.y > oldPos.y + threshold && primaryShown)
+                if (newPos.y > oldPos.y + threshold && !primaryShown)
                 {
                     Debug.Log("primary menu shown");
                     menu1.GetComponent<ResponsiveMenuScript>().Reposition();
                     menu2.GetComponent<ResponsiveMenuScript>().Reposition();
+                    GetComponent<CoverflowScript>().menuToRotate = menu1;
                     //oldPos = newPos;
-                    primaryShown = false;
+                    primaryShown = true;
+
+                    //show label for it
+                    pipelineSprite.SetActive(true);
+                    controlsSprite.SetActive(false);
                 }
-                else if (newPos.y < oldPos.y - threshold && !primaryShown)
+                else if (newPos.y < oldPos.y - threshold && primaryShown)
                 {
                     Debug.Log("secondary menu shown");
                     menu1.GetComponent<ResponsiveMenuScript>().Reposition();
                     menu2.GetComponent<ResponsiveMenuScript>().Reposition();
+                    GetComponent<CoverflowScript>().menuToRotate = menu2;
                     //oldPos = newPos;
-                    primaryShown = true;
+                    primaryShown = false;
+
+                    //show label for it
+                    pipelineSprite.SetActive(false);
+                    controlsSprite.SetActive(true);
                 }
             }
         }

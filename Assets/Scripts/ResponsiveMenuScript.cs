@@ -63,6 +63,7 @@ public class ResponsiveMenuScript : MonoBehaviour {
         if (device.GetTouch(SteamVR_Controller.ButtonMask.Touchpad))
         {
             currentButton = pointer.GetComponent<PointerScript>().collider;
+            currentButton = transform.parent.gameObject.GetComponent<CoverflowScript>().currentButton;
             oldPos = newPos;
             newPos = device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
             Vector2 difference = newPos - oldPos;
@@ -111,25 +112,7 @@ public class ResponsiveMenuScript : MonoBehaviour {
                 currentButton.GetComponent<UniversalButtonScript>().Press();
             }
         }
-
-        /*else if (device.GetPress(SteamVR_Controller.ButtonMask.Touchpad))
-        {
-            //only if pointer is at a increase or Decrease button
-            currentButton = pointer.GetComponent<PointerScript>().collider;
-            if (currentButton.tag == "increaseDecrease")
-            {
-                currentButton.GetComponent<UniversalButtonScript>().Press();
-            }
-        }
-        //cancel all invoke calls for increasing/decreasing
-        else if (device.GetPressUp(SteamVR_Controller.ButtonMask.Touchpad))
-        {
-            if (increaseDecrease)
-            {
-                increaseDecrease = false;
-                currentButton.GetComponent<UniversalButtonScript>().CancelAllCalls();
-            }
-        }*/
+        
     }
 
     private void ToggleResponsiveMenu()

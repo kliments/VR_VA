@@ -22,17 +22,21 @@ public class BackButtonMenu : MonoBehaviour {
 	void Update () {
 		if(device.GetPressDown(SteamVR_Controller.ButtonMask.ApplicationMenu))
         {
-            //remove the last menu from the list and show the second last
-            if(previousMenus.Count>1)
-            {
-                previousMenus[previousMenus.Count - 1].SetActive(false);
-                previousMenus.RemoveAt(previousMenus.Count - 1);
-                previousMenus[previousMenus.Count - 1].SetActive(true);
-                if(previousMenus.Count == 1)
-                {
-                    swapMenuScript.dontShowControlsMenu = false;
-                }
-            }
+            GoBackInMenu();
         }
 	}
+
+    public void GoBackInMenu()
+    {//remove the last menu from the list and show the second last
+        if (previousMenus.Count > 1)
+        {
+            previousMenus[previousMenus.Count - 1].SetActive(false);
+            previousMenus.RemoveAt(previousMenus.Count - 1);
+            previousMenus[previousMenus.Count - 1].SetActive(true);
+            if (previousMenus.Count == 1)
+            {
+                swapMenuScript.dontShowControlsMenu = false;
+            }
+        }
+    }
 }

@@ -32,7 +32,11 @@ public class ResponsiveMenuDatasetsGenerator : MonoBehaviour {
             element.GetComponent<datasetChangerScript>().ChangeText(datasets[i].name);
             datasetButtons.Add(element);
             int s = i + 1;
-            element.GetComponent<RotateDatasetButton>().mySprite = Resources.Load<Sprite>(s.ToString());
+            element.GetComponent<RotateDatasetButtonProperties>().mySprite = Resources.Load<Sprite>(s.ToString());
+            if(i == 0)
+            {
+                element.GetComponent<RotateDatasetButtonProperties>().isHovered = true;
+            }
         }
 
     }

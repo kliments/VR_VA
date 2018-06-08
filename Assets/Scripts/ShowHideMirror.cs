@@ -7,9 +7,11 @@ public class ShowHideMirror : MonoBehaviour {
     public bool isVisible;
     public GameObject mirror;
     public Text text;
+    private int counter;
 	// Use this for initialization
 	void Start () {
         isVisible = false;
+        counter = 0;
 	}
 	
 	// Update is called once per frame
@@ -19,17 +21,21 @@ public class ShowHideMirror : MonoBehaviour {
 
     public void ToggleMirror()
     {
-        if(isVisible)
+        //need the counter, because for some reason this function was being called twice with one press
+        counter++;
+        if(isVisible && counter==2)
         {
             isVisible = false;
             mirror.SetActive(false);
             text.text = "Show Mirror";
+            counter = 0;
         }
-        else
+        else if(!isVisible && counter==2)
         {
             isVisible = true;
             mirror.SetActive(true);
             text.text = "Hide Mirror";
+            counter = 0;
         }
     }
 }

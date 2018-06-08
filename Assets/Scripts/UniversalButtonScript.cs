@@ -42,10 +42,10 @@ public class UniversalButtonScript : MonoBehaviour {
             {
                 toChange = false;
                 meshRenderer.material = onHoverMaterial;
-                if(GetComponent<RotateDatasetButton>() != null)
+                /*if(GetComponent<RotateDatasetButton>() != null)
                 {
                     GetComponent<RotateDatasetButton>().isHovered = true;
-                }
+                }*/
             }
         }
         else
@@ -54,10 +54,10 @@ public class UniversalButtonScript : MonoBehaviour {
             {
                 meshRenderer.material = defaultMaterial;
 
-                if (GetComponent<RotateDatasetButton>() != null)
+                /*if (GetComponent<RotateDatasetButton>() != null)
                 {
                     GetComponent<RotateDatasetButton>().isHovered = false;
-                }
+                }*/
             }
             toChange = true;
         }
@@ -98,12 +98,12 @@ public class UniversalButtonScript : MonoBehaviour {
     
     public void Press()
     {
-        foreach (Transform child in gameObject.transform.parent)
+        /*foreach (Transform child in gameObject.transform.parent)
         {
             child.gameObject.GetComponent<UniversalButtonScript>().isPress = false;
         }
         isPress = true;
-        isHover = false;
+        isHover = false;*/
         RespectiveButtonRespectiveFunction();
     }
 
@@ -117,6 +117,7 @@ public class UniversalButtonScript : MonoBehaviour {
             {
                 menusParent.previousMenus.Add(datasetParent);
                 swapScript.dontShowControlsMenu = true;
+                menusParent.GetComponent<CoverflowScript>().AssignValues(datasetParent);
             }
         }
         //show the visualizations buttons
@@ -127,6 +128,7 @@ public class UniversalButtonScript : MonoBehaviour {
             {
                 menusParent.previousMenus.Add(vizParent);
                 swapScript.dontShowControlsMenu = true;
+                menusParent.GetComponent<CoverflowScript>().AssignValues(vizParent);
             }
         }
         //show the algorithms buttons
@@ -137,6 +139,7 @@ public class UniversalButtonScript : MonoBehaviour {
             {
                 menusParent.previousMenus.Add(algorithmParent);
                 swapScript.dontShowControlsMenu = true;
+                menusParent.GetComponent<CoverflowScript>().AssignValues(algorithmParent);
             }
         }
         //toggle between showing or hiding the mirror
@@ -153,15 +156,18 @@ public class UniversalButtonScript : MonoBehaviour {
         else if (transform.parent == datasetParent.transform)
         {
             GetComponent<datasetChangerScript>().startTargetedAction();
+            menusParent.GetComponent<BackButtonMenu>().GoBackInMenu();
             GetComponent<DatasetSelectedSpriteToggle>().ShowSprite();
         }
         //change to proper visualization
         else if (transform.parent == vizParent.transform)
         {
             GetComponent<VisualizationChangerScript>().startSelectedAction();
+            menusParent.GetComponent<BackButtonMenu>().GoBackInMenu();
             GetComponent<VisualizationSelectedSpriteToggle>().ShowSprite();
         }
         //show the proper algorithm buttons
+        ///////////////////////////////////////////////////////////////////////////////////// TUKA DA PRODOLZAM SO DRUGITE RODITELI NA COVERFLOWWWWWWWWWWWWWWWWWWW
         else if(transform.parent == algorithmParent.transform)
         {
             GetComponent<ShowProperAlgorithmButtons>().ButtonPressed();
