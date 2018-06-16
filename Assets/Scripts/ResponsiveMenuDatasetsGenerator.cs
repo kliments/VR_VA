@@ -12,6 +12,10 @@ public class ResponsiveMenuDatasetsGenerator : MonoBehaviour {
     private float x, y, z;
     // Use this for initialization
     void Start () {
+        if(gameObject.activeSelf)
+        {
+            gameObject.SetActive(false);
+        }
         spr = new Sprite();
         x = -0.24f;
         y = 0;
@@ -32,10 +36,10 @@ public class ResponsiveMenuDatasetsGenerator : MonoBehaviour {
             element.GetComponent<datasetChangerScript>().ChangeText(datasets[i].name);
             datasetButtons.Add(element);
             int s = i + 1;
-            element.GetComponent<RotateDatasetButtonProperties>().mySprite = Resources.Load<Sprite>(s.ToString());
+            element.GetComponent<DatasetSpriteChanger>().actualSprite = Resources.Load<Sprite>(s.ToString());
             if(i == 0)
             {
-                element.GetComponent<RotateDatasetButtonProperties>().isHovered = true;
+                element.GetComponent<GeneralCoverflowProperties>().isHovered = true;
             }
         }
 

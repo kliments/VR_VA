@@ -33,10 +33,14 @@ public class BackButtonMenu : MonoBehaviour {
             previousMenus[previousMenus.Count - 1].SetActive(false);
             previousMenus.RemoveAt(previousMenus.Count - 1);
             previousMenus[previousMenus.Count - 1].SetActive(true);
+            GetComponent<CoverflowScript>().AssignValues(previousMenus[previousMenus.Count - 1]);
             if (previousMenus.Count == 1)
             {
                 swapMenuScript.dontShowControlsMenu = false;
+                //set responsive menu as active one
+                GetComponent<CoverflowScript>().menuToRotate = gameObject.transform.GetChild(1).gameObject;
             }
+
         }
     }
 }

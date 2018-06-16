@@ -42,10 +42,6 @@ public class UniversalButtonScript : MonoBehaviour {
             {
                 toChange = false;
                 meshRenderer.material = onHoverMaterial;
-                /*if(GetComponent<RotateDatasetButton>() != null)
-                {
-                    GetComponent<RotateDatasetButton>().isHovered = true;
-                }*/
             }
         }
         else
@@ -53,14 +49,10 @@ public class UniversalButtonScript : MonoBehaviour {
             if (meshRenderer.material != defaultMaterial)
             {
                 meshRenderer.material = defaultMaterial;
-
-                /*if (GetComponent<RotateDatasetButton>() != null)
-                {
-                    GetComponent<RotateDatasetButton>().isHovered = false;
-                }*/
             }
             toChange = true;
         }
+        
 	}
     
 
@@ -98,12 +90,6 @@ public class UniversalButtonScript : MonoBehaviour {
     
     public void Press()
     {
-        /*foreach (Transform child in gameObject.transform.parent)
-        {
-            child.gameObject.GetComponent<UniversalButtonScript>().isPress = false;
-        }
-        isPress = true;
-        isHover = false;*/
         RespectiveButtonRespectiveFunction();
     }
 
@@ -167,7 +153,6 @@ public class UniversalButtonScript : MonoBehaviour {
             GetComponent<VisualizationSelectedSpriteToggle>().ShowSprite();
         }
         //show the proper algorithm buttons
-        ///////////////////////////////////////////////////////////////////////////////////// TUKA DA PRODOLZAM SO DRUGITE RODITELI NA COVERFLOWWWWWWWWWWWWWWWWWWW
         else if(transform.parent == algorithmParent.transform)
         {
             GetComponent<ShowProperAlgorithmButtons>().ButtonPressed();
@@ -208,6 +193,7 @@ public class UniversalButtonScript : MonoBehaviour {
         //DBSCAN buttons functionalities
         else if(transform.parent == dbscanParent.transform)
         {
+            menusParent.GetComponent<CoverflowScript>().AssignValues(dbscanParent);
             if (this.name == "epsilon")
             {
                 increaseDecreseObj = GetComponent<IncreaseDecrease>();

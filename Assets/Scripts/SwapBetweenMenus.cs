@@ -41,7 +41,9 @@ public class SwapBetweenMenus : MonoBehaviour {
                     Debug.Log("primary menu shown");
                     menu1.GetComponent<ResponsiveMenuScript>().Reposition();
                     menu2.GetComponent<ResponsiveMenuScript>().Reposition();
+                    GetComponent<CoverflowScript>().DeselectAllButtons();
                     GetComponent<CoverflowScript>().menuToRotate = menu1;
+                    GetComponent<CoverflowScript>().SetCurrentButton();
                     //oldPos = newPos;
                     primaryShown = true;
 
@@ -54,7 +56,9 @@ public class SwapBetweenMenus : MonoBehaviour {
                     Debug.Log("secondary menu shown");
                     menu1.GetComponent<ResponsiveMenuScript>().Reposition();
                     menu2.GetComponent<ResponsiveMenuScript>().Reposition();
+                    GetComponent<CoverflowScript>().DeselectAllButtons();
                     GetComponent<CoverflowScript>().menuToRotate = menu2;
+                    GetComponent<CoverflowScript>().SetCurrentButton();
                     //oldPos = newPos;
                     primaryShown = false;
 

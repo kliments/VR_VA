@@ -16,20 +16,22 @@ public class GeneralCoverflowProperties : MonoBehaviour {
         mainPosition = new Vector3(0, 0, 0);
         leftSideButtons = new List<GameObject>();
         rightSideButtons = new List<GameObject>();
-        AssignAccordinglyButtons();
-        originalRotation = transform.rotation;
+        parent = gameObject.transform.parent.gameObject;
         ptr = GameObject.Find("Pointer");
         menusParent = GameObject.Find("MenusParent");
+        allButtons = new List<GameObject>();
+        AssignAccordinglyButtons();
+        originalRotation = transform.rotation;
         ptrOldPos = ptr.transform.localPosition;
         ptrNewPos = ptr.transform.localPosition;
     }
-
+    
     // Update is called once per frame
     void Update()
     {
         if (isHovered)
         {
-            menusParent.GetComponent<CoverflowScript>().currentButton = this.gameObject;
+            //menusParent.GetComponent<CoverflowScript>().currentButton = this.gameObject;
             //rotate to be visible
             transform.localRotation = Quaternion.Euler(0, 0, 0);
             transform.localPosition = mainPosition;

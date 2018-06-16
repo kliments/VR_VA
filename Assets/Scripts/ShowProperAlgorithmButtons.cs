@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class ShowProperAlgorithmButtons : MonoBehaviour {
-    public GameObject kMeansParent, dbScanParent, responsiveMenu, algorithmsParent;
+    public GameObject kMeansParent, dbScanParent, responsiveMenu, algorithmsParent, menusParent;
     private BackButtonMenu backButton;
 	// Use this for initialization
 	void Start () {
         responsiveMenu = GameObject.Find("ResponsiveMenu");
+        menusParent = GameObject.Find("MenusParent");
         foreach(Transform child in responsiveMenu.transform)
         {
             if (child.gameObject.name == "AlgorithmsParent") algorithmsParent = child.gameObject;
@@ -28,11 +29,13 @@ public class ShowProperAlgorithmButtons : MonoBehaviour {
         if (this.name == "K-Means")
         {
             kMeansParent.SetActive(true);
+            menusParent.GetComponent<CoverflowScript>().AssignValues(kMeansParent);
             backButton.previousMenus.Add(kMeansParent);
         }
         else
         {
             dbScanParent.SetActive(true);
+            menusParent.GetComponent<CoverflowScript>().AssignValues(dbScanParent);
             backButton.previousMenus.Add(dbScanParent);
         }
     }
