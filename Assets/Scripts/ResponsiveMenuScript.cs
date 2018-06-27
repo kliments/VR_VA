@@ -17,7 +17,6 @@ public class ResponsiveMenuScript : MonoBehaviour {
     void Start () {
         slide = true;
         isShown = true;
-        increaseDecrease = false;
         trackedObj = transform.parent.transform.parent.GetComponent<SteamVR_TrackedObject>();
         device = SteamVR_Controller.Input((int)trackedObj.index);
         inactiveScale = new Vector3(0.7f, 0.7f, 0.7f);
@@ -70,7 +69,15 @@ public class ResponsiveMenuScript : MonoBehaviour {
             oldPos = newPos;
             newPos = device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
             Vector2 difference = newPos - oldPos;
-            if(Mathf.Abs(difference.x) > 0.01f)
+
+            if (currentButton.tag == "increaseDecrease" && Mathf.Abs(difference.y) > 0.05f)
+            {
+                currentButton.GetComponent<UniversalButtonScript>().difference = difference.y;
+                currentButton.GetComponent<UniversalButtonScript>().Press();
+                slide = false;
+            }
+
+            else if (Mathf.Abs(difference.x) > 0.03f)
             {
                 actualPos.x = difference.x * 0.1f;
                 
@@ -86,28 +93,7 @@ public class ResponsiveMenuScript : MonoBehaviour {
                     actualPos.x = 0;
                 }
                 pointer.transform.localPosition += actualPos;
-            }
-            if (currentButton.tag == "increaseDecrease")
-            {
-                if (Mathf.Abs(difference.y) > 0.05f)
-                {
-                    currentButton.GetComponent<UniversalButtonScript>().difference = difference.y;
-                    currentButton.GetComponent<UniversalButtonScript>().Press();
-                    increaseDecrease = true;
-                }
-            }
-            frameCounter++;
-            if(frameCounter == 5)
-            {
                 slide = false;
-            }
-        }
-        else
-        {
-            if(increaseDecrease)
-            {
-                increaseDecrease = false;
-                currentButton.GetComponent<UniversalButtonScript>().CancelAllCalls();
             }
         }
 
@@ -115,16 +101,14 @@ public class ResponsiveMenuScript : MonoBehaviour {
         {
             slide = true;
             frameCounter = 0;
+            oldPos = new Vector2(0, 0);
+            newPos = new Vector2(0, 0);
+            currentButton.GetComponent<UniversalButtonScript>().CancelAllCalls();
         }
-        //when touchpad press on button but not increasing or decreasing 
+
         if (device.GetPressDown(SteamVR_Controller.ButtonMask.Trigger))
         {
             currentButton.GetComponent<UniversalButtonScript>().Press();
-            //only if pointer is at a button
-            if (pointer.GetComponent<PointerScript>().pointerCollides)
-            {
-                currentButton = pointer.GetComponent<PointerScript>().collider;
-            }
         }
         
     }

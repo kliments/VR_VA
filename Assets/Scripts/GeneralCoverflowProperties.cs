@@ -31,7 +31,7 @@ public class GeneralCoverflowProperties : MonoBehaviour {
     {
         if (isHovered)
         {
-            //menusParent.GetComponent<CoverflowScript>().currentButton = this.gameObject;
+            menusParent.GetComponent<CoverflowScript>().currentButton = this.gameObject;
             //rotate to be visible
             transform.localRotation = Quaternion.Euler(0, 0, 0);
             transform.localPosition = mainPosition;

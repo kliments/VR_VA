@@ -27,7 +27,7 @@ public class ToggleEucledianManhattan : MonoBehaviour {
         {
             eucledian = false;
             distance.euclDist = true;
-            text.text = "Eucledian";
+            text.text = "Euclidean";
         }
         else
         {

@@ -174,6 +174,11 @@ public class KMeansAlgorithm : MonoBehaviour {
             }
             counter++;
 
+            foreach(Transform dataPoint in dataVisuals.transform)
+            {
+                dataPoint.gameObject.GetComponent<MeshRenderer>().material.color = Color.white;
+            }
+
         }
 
         //if the next step is to change the colors of the data points related to the closest sphere

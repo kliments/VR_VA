@@ -7,7 +7,6 @@ public class UniversalButtonScript : MonoBehaviour {
     public GameObject primaryMenu,primaryParent, datasetParent, vizParent, algorithmParent, kmeansParent, dbscanParent;
     public Material onHoverMaterial, defaultMaterial;
     public ResponsiveMenuScript controller;
-    public bool isHover, isPress, toChange;
     public float difference;
     private Transform responsiveMenu;
     private MeshRenderer meshRenderer;
@@ -19,9 +18,6 @@ public class UniversalButtonScript : MonoBehaviour {
     // Use this for initialization
 	void Start () {
         FindParents();
-        isHover = false;
-        isPress = false;
-        toChange = true;
         meshRenderer = GetComponent<MeshRenderer>();
         defaultMaterial = meshRenderer.material;
         onHoverMaterial = Resources.Load("Materials/OnHoverMaterial", typeof(Material)) as Material;
@@ -34,25 +30,7 @@ public class UniversalButtonScript : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        //if hover and not increasing or decreasing
-        if(isHover && !controller.increaseDecrease)
-        {
-            //if it is supposed to be changed and button is not selected before
-            if(toChange)
-            {
-                toChange = false;
-                meshRenderer.material = onHoverMaterial;
-            }
-        }
-        else
-        {
-            if (meshRenderer.material != defaultMaterial)
-            {
-                meshRenderer.material = defaultMaterial;
-            }
-            toChange = true;
-        }
-        
+
 	}
     
 
@@ -164,7 +142,6 @@ public class UniversalButtonScript : MonoBehaviour {
             if (this.name == "NrOfSpheres")
             {
                 increaseDecreseObj = GetComponent<IncreaseDecrease>();
-                //controller.increaseDecrease = true;
                 Vector2 pos = controller.device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
                 if (difference > 0f)
                 {
@@ -197,7 +174,6 @@ public class UniversalButtonScript : MonoBehaviour {
             if (this.name == "epsilon")
             {
                 increaseDecreseObj = GetComponent<IncreaseDecrease>();
-                //controller.increaseDecrease = true;
                 Vector2 pos = controller.device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
                 if (difference > 0f)
                 {
@@ -213,15 +189,16 @@ public class UniversalButtonScript : MonoBehaviour {
             else if(this.name == "minPts")
             {
                 increaseDecreseObj = GetComponent<IncreaseDecrease>();
-                controller.increaseDecrease = true;
                 Vector2 pos = controller.device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
                 if (difference > 0f)
                 {
+
                     if (IsInvoking("DecreaseMinPts")) CancelInvoke("DecreaseMinPts");
                     if (!IsInvoking("IncreaseMinPts")) InvokeRepeating("IncreaseMinPts", 0, 0.2f);
                 }
                 else if (difference < 0f)
                 {
+
                     if (IsInvoking("IncreaseMinPts")) CancelInvoke("IncreaseMinPts");
                     if (!IsInvoking("DecreaseMinPts")) InvokeRepeating("DecreaseMinPts", 0, 0.2f);
                 }

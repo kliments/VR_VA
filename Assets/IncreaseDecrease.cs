@@ -8,10 +8,8 @@ public class IncreaseDecrease : MonoBehaviour {
     public GameObject kMeans;
     public GameObject dbScan;
     public Text text;
-    public float difference;
 	// Use this for initialization
 	void Start () {
-        difference = 0;
 	}
 	
 	// Update is called once per frame
@@ -22,7 +20,7 @@ public class IncreaseDecrease : MonoBehaviour {
     public void IncreaseNrSpheres()
     {
         kMeans.GetComponent<KMeansAlgorithm>().ResetMe();
-        if(kMeans.GetComponent<KMeansAlgorithm>().nrOfSpheres <= 20)
+        if(kMeans.GetComponent<KMeansAlgorithm>().nrOfSpheres < 20)
         {
             kMeans.GetComponent<KMeansAlgorithm>().nrOfSpheres++;
         }
@@ -42,7 +40,7 @@ public class IncreaseDecrease : MonoBehaviour {
     public void IncreaseEpsilon()
     {
         dbScan.GetComponent<DBScanAlgorithm>().ResetMe();
-        if (dbScan.GetComponent<DBScanAlgorithm>().epsilon <= 0.2f)
+        if (dbScan.GetComponent<DBScanAlgorithm>().epsilon < 0.2f)
         {
             dbScan.GetComponent<DBScanAlgorithm>().epsilon += 0.01f;
         }
@@ -59,24 +57,24 @@ public class IncreaseDecrease : MonoBehaviour {
         text.text = "eps: " + dbScan.GetComponent<DBScanAlgorithm>().epsilon.ToString();
     }
 
+
     public void IncreaseMinPts()
     {
         dbScan.GetComponent<DBScanAlgorithm>().ResetMe();
-        if(dbScan.GetComponent<DBScanAlgorithm>().minPts <= 20)
+        if (dbScan.GetComponent<DBScanAlgorithm>().minPts < 20)
         {
             dbScan.GetComponent<DBScanAlgorithm>().minPts++;
         }
-        text.text = "minPts: " + dbScan.GetComponent<DBScanAlgorithm>().minPts;
+        text.text = "minPts: " + dbScan.GetComponent<DBScanAlgorithm>().minPts.ToString();
     }
 
     public void DecreaseMinPts()
     {
         dbScan.GetComponent<DBScanAlgorithm>().ResetMe();
-        if(dbScan.GetComponent<DBScanAlgorithm>().minPts > 2)
+        if (dbScan.GetComponent<DBScanAlgorithm>().minPts > 2)
         {
             dbScan.GetComponent<DBScanAlgorithm>().minPts--;
         }
-        text.text = "minPts: " + dbScan.GetComponent<DBScanAlgorithm>().minPts;
+        text.text = "minPts: " + dbScan.GetComponent<DBScanAlgorithm>().minPts.ToString();
     }
-
 }
