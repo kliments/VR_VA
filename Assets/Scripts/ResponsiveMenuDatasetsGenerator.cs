@@ -17,6 +17,7 @@ public class ResponsiveMenuDatasetsGenerator : MonoBehaviour {
             gameObject.SetActive(false);
         }
         spr = new Sprite();
+        int s = 1;
         x = -0.24f;
         y = 0;
         z = 0;
@@ -33,14 +34,18 @@ public class ResponsiveMenuDatasetsGenerator : MonoBehaviour {
             x += 0.024f;
             element.transform.localRotation = rot;
             element.transform.localScale = scale;
-            element.GetComponent<datasetChangerScript>().ChangeText(datasets[i].name);
+            //element.GetComponent<datasetChangerScript>().ChangeText(datasets[i].name);
             datasetButtons.Add(element);
-            int s = i + 1;
             element.GetComponent<DatasetSpriteChanger>().actualSprite = Resources.Load<Sprite>(s.ToString());
-            if(i == 0)
+            //add text sprite on buttons
+            Sprite spr = Resources.Load<Sprite>("Sprites/ButtonTexts/DatasetTexts/" + s.ToString());
+            element.transform.GetChild(0).gameObject.GetComponent<SpriteRenderer>().sprite = spr;
+            s++;
+            if (i == 0)
             {
                 element.GetComponent<GeneralCoverflowProperties>().isHovered = true;
             }
+
         }
 
     }

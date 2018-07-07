@@ -4,13 +4,11 @@ using UnityEngine;
 
 public class DatasetSelectedSpriteToggle : MonoBehaviour {
 
-    public GameObject spriteObj, datasetButtonSpriteObj;
-    public Sprite sprite,datasetButtonSprite;
+    public GameObject spriteObj, datasetSelectedSprite;
     // Use this for initialization
     void Start()
     {
-        spriteObj = GameObject.Find("DatasetVizSprite");
-        datasetButtonSpriteObj = GameObject.Find("ResponsiveMenu").transform.GetChild(0).transform.GetChild(0).transform.GetChild(1).gameObject;
+
     }
 
     // Update is called once per frame
@@ -21,12 +19,19 @@ public class DatasetSelectedSpriteToggle : MonoBehaviour {
 
     public void ShowSprite()
     {
-        spriteObj.GetComponent<SpriteRenderer>().sprite = sprite;
-        datasetButtonSpriteObj.GetComponent<SpriteRenderer>().sprite = datasetButtonSprite;
+        if(spriteObj==null || datasetSelectedSprite==null)
+        {
+            //checkmark that dataset has been selected
+            spriteObj = GameObject.Find("PrimaryMenuParent").transform.GetChild(0).transform.GetChild(0).gameObject;
+            //sprite notification that disappears after 3 seconds
+            datasetSelectedSprite = GameObject.Find("MenusParent").transform.GetChild(5).gameObject;
+        }
+        spriteObj.SetActive(true);
+        datasetSelectedSprite.SetActive(true);
         Invoke("HideSprite", 3f);
     }
     private void HideSprite()
     {
-        spriteObj.GetComponent<SpriteRenderer>().sprite = null;
+        datasetSelectedSprite.SetActive(false);
     }
 }

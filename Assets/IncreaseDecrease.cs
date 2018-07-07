@@ -43,6 +43,7 @@ public class IncreaseDecrease : MonoBehaviour {
         if (dbScan.GetComponent<DBScanAlgorithm>().epsilon < 0.2f)
         {
             dbScan.GetComponent<DBScanAlgorithm>().epsilon += 0.01f;
+            dbScan.GetComponent<DBScanAlgorithm>().epsilon = (float)(System.Math.Round((double)dbScan.GetComponent<DBScanAlgorithm>().epsilon, 2));
         }
         text.text = "eps: " + dbScan.GetComponent<DBScanAlgorithm>().epsilon.ToString();
     }
@@ -53,6 +54,7 @@ public class IncreaseDecrease : MonoBehaviour {
         if(dbScan.GetComponent<DBScanAlgorithm>().epsilon > 0.001)
         {
             dbScan.GetComponent<DBScanAlgorithm>().epsilon -= 0.01f;
+            dbScan.GetComponent<DBScanAlgorithm>().epsilon = (float)(System.Math.Round((double)dbScan.GetComponent<DBScanAlgorithm>().epsilon, 2));
         }
         text.text = "eps: " + dbScan.GetComponent<DBScanAlgorithm>().epsilon.ToString();
     }

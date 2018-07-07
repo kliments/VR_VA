@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class GeneralCoverflowProperties : MonoBehaviour {
     public bool isHovered;
-    public GameObject parent;
+    public GameObject parent, highlight;
     public List<GameObject> leftSideButtons, rightSideButtons;
     private List<GameObject> allButtons;
     private Quaternion originalRotation;
@@ -24,6 +24,14 @@ public class GeneralCoverflowProperties : MonoBehaviour {
         originalRotation = transform.rotation;
         ptrOldPos = ptr.transform.localPosition;
         ptrNewPos = ptr.transform.localPosition;
+
+        foreach (Transform child in gameObject.transform)
+        {
+            if (child.name == "HighlightedButton")
+            {
+                highlight = child.gameObject;
+            }
+        }
     }
     
     // Update is called once per frame
@@ -73,6 +81,14 @@ public class GeneralCoverflowProperties : MonoBehaviour {
                     obj.transform.localRotation = Quaternion.Euler(0, 0, 60);
                 }
             }
+        }
+        if(isHovered && !highlight.activeSelf)
+        {
+            highlight.SetActive(true);
+        }
+        else if(!isHovered && highlight.activeSelf)
+        {
+            highlight.SetActive(false);
         }
     }
 

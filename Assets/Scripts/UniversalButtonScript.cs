@@ -164,7 +164,7 @@ public class UniversalButtonScript : MonoBehaviour {
             }
             else if(this.name == "Play")
             {
-                GetComponent<PlayScript>().buttonWasPressed = true;
+                GetComponent<PlayScript>().TogglePlayPause();
             }
         }
         //DBSCAN buttons functionalities
@@ -217,7 +217,7 @@ public class UniversalButtonScript : MonoBehaviour {
             }
             else if(this.name == "Play")
             {
-                GetComponent<DBScanPlay>().play = true;
+                GetComponent<DBScanPlay>().TogglePlayPause();
             }
         }
 

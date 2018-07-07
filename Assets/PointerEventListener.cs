@@ -339,7 +339,7 @@ public LayerMask layersToIgnoreAdd = Physics.IgnoreRaycastLayer;
         //Play K-Means algorithm automatically
         else if (selectedObject.name == "KMeansPlay")
         {
-            selectedObject.GetComponent<PlayScript>().buttonWasPressed = true;
+
         }
         //Increase the number of spheres for K-Means
         else if (selectedObject.name == "IncreaseSpheres")
@@ -384,7 +384,7 @@ public LayerMask layersToIgnoreAdd = Physics.IgnoreRaycastLayer;
         }
         else if (selectedObject.name == "DBScanPlay")
         {
-            selectedObject.GetComponent<DBScanPlay>().play = true;
+
         }
 
         //Reload the whole scene

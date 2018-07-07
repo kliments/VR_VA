@@ -5,21 +5,39 @@ using UnityEngine;
 public class DBScanPlay : MonoBehaviour {
     public GameObject dbScanButton;
     public bool play;
-    private bool allClustersFound;
-	// Use this for initialization
-	void Start () {
-		
-	}
+    private bool allClustersFound, nextStepPause;
+    public Sprite playSprite, pauseSprite;
+    public SpriteRenderer sprite;
+    // Use this for initialization
+    void Start ()
+    {
+        nextStepPause = false;
+    }
 	
 	// Update is called once per frame
 	void Update () {
-        if (play)
+
+    }
+
+
+    public void TogglePlayPause()
+    {
+        if (!nextStepPause)
         {
             StartRoutine();
-            play = false;
+            nextStepPause = true;
+            //change label
+            sprite.sprite = playSprite;
+        }
+        else
+        {
+            StopRoutine();
+            nextStepPause = false;
+            //change label
+            sprite.sprite = pauseSprite;
         }
     }
-    
+
     void StartRoutine()
     {
         //call the DBSCAN script every 1 seconds

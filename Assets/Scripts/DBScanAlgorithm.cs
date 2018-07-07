@@ -350,7 +350,6 @@ public class DBScanAlgorithm : MonoBehaviour {
         dataPoints = new List<GameObject>();
         counter = 0;
         allClustersFound = false;
-        playRoutine.GetComponent<DBScanPlay>().play = false;
         playRoutine.GetComponent<DBScanPlay>().StopRoutine();
         dbscanFinishedPlane.SetActive(false);
         steps = new List<string>();

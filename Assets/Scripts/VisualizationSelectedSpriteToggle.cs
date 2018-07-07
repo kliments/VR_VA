@@ -5,12 +5,10 @@ using UnityEngine;
 public class VisualizationSelectedSpriteToggle : MonoBehaviour {
 
     public GameObject spriteObj, visualizationButtonSpriteObj;
-    public Sprite sprite, visualizationButtonSprite;
     // Use this for initialization
     void Start()
     {
-        spriteObj = GameObject.Find("DatasetVizSprite");
-        visualizationButtonSpriteObj = GameObject.Find("ResponsiveMenu").transform.GetChild(0).transform.GetChild(1).transform.GetChild(1).gameObject;
+
     }
 
     // Update is called once per frame
@@ -21,12 +19,20 @@ public class VisualizationSelectedSpriteToggle : MonoBehaviour {
 
     public void ShowSprite()
     {
-        spriteObj.GetComponent<SpriteRenderer>().sprite = sprite;
-        visualizationButtonSpriteObj.GetComponent<SpriteRenderer>().sprite = visualizationButtonSprite;
+
+        if (spriteObj == null || visualizationButtonSpriteObj == null)
+        {
+            //checkmark that dataset has been selected
+            spriteObj = GameObject.Find("PrimaryMenuParent").transform.GetChild(0).transform.GetChild(0).gameObject;
+            //sprite notification that disappears after 3 seconds
+            visualizationButtonSpriteObj = GameObject.Find("MenusParent").transform.GetChild(6).gameObject;
+        }
+        spriteObj.SetActive(true);
+        visualizationButtonSpriteObj.SetActive(true);
         Invoke("HideSprite", 3f);
     }
     private void HideSprite()
     {
-        spriteObj.GetComponent<SpriteRenderer>().sprite = null;
+        visualizationButtonSpriteObj.SetActive(false);
     }
 }

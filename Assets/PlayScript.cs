@@ -5,23 +5,38 @@ using UnityEngine;
 public class PlayScript : MonoBehaviour {
 
     public GameObject nextStepObj;
-    public bool buttonWasPressed = false;
-    private bool iterationHasFinished;
+    public Sprite playSprite, pauseSprite;
+    public SpriteRenderer sprite;
+    private bool iterationHasFinished, nextStepPause;
 
 	// Use this for initialization
 	void Start () {
-
+        nextStepPause = false;
     }
 
 	
 	// Update is called once per frame
 	void Update () {
-		if(buttonWasPressed)
+
+	}
+
+    public void TogglePlayPause()
+    {
+        if(!nextStepPause)
         {
             StartRoutine();
-            buttonWasPressed = false;
+            nextStepPause = true;
+            //change label
+            sprite.sprite = playSprite;
         }
-	}
+        else
+        {
+            StopRoutine();
+            nextStepPause = false;
+            //change label
+            sprite.sprite = pauseSprite;
+        }
+    }
 
     void StartRoutine()
     {

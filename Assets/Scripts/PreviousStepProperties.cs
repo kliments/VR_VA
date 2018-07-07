@@ -10,7 +10,7 @@ public class PreviousStepProperties : MonoBehaviour {
     {
         originalColor = GetComponent<MeshRenderer>().material.color;
         colorList = new List<Color>();
-        colorList.Add(originalColor);
+        colorList.Add(Color.white);
 	}
 	
 	// Update is called once per frame
