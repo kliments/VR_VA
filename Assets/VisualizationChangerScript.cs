@@ -26,7 +26,7 @@ public class VisualizationChangerScript : MonoBehaviour {
     public bool isSelected;
 
 
-    private int trnglCounter, ttrhdrnCounter = 0;
+    private int cubesCounter, piesCounter, trnglCounter, ttrhdrnCounter = 0;
     public GameObject resetKmeans;
     public GameObject resetDBScan;
 
@@ -46,7 +46,6 @@ public class VisualizationChangerScript : MonoBehaviour {
         tetrahedrons = FindObject(Scatterplot, "Tetrahedron");
 
         myDataset = data(ChooserElementsContainer);
-
         if (Time.time - lastActivation > 2)
         {
             lastActivation = Time.time;
@@ -75,8 +74,19 @@ public class VisualizationChangerScript : MonoBehaviour {
                     dummy.resetMe();
                     tetrahedrons.SetActive(false);
                 }
-                cubes.SetActive(true);
-                cubes.GetComponent<DataSpaceHandler>().changeDatafile(myDataset);
+
+                //this is needed since the first time the Start function is being called two times for some reason, and after that not even once
+                if (cubesCounter == 0)
+                {
+                    cubesCounter++;
+                    cubes.GetComponent<DataSpaceHandler>().data = data(ChooserElementsContainer);
+                    cubes.SetActive(true);
+                }
+                else
+                {
+                    cubes.SetActive(true);
+                    cubes.GetComponent<DataSpaceHandler>().changeDatafile(myDataset);
+                }
 
             }
             else if (this.name == "PieChartsButton")
@@ -101,9 +111,18 @@ public class VisualizationChangerScript : MonoBehaviour {
                     tetrahedrons.SetActive(false);
                 }
 
-                pies.SetActive(true);
-                pies.GetComponent<PieChartMeshController>().changeDatafile(myDataset);
-
+                //this is needed since the first time the Start function is being called two times for some reason, and after that not even once
+                if (piesCounter == 0)
+                {
+                    piesCounter++;
+                    pies.GetComponent<PieChartMeshController>().data = data(ChooserElementsContainer);
+                    pies.SetActive(true);
+                }
+                else
+                {
+                    pies.SetActive(true);
+                    pies.GetComponent<PieChartMeshController>().changeDatafile(myDataset);
+                }
             }
             else if (this.name == "TrianglesButton")
             {

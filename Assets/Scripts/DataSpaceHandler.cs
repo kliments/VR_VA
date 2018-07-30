@@ -170,10 +170,10 @@ public class DataSpaceHandler : MonoBehaviour
 
         //prepare data
         //
-        if (counterData == 0)
+        /*if (counterData == 0)
         {
             data = FindObjectOfType<ResponsiveMenuDatasetsGenerator>().datasets[0];
-        }
+        }*/
         string[] lines = data.text.Split('\n');
         string[] attr = lines[0].Split(',');
         int rows = lines.Length;

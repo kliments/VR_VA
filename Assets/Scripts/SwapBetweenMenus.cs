@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class SwapBetweenMenus : MonoBehaviour {
-    public GameObject menu1, menu2, pipelineSprite, controlsSprite;
+    public GameObject menu1, menu2, menu3, pipelineSprite, controlsSprite;
     SteamVR_TrackedObject trackedObj;
     public SteamVR_Controller.Device device;
     public bool dontShowControlsMenu;

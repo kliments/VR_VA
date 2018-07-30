@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class UniversalButtonScript : MonoBehaviour {
-    public GameObject primaryMenu,primaryParent, datasetParent, vizParent, algorithmParent, kmeansParent, dbscanParent;
+    public GameObject primaryMenu,primaryParent, datasetParent, vizParent, algorithmParent, kmeansParent, dbscanParent, ground;
     public Material onHoverMaterial, defaultMaterial;
     public ResponsiveMenuScript controller;
     public float difference;
@@ -26,6 +26,7 @@ public class UniversalButtonScript : MonoBehaviour {
         ptEvtLsnr = (PointerEventListener)FindObjectOfType(typeof(PointerEventListener));
         menusParent = (BackButtonMenu)FindObjectOfType(typeof(BackButtonMenu));
         swapScript = (SwapBetweenMenus)FindObjectOfType(typeof(SwapBetweenMenus));
+        ground = GameObject.Find("Ground");
     }
 	
 	// Update is called once per frame
@@ -222,7 +223,7 @@ public class UniversalButtonScript : MonoBehaviour {
         }
 
         //Controls Menu functionalities
-        else if(transform.parent.gameObject.name == "ControlsMenu")
+        else if(transform.parent.gameObject.name == "ControlsMenu" || transform.parent.gameObject.name == "KMeansControlsMenu")
         {
             if(this.name == "Move")
             {
@@ -239,6 +240,10 @@ public class UniversalButtonScript : MonoBehaviour {
             else if(this.name == "Select")
             {
                 ptEvtLsnr.setSelectDataMode();
+            }
+            else if(this.name == "GoToGround")
+            {
+                ground.GetComponent<SetToGround>().rigPosReset = true;
             }
         }
         
