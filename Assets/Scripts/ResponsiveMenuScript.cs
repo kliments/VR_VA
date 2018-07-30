@@ -7,8 +7,8 @@ public class ResponsiveMenuScript : MonoBehaviour {
     SteamVR_TrackedObject trackedObj;
     public SteamVR_Controller.Device device;
     public GameObject pointer, datasetParent;
-    public bool isActive;
-    private bool wasTouched, moveAndResize, slide;
+    public bool isActive, moveAndResize;
+    private bool wasTouched, slide;
     private GameObject currentButton;
     private Vector3 inactivePos, activePos, inactiveScale, activeScale, actualPos;
     private Vector2 oldPos, newPos;
@@ -106,7 +106,7 @@ public class ResponsiveMenuScript : MonoBehaviour {
             currentButton.GetComponent<UniversalButtonScript>().CancelAllCalls();
         }
 
-        if (device.GetPressDown(SteamVR_Controller.ButtonMask.Trigger))
+        if (device.GetPressDown(SteamVR_Controller.ButtonMask.Trigger) && gameObject.name == "ResponsiveMenu")
         {
             currentButton.GetComponent<UniversalButtonScript>().Press();
         }

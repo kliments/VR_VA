@@ -77,6 +77,45 @@ public class SwapBetweenMenus : MonoBehaviour {
         {
             menu2.SetActive(true);
         }
+
+
+        if(menu3.activeSelf)
+        {
+            if (device.GetTouchDown(SteamVR_Controller.ButtonMask.Touchpad))
+            {
+                newPos = device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
+                oldPos = newPos;
+            }
+            if (device.GetTouch(SteamVR_Controller.ButtonMask.Touchpad))
+            {
+                oldPos = newPos;
+                newPos = device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
+                if (newPos.y > oldPos.y + threshold && !primaryShown)
+                {
+                    Debug.Log("primary menu shown");
+                    menu1.GetComponent<ResponsiveMenuScript>().Reposition();
+                    menu3.GetComponent<ResponsiveMenuScript>().Reposition();
+                    GetComponent<CoverflowScript>().DeselectAllButtons();
+                    GetComponent<CoverflowScript>().menuToRotate = menu1;
+                    GetComponent<CoverflowScript>().SetCurrentButton();
+                    //oldPos = newPos;
+                    primaryShown = true;
+                    
+                }
+                else if (newPos.y < oldPos.y - threshold && primaryShown)
+                {
+                    Debug.Log("secondary menu shown");
+                    menu1.GetComponent<ResponsiveMenuScript>().Reposition();
+                    menu3.GetComponent<ResponsiveMenuScript>().Reposition();
+                    GetComponent<CoverflowScript>().DeselectAllButtons();
+                    GetComponent<CoverflowScript>().menuToRotate = menu3;
+                    GetComponent<CoverflowScript>().SetCurrentButton();
+                    //oldPos = newPos;
+                    primaryShown = false;
+                    
+                }
+            }
+        }
     }
     
 }

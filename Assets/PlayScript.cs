@@ -27,14 +27,14 @@ public class PlayScript : MonoBehaviour {
             StartRoutine();
             nextStepPause = true;
             //change label
-            sprite.sprite = playSprite;
+            sprite.sprite = pauseSprite;
         }
         else
         {
             StopRoutine();
             nextStepPause = false;
             //change label
-            sprite.sprite = pauseSprite;
+            sprite.sprite = playSprite;
         }
     }
 

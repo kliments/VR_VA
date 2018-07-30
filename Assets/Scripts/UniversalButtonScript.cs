@@ -237,7 +237,7 @@ public class UniversalButtonScript : MonoBehaviour {
             {
                 ptEvtLsnr.setRotationMode();
             }
-            else if(this.name == "Select")
+            else if (this.name == "GoToSphere")
             {
                 ptEvtLsnr.setSelectDataMode();
             }

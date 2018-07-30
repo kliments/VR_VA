@@ -6,8 +6,8 @@ using UnityEngine.UI;
 public class ShowHideMirror : MonoBehaviour {
     public bool isVisible;
     public GameObject mirror;
-    public Text text;
     private int counter;
+    public Sprite showMirror, hideMirror;
 	// Use this for initialization
 	void Start () {
         isVisible = false;
@@ -23,19 +23,19 @@ public class ShowHideMirror : MonoBehaviour {
     {
         //need the counter, because for some reason this function was being called twice with one press
         counter++;
-        if(isVisible && counter==2)
+        if(isVisible)
         {
+            counter = 0;
             isVisible = false;
             mirror.SetActive(false);
-            text.text = "Show Mirror";
-            counter = 0;
+            transform.GetChild(0).gameObject.GetComponent<SpriteRenderer>().sprite = showMirror;
         }
-        else if(!isVisible && counter==2)
+        else if(!isVisible)
         {
+            counter = 0;
             isVisible = true;
             mirror.SetActive(true);
-            text.text = "Hide Mirror";
-            counter = 0;
+            transform.GetChild(0).gameObject.GetComponent<SpriteRenderer>().sprite = hideMirror;
         }
     }
 }

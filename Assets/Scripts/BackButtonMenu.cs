@@ -7,6 +7,7 @@ public class BackButtonMenu : MonoBehaviour {
     SteamVR_TrackedObject trackedObj;
     public SteamVR_Controller.Device device;
     private SwapBetweenMenus swapMenuScript;
+    public GameObject responsiveMenu, kmeansControlsMenu;
     // Use this for initialization
     void Start ()
     {
@@ -22,6 +23,15 @@ public class BackButtonMenu : MonoBehaviour {
 	void Update () {
 		if(device.GetPressDown(SteamVR_Controller.ButtonMask.ApplicationMenu))
         {
+            //in case we are in KMeansControlsMenu and we press back button, responsive menu should be the actual one
+            if(!kmeansControlsMenu.GetComponent<ResponsiveMenuScript>().isActive)
+            {
+                kmeansControlsMenu.GetComponent<ResponsiveMenuScript>().isActive = true;
+                kmeansControlsMenu.GetComponent<ResponsiveMenuScript>().moveAndResize = true;
+                responsiveMenu.GetComponent<ResponsiveMenuScript>().isActive = false;
+                responsiveMenu.GetComponent<ResponsiveMenuScript>().moveAndResize = true;
+                responsiveMenu.transform.parent.GetComponent<SwapBetweenMenus>().primaryShown = true;
+            }
             GoBackInMenu();
         }
 	}
