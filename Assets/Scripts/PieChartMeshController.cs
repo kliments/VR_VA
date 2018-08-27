@@ -9,10 +9,12 @@ public class PieChartMeshController : MonoBehaviour
     float[] mData;
     public TextAsset data;
     public Vector3 Positions;
+    public List<Vector3> dataPositions;
     public GameObject dummy;
 	private int timer = 0;
 	PieChartMesh[] listObjects;
     public Camera myCamera;
+    public TiledmapGeneration tiledMap;
     private Vector3 target;
 
     private GameObject[] rotateObjects;
@@ -86,7 +88,7 @@ public class PieChartMeshController : MonoBehaviour
                     classes.Add(attributes[attributes.Length - 1]);
                 }
             }
-            
+
             normData = normalization(dataset);
             alglib.covm(normData, out covarianceMatrix);
             alglib.smatrixevd(covarianceMatrix, cols - 2, 1, true, out eigenValueSym, out eigenVectorSym);
@@ -119,21 +121,23 @@ public class PieChartMeshController : MonoBehaviour
                         continue;
                     }
                 }
-                float[] dataPositions = {dataPosition.x, dataPosition.y,dataPosition.z};
+                dataPositions.Add(dataPosition);
+                float[] dataPos = {dataPosition.x, dataPosition.y,dataPosition.z};
 
                 GameObject pieChart = Instantiate(dummy, dataPosition, Quaternion.AngleAxis(0, Vector3.up), transform);
                 PieChartMesh bar = pieChart.GetComponent<PieChartMesh>();
                 pieChart.AddComponent<PreviousStepProperties>();
                 pieChart.AddComponent<DBScanProperties>();
-                bar.Init(dataPositions, 100, 0, 100, null, dataPosition);
-                bar.Draw(dataPositions);
+                bar.Init(dataPos, 100, 0, 100, null, dataPosition);
+                bar.Draw(dataPos);
                 bar.transform.localScale -= new Vector3(0.985F, 0.985F, 0.985F);
                 //bar.transform.localRotation = Quaternion.AngleAxis(180, Vector3.up);
                 listObjects[i] = bar;
+                
 
-                if(dataPosition.x > dataPosition.y && dataPosition.x > dataPosition.z)
+                if (dataPosition.x > dataPosition.y && dataPosition.x > dataPosition.z)
                 {
-                    bar.GetComponent<PieChartBehaviour>().color = Color.red; 
+                    bar.GetComponent<PieChartBehaviour>().color = Color.red;
                 }
                 else if( dataPosition.y > dataPosition.x && dataPosition.y > dataPosition.z)
                 {
@@ -171,7 +175,16 @@ public class PieChartMeshController : MonoBehaviour
                 listObjects[i] = bar;
             }
         }
-		dummy.SetActive (false);
+
+        tiledMap.positions = new Vector3[dataPositions.Count];
+        for (int p = 0; p < dataPositions.Count; p++)
+        {
+            tiledMap.positions[p] = dataPositions[p];
+        }
+        tiledMap.gaussCoef = GetComponent<GaussianCoefficients>();
+        tiledMap.ResetMe();
+        tiledMap.gameObject.SetActive(true);
+        dummy.SetActive (false);
     }
 
     void Update()
@@ -191,6 +204,7 @@ public class PieChartMeshController : MonoBehaviour
         //increase counterData so it wont load the first dataset in data
         counterData++;
         data = newData;
+        dataPositions = new List<Vector3>();
         resetMe();
         this.Start();
     }

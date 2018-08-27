@@ -16,6 +16,8 @@ public class Triangle : MonoBehaviour {
     public GameObject scatterplot;
     public Material material;
     public Color[] colorArray;
+    public List<Vector3> dataPositions;
+    public TiledmapGeneration tiledMap;
 
     public List<Color> listOfColors = new List<Color>();
     private Vector3 dummyPos;
@@ -101,6 +103,7 @@ public class Triangle : MonoBehaviour {
                     classes.Add(attributes[attributes.Length - 1]);
                 }
             }
+            
 
             //adding specific color accodring to each class
             Color[] colorArray = new Color[classes.Count];
@@ -146,7 +149,8 @@ public class Triangle : MonoBehaviour {
                         continue;
                     }
                 }
-                float[] dataPositions = { dataPosition.x, dataPosition.y, dataPosition.z };
+                dataPositions.Add(dataPosition);
+                float[] dataPos = { dataPosition.x, dataPosition.y, dataPosition.z };
 
                 GameObject triangle = Instantiate(dummy, Positions, Quaternion.AngleAxis(0, Vector3.up), gameObject.transform);
                 TriangleMesh bar = triangle.GetComponent<TriangleMesh>();
@@ -154,18 +158,18 @@ public class Triangle : MonoBehaviour {
                 triangle.AddComponent<DBScanProperties>();
                 triangle.GetComponent<MeshRenderer>().material = material;
 
-                bar.Init(dataPositions, Positions);
+                bar.Init(dataPos, Positions);
                 bar.transform.localScale -= new Vector3(0.985F, 0.985F, 0.985F);
                 listObjects[i] = bar;
 
                 Mesh mesh = bar.GetComponent<MeshFilter>().mesh;
                 Vector3[] vertices = mesh.vertices;
                 Color[] colors = new Color[vertices.Length];
-
+                
 
                 /*for (int t = 0; t < vertices.Length; t++)
                 {*/
-                    for (int z = 0; z < classes.Count; z++)
+                for (int z = 0; z < classes.Count; z++)
                     {
                         if (strDataset[i, cols - 1] == classes[z])
                         {
@@ -208,6 +212,15 @@ public class Triangle : MonoBehaviour {
             }
         }
 
+        tiledMap.positions = new Vector3[dataPositions.Count];
+        for (int p = 0; p < dataPositions.Count; p++)
+        {
+            tiledMap.positions[p] = dataPositions[p];
+        }
+        tiledMap.gaussCoef = GetComponent<GaussianCoefficients>();
+        tiledMap.ResetMe();
+        tiledMap.gameObject.SetActive(true);
+
         int vertexCount = 0;
         for (int g=0; g<listObjects.Length; g++)
         {
@@ -245,6 +258,7 @@ public class Triangle : MonoBehaviour {
         //increase counterData so it wont load the first dataset in data
         counterData++;
         data = newData;
+        dataPositions = new List<Vector3>();
         resetMe();
         this.Start();
     }

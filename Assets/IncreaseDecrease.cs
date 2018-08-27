@@ -7,6 +7,7 @@ public class IncreaseDecrease : MonoBehaviour {
 
     public GameObject kMeans;
     public GameObject dbScan;
+    public GameObject denclue;
     public Text text;
 	// Use this for initialization
 	void Start () {

@@ -27,9 +27,10 @@ public class DataSpaceHandler : MonoBehaviour
     //TODO replace with something more sensible
     public Text countingTextList;
     
-    //todo performance
     public List<Vector3> dataPositions;
     public List<string> classes;
+
+    public TiledmapGeneration tiledMap;
 
     [SerializeField]
     public TextAsset data;
@@ -46,8 +47,7 @@ public class DataSpaceHandler : MonoBehaviour
     public Material dataMappedTransparent;
 
     private List<GameObject> childCat1;
-
-
+    
     public List<Color> listOfColors = new List<Color>();
     private Color tempColor;
 
@@ -230,6 +230,7 @@ public class DataSpaceHandler : MonoBehaviour
                 }
                 count++;
             }
+          
 
             //adding specific color accodring to each class
             Color[] colorArray = new Color[classes.Count];
@@ -285,7 +286,6 @@ public class DataSpaceHandler : MonoBehaviour
                 Mesh mesh = dataPoint.GetComponent<MeshFilter>().mesh;
                 Vector3[] vertices = mesh.vertices;
                 Color[] colors = new Color[vertices.Length];
-
 
                 for (int t = 0; t < vertices.Length; t++)
                 {
@@ -351,8 +351,16 @@ public class DataSpaceHandler : MonoBehaviour
                 count++;
             }
         }
-        
-//        createTiledCube(childCat1);
+        tiledMap.positions = new Vector3[dataPositions.Count];
+        for(int p=0; p<dataPositions.Count; p++)
+        {
+            tiledMap.positions[p] = dataPositions[p];
+        }
+        tiledMap.gaussCoef = GetComponent<GaussianCoefficients>();
+        tiledMap.ResetMe();
+        tiledMap.gameObject.SetActive(true);
+
+        //        createTiledCube(childCat1);
 
         //Debug.Log(count);
     }
@@ -543,6 +551,7 @@ public class DataSpaceHandler : MonoBehaviour
         //increase counterData so it wont load the first dataset in data
         counterData++;
         data = newData;
+        dataPositions = new List<Vector3>();
         resetMe();
         listOfColors.Clear();
         this.Start();

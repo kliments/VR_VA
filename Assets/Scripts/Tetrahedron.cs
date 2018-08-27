@@ -12,6 +12,8 @@ public class Tetrahedron : MonoBehaviour
     public TextAsset data;
     List<TetrahedronMesh> listObjects;
     public Vector3 Positions;
+    public List<Vector3> dataPositions;
+    public TiledmapGeneration tiledMap;
     public GameObject dummy;
     private Vector3 dummyPos;
 
@@ -200,6 +202,7 @@ public class Tetrahedron : MonoBehaviour
                     classes.Add(attributes[attributes.Length - 1]);
                 }
             }
+            
 
             //adding specific color accodring to each class
             Color[] colorArray = new Color[classes.Count];
@@ -245,7 +248,8 @@ public class Tetrahedron : MonoBehaviour
                         continue;
                     }
                 }
-                float[] dataPositions = { dataPosition.x, dataPosition.y, dataPosition.z };
+                dataPositions.Add(dataPosition);
+                float[] dataPos = { dataPosition.x, dataPosition.y, dataPosition.z };
 
                 GameObject tetrahedron = Instantiate(dummy, Positions, Quaternion.AngleAxis(0, Vector3.up), transform);
                 TetrahedronMesh bar = tetrahedron.GetComponent<TetrahedronMesh>();
@@ -253,7 +257,9 @@ public class Tetrahedron : MonoBehaviour
                 tetrahedron.AddComponent<DBScanProperties>();
                 tetrahedron.GetComponent<MeshRenderer>().material = dataMappedMaterial;
 
-                bar.Init(dataPositions, Positions);
+                
+
+                bar.Init(dataPos, Positions);
                 bar.transform.localScale -= new Vector3(0.985F, 0.985F, 0.985F);
 
                 Mesh mesh = bar.GetComponent<MeshFilter>().mesh;
@@ -311,8 +317,16 @@ public class Tetrahedron : MonoBehaviour
                 listObjects.Add(bar);
             }
         }
-        
-//        createCombinedTetrahedron(listObjects);
+
+        tiledMap.positions = new Vector3[dataPositions.Count];
+        for (int p = 0; p < dataPositions.Count; p++)
+        {
+            tiledMap.positions[p] = dataPositions[p];
+        }
+        tiledMap.gaussCoef = GetComponent<GaussianCoefficients>();
+        tiledMap.ResetMe();
+        tiledMap.gameObject.SetActive(true);
+        //        createCombinedTetrahedron(listObjects);
         dummy.SetActive(false);
     }
 
@@ -422,6 +436,7 @@ public class Tetrahedron : MonoBehaviour
         //increase counterData so it wont load the first dataset in data
         counterData++;
         data = newData;
+        dataPositions = new List<Vector3>();
         resetMe();
         listOfColors.Clear();
         this.Start();
