@@ -16,6 +16,9 @@ public class UniversalButtonScript : MonoBehaviour {
     private SwapBetweenMenus swapScript;
     private TiledmapGeneration denclue;
 
+    //for debugging
+    public bool loadDataset, loadVis, startDenclue;
+
     // Use this for initialization
 	void Start () {
         FindParents();
@@ -29,12 +32,37 @@ public class UniversalButtonScript : MonoBehaviour {
         swapScript = (SwapBetweenMenus)FindObjectOfType(typeof(SwapBetweenMenus));
         ground = GameObject.Find("Ground");
         denclue = (TiledmapGeneration)FindObjectOfType(typeof(TiledmapGeneration));
+
+        loadDataset = loadVis = startDenclue = false;
     }
 	
 	// Update is called once per frame
-	void Update () {
+	void Update ()
+    {
+        if (loadDataset)
+        {
+            loadDataset = false;
+            if (transform.parent == datasetParent.transform && GetComponent<datasetChangerScript>().isSelected)
+            {
+                GetComponent<datasetChangerScript>().startTargetedAction();
+            }
+        }
 
-	}
+        if (loadVis)
+        {
+            loadVis = false;
+            if (transform.parent == vizParent.transform && GetComponent<VisualizationChangerScript>().isSelected)
+            {
+                GetComponent<VisualizationChangerScript>().startSelectedAction();
+            }
+        }
+
+        if (startDenclue)
+        {
+            startDenclue = false;
+            denclue.StartDenclue();
+        }
+    }
     
 
     void FindParents()
