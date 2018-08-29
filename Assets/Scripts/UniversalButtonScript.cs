@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class UniversalButtonScript : MonoBehaviour {
-    public GameObject primaryMenu,primaryParent, datasetParent, vizParent, algorithmParent, kmeansParent, dbscanParent, ground;
+    public GameObject primaryMenu,primaryParent, datasetParent, vizParent, algorithmParent, kmeansParent, dbscanParent, denclueParent, ground;
     public Material onHoverMaterial, defaultMaterial;
     public ResponsiveMenuScript controller;
     public float difference;
@@ -14,6 +14,7 @@ public class UniversalButtonScript : MonoBehaviour {
     private PointerEventListener ptEvtLsnr;
     private BackButtonMenu menusParent;
     private SwapBetweenMenus swapScript;
+    private TiledmapGeneration denclue;
 
     // Use this for initialization
 	void Start () {
@@ -27,6 +28,7 @@ public class UniversalButtonScript : MonoBehaviour {
         menusParent = (BackButtonMenu)FindObjectOfType(typeof(BackButtonMenu));
         swapScript = (SwapBetweenMenus)FindObjectOfType(typeof(SwapBetweenMenus));
         ground = GameObject.Find("Ground");
+        denclue = (TiledmapGeneration)FindObjectOfType(typeof(TiledmapGeneration));
     }
 	
 	// Update is called once per frame
@@ -63,6 +65,10 @@ public class UniversalButtonScript : MonoBehaviour {
             else if(child.name == "DBSCANParent")
             {
                 dbscanParent = child.gameObject;
+            }
+            else if (child.name == "DENCLUEParent")
+            {
+                denclueParent = child.gameObject;
             }
         }
     }
@@ -222,8 +228,57 @@ public class UniversalButtonScript : MonoBehaviour {
             }
         }
 
+        //DENCLUE buttons functionalities
+        else if(transform.parent == denclueParent.transform)
+        {
+            menusParent.GetComponent<CoverflowScript>().AssignValues(denclueParent);
+            if(this.name == "neighbourhood")
+            {
+                increaseDecreseObj = GetComponent<IncreaseDecrease>();
+                Vector2 pos = controller.device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
+                if (difference > 0f)
+                {
+
+                    if (IsInvoking("DecreaseNeighborhood")) CancelInvoke("DecreaseNeighborhood");
+                    if (!IsInvoking("IncreaseNeighborhood")) InvokeRepeating("IncreaseNeighborhood", 0, 0.2f);
+                }
+                else if (difference < 0f)
+                {
+
+                    if (IsInvoking("IncreaseNeighborhood")) CancelInvoke("IncreaseNeighborhood");
+                    if (!IsInvoking("DecreaseNeighborhood")) InvokeRepeating("DecreaseNeighborhood", 0, 0.2f);
+                }
+            }
+            else if(this.name == "influence")
+            {
+                increaseDecreseObj = GetComponent<IncreaseDecrease>();
+                Vector2 pos = controller.device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
+                if (difference > 0f)
+                {
+
+                    if (IsInvoking("DecreaseInfluence")) CancelInvoke("DecreaseInfluence");
+                    if (!IsInvoking("IncreaseInfluence")) InvokeRepeating("IncreaseInfluence", 0, 0.2f);
+                }
+                else if (difference < 0f)
+                {
+
+                    if (IsInvoking("IncreaseInfluence")) CancelInvoke("IncreaseInfluence");
+                    if (!IsInvoking("DecreaseInfluence")) InvokeRepeating("DecreaseInfluence", 0, 0.2f);
+                }
+            }
+            else if(this.name == "SquareGaussian")
+            {
+                GetComponent<SquareGaussian>().ToggleSquareGaussian();
+            }
+            else if(this.name == "DencluePlay")
+            {
+                denclue.StartDenclue();
+            }
+        }
+        
+
         //Controls Menu functionalities
-        else if(transform.parent.gameObject.name == "ControlsMenu" || transform.parent.gameObject.name == "KMeansControlsMenu")
+        else if (transform.parent.gameObject.name == "ControlsMenu" || transform.parent.gameObject.name == "KMeansControlsMenu")
         {
             if(this.name == "Move")
             {
@@ -277,6 +332,26 @@ public class UniversalButtonScript : MonoBehaviour {
     void DecreaseMinPts()
     {
         increaseDecreseObj.DecreaseMinPts();
+    }
+
+    void IncreaseNeighborhood()
+    {
+        increaseDecreseObj.IncreaseNeighborhood();
+    }
+
+    void DecreaseNeighborhood()
+    {
+        increaseDecreseObj.DecreaseNeighborhood();
+    }
+
+    void IncreaseInfluence()
+    {
+        increaseDecreseObj.IncreaseInfluence();
+    }
+
+    void DecreaseInfluence()
+    {
+        increaseDecreseObj.DecreaseInfluence();
     }
 
     public void CancelAllCalls()

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class ShowProperAlgorithmButtons : MonoBehaviour {
-    public GameObject kMeansParent, dbScanParent, responsiveMenu, algorithmsParent, menusParent;
+    public GameObject kMeansParent, dbScanParent, denclueParent, responsiveMenu, algorithmsParent, menusParent;
     private BackButtonMenu backButton;
 	// Use this for initialization
 	void Start () {
@@ -14,6 +14,7 @@ public class ShowProperAlgorithmButtons : MonoBehaviour {
             if (child.gameObject.name == "AlgorithmsParent") algorithmsParent = child.gameObject;
             else if (child.gameObject.name == "KMeansParent") kMeansParent = child.gameObject;
             else if (child.gameObject.name == "DBSCANParent") dbScanParent = child.gameObject;
+            else if (child.gameObject.name == "DENCLUEParent") denclueParent = child.gameObject;
         }
         backButton = (BackButtonMenu)FindObjectOfType(typeof(BackButtonMenu));
 	}
@@ -32,11 +33,17 @@ public class ShowProperAlgorithmButtons : MonoBehaviour {
             menusParent.GetComponent<CoverflowScript>().AssignValues(kMeansParent);
             backButton.previousMenus.Add(kMeansParent);
         }
-        else
+        else if(this.name == "DBSCAN")
         {
             dbScanParent.SetActive(true);
             menusParent.GetComponent<CoverflowScript>().AssignValues(dbScanParent);
             backButton.previousMenus.Add(dbScanParent);
+        }
+        else
+        {
+            denclueParent.SetActive(true);
+            menusParent.GetComponent<CoverflowScript>().AssignValues(denclueParent);
+            backButton.previousMenus.Add(denclueParent);
         }
     }
 }

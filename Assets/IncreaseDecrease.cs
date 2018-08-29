@@ -80,4 +80,44 @@ public class IncreaseDecrease : MonoBehaviour {
         }
         text.text = "minPts: " + dbScan.GetComponent<DBScanAlgorithm>().minPts.ToString();
     }
+
+    public void IncreaseNeighborhood()
+    {
+        denclue.GetComponent<TiledmapGeneration>().ResetMe();
+        if(denclue.GetComponent<TiledmapGeneration>().halfLengthOfNeighbourhood < 10)
+        {
+            denclue.GetComponent<TiledmapGeneration>().halfLengthOfNeighbourhood++;
+        }
+        text.text = "n: " + denclue.GetComponent<TiledmapGeneration>().halfLengthOfNeighbourhood.ToString();
+    }
+
+    public void DecreaseNeighborhood()
+    {
+        denclue.GetComponent<TiledmapGeneration>().ResetMe();
+        if (denclue.GetComponent<TiledmapGeneration>().halfLengthOfNeighbourhood > 4)
+        {
+            denclue.GetComponent<TiledmapGeneration>().halfLengthOfNeighbourhood--;
+        }
+        text.text = "n: " + denclue.GetComponent<TiledmapGeneration>().halfLengthOfNeighbourhood.ToString();
+    }
+
+    public void IncreaseInfluence()
+    {
+        denclue.GetComponent<TiledmapGeneration>().ResetMe();
+        if (denclue.GetComponent<TiledmapGeneration>().influence < 10)
+        {
+            denclue.GetComponent<TiledmapGeneration>().influence++;
+        }
+        text.text = "n: " + denclue.GetComponent<TiledmapGeneration>().influence.ToString();
+    }
+
+    public void DecreaseInfluence()
+    {
+        denclue.GetComponent<TiledmapGeneration>().ResetMe();
+        if (denclue.GetComponent<TiledmapGeneration>().influence > 2)
+        {
+            denclue.GetComponent<TiledmapGeneration>().influence--;
+        }
+        text.text = "infl: " + denclue.GetComponent<TiledmapGeneration>().influence.ToString();
+    }
 }
