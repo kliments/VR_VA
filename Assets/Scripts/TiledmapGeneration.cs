@@ -30,7 +30,7 @@ public class TiledmapGeneration : MonoBehaviour {
     private Color[] colors;
     // Use this for initialization
     void Start () {
-        gaussianCalculation = false;
+        gaussianCalculation = true;
         x = -0.25f;
         y = 0;
         z = -0.25f;
@@ -95,53 +95,91 @@ public class TiledmapGeneration : MonoBehaviour {
     //increasing influence if "tiles" belong in neighbourhood
     void IncreaseInfluence()
     {
-        for (int m = 0; m < mapTilesInfluence.Length; m++)
+        for (int d = 0; d < positions.Length; d++)
         {
-            for (int l = 0; l < mapTilesInfluence[m].Length; l++)
+            if (positions[d].x < 0.5f && positions[d].z < 0.5f)
             {
-                for (int d = 0; d < positions.Length; d++)
+                for (int m = 0; m < 100; m++)
                 {
-                    if (ChebyshevDistance(positions[d], mapPositions[m][l])<= 0.0075f/2)
+                    for (int l = 0; l < 100; l++)
                     {
-                        int gaussX = 0;
-                        int gaussZ = 0;
-                        for(int xPos = m-halfLengthOfNeighbourhood; xPos<=m+ halfLengthOfNeighbourhood; xPos++)
-                        {
-                            for(int zPos = l- halfLengthOfNeighbourhood; zPos<=l+ halfLengthOfNeighbourhood; zPos++)
-                            {
-                                //calculate gaussian coefficients only one time
-                                if(!gaussCoef.valuesCalculated)
-                                {
-                                    gaussCoef.valuesCalculated = true;                                    
-                                    for(int gX = 0; gX<gaussCoef.matrixRowLength; gX++)
-                                    {
-                                        gaussCoef.gaussianPositionMatrix[gX] = new Vector3[gaussCoef.matrixRowLength];
-                                        for(int gY=0; gY<gaussCoef.matrixRowLength; gY++)
-                                        {
-                                            gaussCoef.gaussianPositionMatrix[gX][gY] = mapPositions[xPos + gX][zPos + gY];
-                                        }
-                                    }
-                                    gaussCoef.GaussianCoefCalculator();
-                                }
-                                if(gaussianCalculation)
-                                {
-                                    mapTilesInfluence[xPos][zPos] += gaussCoef.gaussianCoef[gaussX][gaussZ] * influence / 3;
-                                }
-                                else
-                                {
-                                    mapTilesInfluence[xPos][zPos] += influence / 3;
-                                }
-                                gaussZ++;
-                            }
-                            gaussZ = 0;
-                            gaussX++;
-                        }
+                        FeedMapTilesInfluence(positions[d], m, l);
+                    }
+                }
+            }
+            else if (positions[d].x < 0.5f && positions[d].z >= 0.5f)
+            {
+                for (int m = 0; m < 100; m++)
+                {
+                    for (int l = 100; l < 200; l++)
+                    {
+                        FeedMapTilesInfluence(positions[d], m, l);
+                    }
+                }
+            }
+            else if (positions[d].x >= 0.5f && positions[d].z < 0.5f)
+            {
+                for (int m = 100; m < 200; m++)
+                {
+                    for (int l = 0; l < 100; l++)
+                    {
+                        FeedMapTilesInfluence(positions[d], m, l);
+                    }
+                }
+            }
+            else
+            {
+                for (int m = 100; m < 200; m++)
+                {
+                    for (int l = 100; l < 200; l++)
+                    {
+                        FeedMapTilesInfluence(positions[d], m, l);
                     }
                 }
             }
         }
         CountTiles();
         CreateVerticesAndTriangles();
+    }
+
+    private void FeedMapTilesInfluence(Vector3 position, int m, int l)
+    {
+        if (ChebyshevDistance(position, mapPositions[m][l]) <= 0.0075f / 2)
+        {
+            int gaussX = 0;
+            int gaussZ = 0;
+            for (int xPos = m - halfLengthOfNeighbourhood; xPos <= m + halfLengthOfNeighbourhood; xPos++)
+            {
+                for (int zPos = l - halfLengthOfNeighbourhood; zPos <= l + halfLengthOfNeighbourhood; zPos++)
+                {
+                    //calculate gaussian coefficients only one time
+                    if (!gaussCoef.valuesCalculated)
+                    {
+                        gaussCoef.valuesCalculated = true;
+                        for (int gX = 0; gX < gaussCoef.matrixRowLength; gX++)
+                        {
+                            gaussCoef.gaussianPositionMatrix[gX] = new Vector3[gaussCoef.matrixRowLength];
+                            for (int gY = 0; gY < gaussCoef.matrixRowLength; gY++)
+                            {
+                                gaussCoef.gaussianPositionMatrix[gX][gY] = mapPositions[xPos + gX][zPos + gY];
+                            }
+                        }
+                        gaussCoef.GaussianCoefCalculator();
+                    }
+                    if (gaussianCalculation)
+                    {
+                        mapTilesInfluence[xPos][zPos] += gaussCoef.gaussianCoef[gaussX][gaussZ] * influence / 3;
+                    }
+                    else
+                    {
+                        mapTilesInfluence[xPos][zPos] += influence / 3;
+                    }
+                    gaussZ++;
+                }
+                gaussZ = 0;
+                gaussX++;
+            }
+        }
     }
 
     //counts the total number of "tiles"
