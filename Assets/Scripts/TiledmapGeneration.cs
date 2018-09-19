@@ -12,6 +12,7 @@ public class TiledmapGeneration : MonoBehaviour {
     //plus/minus neighbourhood cubes around the center cube in the matrix
     public int halfLengthOfNeighbourhood;
     public float influence;
+    public GameObject thresholdPlane;
 
     private GameObject obj;
     private Mesh mesh;
@@ -150,7 +151,11 @@ public class TiledmapGeneration : MonoBehaviour {
         {
             for (int z = 0; z < mapTilesInfluence[x].Length; z++)
             {
-                if (mapTilesInfluence[x][z] > 0 || HasNeighbours(x,z))
+                if ((mapTilesInfluence[x][z] > 0 || HasNeighbours(x,z)) && !gaussianCalculation)
+                {
+                    counter++;
+                }
+                else if(mapTilesInfluence[x][z]>0 && gaussianCalculation)
                 {
                     counter++;
                 }
@@ -172,7 +177,7 @@ public class TiledmapGeneration : MonoBehaviour {
         verticesMatrix = new Vector3[counter][];
         trianglesMatrix = new int[counter][];
         countersMatrix = new int[200][];
-        matrixColors = new Color[counter][];
+		matrixColors = new Color[counter][];
         int currentTile = 0;
         for (int x = 0; x < mapTilesInfluence.Length; x++)
         {
@@ -181,130 +186,181 @@ public class TiledmapGeneration : MonoBehaviour {
             for (int z = 0; z < mapTilesInfluence[x].Length; z++)
             {
                 tiledMapVertices[x][z] = new Vector3[4];
-                //first check for border tiles, to create fictional vertices to access later for creating the walls of the mesh
-                if (mapTilesInfluence[x][z]==0 && HasNeighbours(x,z))
-                {
-                    verticesMatrix[currentTile] = new Vector3[4];
-                    matrixColors[currentTile] = new Color[4];
-                    countersMatrix[x][z] = currentTile;
-                    int count = (currentTile + 1) * 4;
-                    //bottom left vertex
-                    verticesMatrix[currentTile][0].x = mapPositions[x][z].x - 0.00375f;
-                    verticesMatrix[currentTile][0].y = mapTilesInfluence[x][z] / 50;
-                    verticesMatrix[currentTile][0].z = mapPositions[x][z].z - 0.00375f;
-                    tiledMapVertices[x][z][0] = verticesMatrix[currentTile][0];
-                    //bottom right vertex
-                    verticesMatrix[currentTile][1].x = mapPositions[x][z].x + 0.00375f;
-                    verticesMatrix[currentTile][1].y = mapTilesInfluence[x][z] / 50;
-                    verticesMatrix[currentTile][1].z = mapPositions[x][z].z - 0.00375f;
-                    tiledMapVertices[x][z][1] = verticesMatrix[currentTile][1];
-                    //top left vertex
-                    verticesMatrix[currentTile][2].x = mapPositions[x][z].x - 0.00375f;
-                    verticesMatrix[currentTile][2].y = mapTilesInfluence[x][z] / 50;
-                    verticesMatrix[currentTile][2].z = mapPositions[x][z].z + 0.00375f;
-                    tiledMapVertices[x][z][2] = verticesMatrix[currentTile][2];
-                    //top right vertex
-                    verticesMatrix[currentTile][3].x = mapPositions[x][z].x + 0.00375f;
-                    verticesMatrix[currentTile][3].y = mapTilesInfluence[x][z] / 50;
-                    verticesMatrix[currentTile][3].z = mapPositions[x][z].z + 0.00375f;
-                    tiledMapVertices[x][z][3] = verticesMatrix[currentTile][3];
+                if(!gaussianCalculation)
+                { 
+                    //first check for border tiles, to create fictional vertices to access later for creating the walls of the mesh
+                    if (mapTilesInfluence[x][z] == 0 && HasNeighbours(x, z))
+                    {
+                        verticesMatrix[currentTile] = new Vector3[4];
+						matrixColors[currentTile] = new Color[4];
+                        countersMatrix[x][z] = currentTile;
+                        int count = (currentTile + 1) * 4;
+                        //bottom left vertex
+                        verticesMatrix[currentTile][0].x = mapPositions[x][z].x - 0.00375f;
+                        verticesMatrix[currentTile][0].y = mapTilesInfluence[x][z] / 50;
+                        verticesMatrix[currentTile][0].z = mapPositions[x][z].z - 0.00375f;
+                        tiledMapVertices[x][z][0] = verticesMatrix[currentTile][0];
+                        //bottom right vertex
+                        verticesMatrix[currentTile][1].x = mapPositions[x][z].x + 0.00375f;
+                        verticesMatrix[currentTile][1].y = mapTilesInfluence[x][z] / 50;
+                        verticesMatrix[currentTile][1].z = mapPositions[x][z].z - 0.00375f;
+                        tiledMapVertices[x][z][1] = verticesMatrix[currentTile][1];
+                        //top left vertex
+                        verticesMatrix[currentTile][2].x = mapPositions[x][z].x - 0.00375f;
+                        verticesMatrix[currentTile][2].y = mapTilesInfluence[x][z] / 50;
+                        verticesMatrix[currentTile][2].z = mapPositions[x][z].z + 0.00375f;
+                        tiledMapVertices[x][z][2] = verticesMatrix[currentTile][2];
+                        //top right vertex
+                        verticesMatrix[currentTile][3].x = mapPositions[x][z].x + 0.00375f;
+                        verticesMatrix[currentTile][3].y = mapTilesInfluence[x][z] / 50;
+                        verticesMatrix[currentTile][3].z = mapPositions[x][z].z + 0.00375f;
+                        tiledMapVertices[x][z][3] = verticesMatrix[currentTile][3];
 
-                    trianglesMatrix[currentTile] = new int[18];
-                    for(int t=0;t<18;t++)
-                    {
-                        trianglesMatrix[currentTile][t] = count - 4;
+                        trianglesMatrix[currentTile] = new int[18];
+                        for (int t = 0; t < 18; t++)
+                        {
+                            trianglesMatrix[currentTile][t] = count - 4;
+                        }
+                        // if there is an neighbour down of current tile, create a square that represents wall to the ground
+                        if (HasNeighbourDown(x, z))
+                        {
+                            trianglesMatrix[currentTile][0] = count - 4;                                // vertex 0
+                            trianglesMatrix[currentTile][1] = count - 3;                                // 1
+                            trianglesMatrix[currentTile][2] = (countersMatrix[x][z - 1] + 1) * 4 - 2;   // 2 from tile down
+                            trianglesMatrix[currentTile][3] = (countersMatrix[x][z - 1] + 1) * 4 - 2;   // 2 from tile down
+                            trianglesMatrix[currentTile][4] = count - 3;                                // 1
+                            trianglesMatrix[currentTile][5] = (countersMatrix[x][z - 1] + 1) * 4 - 1;   // 3 from tile down
+                        }
+                        if (HasNeighbourOnTheLeft(x, z))
+                        {
+                            trianglesMatrix[currentTile][6] = count - 2;                               // 2
+                            trianglesMatrix[currentTile][7] = count - 4;                               // 0
+                            trianglesMatrix[currentTile][8] = (countersMatrix[x - 1][z] + 1) * 4 - 1;  // vertex 3 from tile on the left
+                            trianglesMatrix[currentTile][9] = count - 4;                               // 0
+                            trianglesMatrix[currentTile][10] = (countersMatrix[x - 1][z] + 1) * 4 - 3; // 1 from tile on the left
+                            trianglesMatrix[currentTile][11] = (countersMatrix[x - 1][z] + 1) * 4 - 1; // 3 from tile on the left
+                        }
+						
+						//set the color of the current tile to white
+						for (int c = 0; c < 4; c++)
+						{
+							matrixColors[currentTile][c] = new Color(0, 0, Math.Abs(1-verticesMatrix[currentTile][c].y));
+						}
+						
+                        currentTile++;
                     }
-                    // if there is an neighbour down of current tile, create a square that represents wall to the ground
-                    if(HasNeighbourDown(x,z))
+                    else if (mapTilesInfluence[x][z] > 0)
                     {
-                        trianglesMatrix[currentTile][0] = count - 4;                                // vertex 0
-                        trianglesMatrix[currentTile][1] = count - 3;                                // 1
-                        trianglesMatrix[currentTile][2] = (countersMatrix[x][z - 1] + 1) * 4 - 2;   // 2 from tile down
-                        trianglesMatrix[currentTile][3] = (countersMatrix[x][z - 1] + 1) * 4 - 2;   // 2 from tile down
-                        trianglesMatrix[currentTile][4] = count - 3;                                // 1
-                        trianglesMatrix[currentTile][5] = (countersMatrix[x][z - 1] + 1) * 4 - 1;   // 3 from tile down
-                    }
-                    if(HasNeighbourOnTheLeft(x,z))
-                    {
-                        trianglesMatrix[currentTile][6] = count - 2;                               // 2
-                        trianglesMatrix[currentTile][7] = count - 4;                               // 0
-                        trianglesMatrix[currentTile][8] = (countersMatrix[x - 1][z] + 1) * 4 - 1;  // vertex 3 from tile on the left
-                        trianglesMatrix[currentTile][9] = count - 4;                               // 0
+                        verticesMatrix[currentTile] = new Vector3[4];
+						matrixColors[currentTile] = new Color[4];
+                        //bottom left vertex
+                        verticesMatrix[currentTile][0].x = mapPositions[x][z].x - 0.00375f;
+                        verticesMatrix[currentTile][0].y = mapTilesInfluence[x][z] / 50;
+                        verticesMatrix[currentTile][0].z = mapPositions[x][z].z - 0.00375f;
+                        tiledMapVertices[x][z][0] = verticesMatrix[currentTile][0];
+                        //bottom right vertex
+                        verticesMatrix[currentTile][1].x = mapPositions[x][z].x + 0.00375f;
+                        verticesMatrix[currentTile][1].y = mapTilesInfluence[x][z] / 50;
+                        verticesMatrix[currentTile][1].z = mapPositions[x][z].z - 0.00375f;
+                        tiledMapVertices[x][z][1] = verticesMatrix[currentTile][1];
+                        //top left vertex
+                        verticesMatrix[currentTile][2].x = mapPositions[x][z].x - 0.00375f;
+                        verticesMatrix[currentTile][2].y = mapTilesInfluence[x][z] / 50;
+                        verticesMatrix[currentTile][2].z = mapPositions[x][z].z + 0.00375f;
+                        tiledMapVertices[x][z][2] = verticesMatrix[currentTile][2];
+                        //top right vertex
+                        verticesMatrix[currentTile][3].x = mapPositions[x][z].x + 0.00375f;
+                        verticesMatrix[currentTile][3].y = mapTilesInfluence[x][z] / 50;
+                        verticesMatrix[currentTile][3].z = mapPositions[x][z].z + 0.00375f;
+                        tiledMapVertices[x][z][3] = verticesMatrix[currentTile][3];
+
+                        //current tile saved in the matrix of integers, to access the vertices
+                        countersMatrix[x][z] = currentTile;
+
+                        int count = (currentTile + 1) * 4;
+                        //need to create 5 extra rectangles around a tile, to look like a cube
+                        //center rectangle
+                        trianglesMatrix[currentTile] = new int[18];
+                        trianglesMatrix[currentTile][0] = count - 4; // vertex 0
+                        trianglesMatrix[currentTile][1] = count - 2; // 2
+                        trianglesMatrix[currentTile][2] = count - 3; // 1
+                        trianglesMatrix[currentTile][3] = count - 2; // 2
+                        trianglesMatrix[currentTile][4] = count - 1; // 3
+                        trianglesMatrix[currentTile][5] = count - 3; // 1
+                                                                     //left rectangle
+                        trianglesMatrix[currentTile][6] = count - 2; // 2
+                        trianglesMatrix[currentTile][7] = count - 4; // 0
+                        trianglesMatrix[currentTile][8] = (countersMatrix[x - 1][z] + 1) * 4 - 1; // vertex 3 from tile on the left
+                        trianglesMatrix[currentTile][9] = count - 4;                      // 0
                         trianglesMatrix[currentTile][10] = (countersMatrix[x - 1][z] + 1) * 4 - 3; // 1 from tile on the left
                         trianglesMatrix[currentTile][11] = (countersMatrix[x - 1][z] + 1) * 4 - 1; // 3 from tile on the left
+                                                                                                   //down rectangle
+                        trianglesMatrix[currentTile][12] = count - 4;                      // vertex 0
+                        trianglesMatrix[currentTile][13] = count - 3;                      // 1
+                        trianglesMatrix[currentTile][14] = (countersMatrix[x][z - 1] + 1) * 4 - 2;   // 2 from tile down
+                        trianglesMatrix[currentTile][15] = (countersMatrix[x][z - 1] + 1) * 4 - 2;   // 2 from tile down
+                        trianglesMatrix[currentTile][16] = count - 3;                      // 1
+                        trianglesMatrix[currentTile][17] = (countersMatrix[x][z - 1] + 1) * 4 - 1;   // 3 from tile down
+						
+						for (int c = 0; c < 4; c++)
+						{
+							matrixColors[currentTile][c] = new Color(verticesMatrix[currentTile][c].y, 0, Math.Abs(1 - verticesMatrix[currentTile][c].y));
+						}
+						
+                        currentTile++;
                     }
-
-                    //set the color of the current tile to white
-                    for(int c=0; c<4; c++)
-                    {
-                        matrixColors[currentTile][c] = new Color(0, 0, 0);
-                    }
-
-                    currentTile++;
                 }
-                else if (mapTilesInfluence[x][z] > 0)
+                else
                 {
-                    verticesMatrix[currentTile] = new Vector3[4];
-                    matrixColors[currentTile] = new Color[4];
-                    //bottom left vertex
-                    verticesMatrix[currentTile][0].x = mapPositions[x][z].x - 0.00375f;
-                    verticesMatrix[currentTile][0].y = mapTilesInfluence[x][z] / 50;
-                    verticesMatrix[currentTile][0].z = mapPositions[x][z].z - 0.00375f;
-                    tiledMapVertices[x][z][0] = verticesMatrix[currentTile][0];
-                    //bottom right vertex
-                    verticesMatrix[currentTile][1].x = mapPositions[x][z].x + 0.00375f;
-                    verticesMatrix[currentTile][1].y = mapTilesInfluence[x][z] / 50;
-                    verticesMatrix[currentTile][1].z = mapPositions[x][z].z - 0.00375f;
-                    tiledMapVertices[x][z][1] = verticesMatrix[currentTile][1];
-                    //top left vertex
-                    verticesMatrix[currentTile][2].x = mapPositions[x][z].x - 0.00375f;
-                    verticesMatrix[currentTile][2].y = mapTilesInfluence[x][z] / 50;
-                    verticesMatrix[currentTile][2].z = mapPositions[x][z].z + 0.00375f;
-                    tiledMapVertices[x][z][2] = verticesMatrix[currentTile][2];
-                    //top right vertex
-                    verticesMatrix[currentTile][3].x = mapPositions[x][z].x + 0.00375f;
-                    verticesMatrix[currentTile][3].y = mapTilesInfluence[x][z] / 50;
-                    verticesMatrix[currentTile][3].z = mapPositions[x][z].z + 0.00375f;
-                    tiledMapVertices[x][z][3] = verticesMatrix[currentTile][3];
+                    if (mapTilesInfluence[x][z] > 0)
+                    { 
+                        verticesMatrix[currentTile] = new Vector3[4];
+						matrixColors[currentTile] = new Color[4];
+                        //bottom left vertex
+                        verticesMatrix[currentTile][0].x = mapPositions[x][z].x - 0.00375f;
+                        verticesMatrix[currentTile][0].y = mapTilesInfluence[x][z] / 50;
+                        verticesMatrix[currentTile][0].z = mapPositions[x][z].z - 0.00375f;
+                        tiledMapVertices[x][z][0] = verticesMatrix[currentTile][0];
+                        //bottom right vertex
+                        verticesMatrix[currentTile][1].x = mapPositions[x][z].x + 0.00375f;
+                        verticesMatrix[currentTile][1].y = mapTilesInfluence[x][z] / 50;
+                        verticesMatrix[currentTile][1].z = mapPositions[x][z].z - 0.00375f;
+                        tiledMapVertices[x][z][1] = verticesMatrix[currentTile][1];
+                        //top left vertex
+                        verticesMatrix[currentTile][2].x = mapPositions[x][z].x - 0.00375f;
+                        verticesMatrix[currentTile][2].y = mapTilesInfluence[x][z] / 50;
+                        verticesMatrix[currentTile][2].z = mapPositions[x][z].z + 0.00375f;
+                        tiledMapVertices[x][z][2] = verticesMatrix[currentTile][2];
+                        //top right vertex
+                        verticesMatrix[currentTile][3].x = mapPositions[x][z].x + 0.00375f;
+                        verticesMatrix[currentTile][3].y = mapTilesInfluence[x][z] / 50;
+                        verticesMatrix[currentTile][3].z = mapPositions[x][z].z + 0.00375f;
+                        tiledMapVertices[x][z][3] = verticesMatrix[currentTile][3];
 
-                    //current tile saved in the matrix of integers, to access the vertices
-                    countersMatrix[x][z] = currentTile;
-
-                    int count = (currentTile + 1) * 4;
-                    //need to create 5 extra rectangles around a tile, to look like a cube
-                    //center rectangle
-                    trianglesMatrix[currentTile] = new int[18];
-                    trianglesMatrix[currentTile][0] = count - 4; // vertex 0
-                    trianglesMatrix[currentTile][1] = count - 2; // 2
-                    trianglesMatrix[currentTile][2] = count - 3; // 1
-                    trianglesMatrix[currentTile][3] = count - 2; // 2
-                    trianglesMatrix[currentTile][4] = count - 1; // 3
-                    trianglesMatrix[currentTile][5] = count - 3; // 1
-                    //left rectangle
-                    trianglesMatrix[currentTile][6] = count - 2; // 2
-                    trianglesMatrix[currentTile][7] = count - 4; // 0
-                    trianglesMatrix[currentTile][8] = (countersMatrix[x - 1][z]+1)*4 - 1; // vertex 3 from tile on the left
-                    trianglesMatrix[currentTile][9] = count - 4;                      // 0
-                    trianglesMatrix[currentTile][10] = (countersMatrix[x - 1][z] + 1)*4 - 3; // 1 from tile on the left
-                    trianglesMatrix[currentTile][11] = (countersMatrix[x - 1][z] + 1) * 4 - 1; // 3 from tile on the left
-                    //down rectangle
-                    trianglesMatrix[currentTile][12] = count - 4;                      // vertex 0
-                    trianglesMatrix[currentTile][13] = count - 3;                      // 1
-                    trianglesMatrix[currentTile][14] = (countersMatrix[x][z - 1] + 1) * 4 - 2;   // 2 from tile down
-                    trianglesMatrix[currentTile][15] = (countersMatrix[x][z - 1] + 1) * 4 - 2;   // 2 from tile down
-                    trianglesMatrix[currentTile][16] = count - 3;                      // 1
-                    trianglesMatrix[currentTile][17] = (countersMatrix[x][z - 1] + 1) * 4 - 1;   // 3 from tile down
-
-                    //change the color of the current tile vertices according to its height
-                    for (int c = 0; c < 4; c++)
-                    {
-                        matrixColors[currentTile][c] = new Color(verticesMatrix[currentTile][c].y, 0, Math.Abs(1 - verticesMatrix[currentTile][c].y));
+                        //current tile saved in the matrix of integers, to access the vertices
+                        countersMatrix[x][z] = currentTile;
+                        //center rectangle
+                        int count = (currentTile + 1) * 4;
+                        trianglesMatrix[currentTile] = new int[6];
+                        trianglesMatrix[currentTile][0] = count - 4;
+                        trianglesMatrix[currentTile][1] = count - 2;
+                        trianglesMatrix[currentTile][2] = count - 3;
+                        trianglesMatrix[currentTile][3] = count - 2;
+                        trianglesMatrix[currentTile][4] = count - 1;
+                        trianglesMatrix[currentTile][5] = count - 3;
+						
+						for (int c = 0; c < 4; c++)
+						{
+							matrixColors[currentTile][c] = new Color(verticesMatrix[currentTile][c].y, 0, Math.Abs(1 - verticesMatrix[currentTile][c].y));
+						}
+						
+                        currentTile++;
+                        if(currentTile == 2403)
+                        {
+                            Debug.Log("bla");
+                        }
                     }
-
-                    currentTile++;
-
                 }
-
             }
         }
         currentTile = 0;
@@ -334,8 +390,15 @@ public class TiledmapGeneration : MonoBehaviour {
         int nextVertex = 0;
         int nextTriangle = 0;
         vertices = new Vector3[counter * 4];
-        triangles = new int[counter * 18];
-        colors = new Color[counter * 4];
+		colors = new Color[counter * 4];
+        if(!gaussianCalculation)
+        {
+            triangles = new int[counter * 18];
+        }
+        else
+        {
+            triangles = new int[counter * 6];
+        }
         for(int i=0; i<counter; i++)
         {
             for(int j=0; j<4; j++)
@@ -365,9 +428,10 @@ public class TiledmapGeneration : MonoBehaviour {
         obj.AddComponent<MeshRenderer>();
         obj.GetComponent<MeshFilter>().mesh = mesh;
         obj.GetComponent<MeshRenderer>().material = mat;
-        obj.transform.localPosition = new Vector3(0.819f, 0, 0.751f);
+        obj.transform.localPosition = new Vector3(0.819f, 0.002f, 0.751f);
         obj.transform.localRotation = new Quaternion(0, 180, 0,0);
         obj.transform.localScale = new Vector3(0.6600493f, 0.6600493f, 0.6600493f);
+        //thresholdPlane.SetActive(true);
     }    
 
     private Vector3[] ChangeVertices(Vector3[] actualVertex, float top,float down, float topRight, float right, float downLeft, float left)
@@ -411,31 +475,41 @@ public class TiledmapGeneration : MonoBehaviour {
         gaussCoef.floorTileCounter = gaussCoef.matrixRowLength * gaussCoef.matrixRowLength;
         gaussCoef.gaussianPositionMatrix = new Vector3[gaussCoef.matrixRowLength][];
         gaussCoef.valuesCalculated = false;
+        //thresholdPlane.SetActive(false);
     }
 
     //checks whether a tile has any neighbours around that are part of the mesh
     bool HasNeighbours(int x, int z)
     {
-        if (x > 0 && mapTilesInfluence[x - 1][z] > 0)
+        if(x>0)
         {
-            return true;
+            if(mapTilesInfluence[x-1][z]>0)
+            {
+                return true;
+            }
         }
-        else if (x < 199 && mapTilesInfluence[x + 1][z] > 0)
+        if(x<199)
         {
-            return true;
+            if(mapTilesInfluence[x+1][z]>0)
+            {
+                return true;
+            }
         }
-        else if (z > 0 && mapTilesInfluence[x][z - 1] > 0)
+        if(z>0)
         {
-            return true;
+            if(mapTilesInfluence[x][z-1]>0)
+            {
+                return true;
+            }
         }
-        else if (z < 199 && mapTilesInfluence[x][z + 1] > 0)
+        if(z<199)
         {
-            return true;
+            if(mapTilesInfluence[x][z+1]>0)
+            {
+                return true;
+            }
         }
-        else
-        {
-            return false;
-        }
+        return false;
     }
 
     bool HasNeighbourOnTheLeft(int x, int z)
