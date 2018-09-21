@@ -13,21 +13,24 @@ public class TiledmapGeneration : MonoBehaviour {
     public int halfLengthOfNeighbourhood;
     public float influence;
     public GameObject thresholdPlane;
+    public List<Vector3> peaks;
+    public bool resizeMesh;
 
     private GameObject obj;
     private Mesh mesh;
     private int counter;
     private List<GameObject> list;
     private Vector3[][][] tiledMapVertices;
-    private Vector3[][] mapPositions, verticesMatrix;
+    private Vector3[][] mapPositions, verticesMatrix, verticesMaximumMatrix;
     private Vector3[] vertices;
     private int[][] trianglesMatrix, countersMatrix;
     private int[] triangles;
     private float x, y, z;
-    public bool resizeMesh;
     private Vector3 startSize, finishSize;
+    private Color[][][] tiledMapColors;
     private Color[][] matrixColors;
     private Color[] colors;
+    private bool[][] isPeak;
     // Use this for initialization
     void Start () {
         gaussianCalculation = true;
@@ -66,7 +69,8 @@ public class TiledmapGeneration : MonoBehaviour {
         }
 
         tiledMapVertices = new Vector3[200][][];
-
+        tiledMapColors = new Color[200][][];
+        peaks = new List<Vector3>();
         gaussCoef.matrixRowLength = halfLengthOfNeighbourhood * 2 + 1;
         gaussCoef.floorTileCounter = gaussCoef.matrixRowLength * gaussCoef.matrixRowLength;
         gaussCoef.gaussianPositionMatrix = new Vector3[gaussCoef.matrixRowLength][];
@@ -215,15 +219,21 @@ public class TiledmapGeneration : MonoBehaviour {
         verticesMatrix = new Vector3[counter][];
         trianglesMatrix = new int[counter][];
         countersMatrix = new int[200][];
+        isPeak = new bool[200][];
 		matrixColors = new Color[counter][];
+        verticesMaximumMatrix = new Vector3[200][];
         int currentTile = 0;
         for (int x = 0; x < mapTilesInfluence.Length; x++)
         {
             tiledMapVertices[x] = new Vector3[200][];
             countersMatrix[x] = new int[200];
+            verticesMaximumMatrix[x] = new Vector3[200];
+            tiledMapColors[x] = new Color[200][];
+            isPeak[x] = new bool[200];
             for (int z = 0; z < mapTilesInfluence[x].Length; z++)
             {
                 tiledMapVertices[x][z] = new Vector3[4];
+                tiledMapColors[x][z] = new Color[4];
                 if(!gaussianCalculation)
                 { 
                     //first check for border tiles, to create fictional vertices to access later for creating the walls of the mesh
@@ -283,14 +293,16 @@ public class TiledmapGeneration : MonoBehaviour {
 						for (int c = 0; c < 4; c++)
 						{
 							matrixColors[currentTile][c] = new Color(0, 0, Math.Abs(1-verticesMatrix[currentTile][c].y));
-						}
-						
+                            tiledMapColors[x][z][c] = new Color(0, 0, Math.Abs(1 - verticesMatrix[currentTile][c].y));
+                        }
+                        verticesMaximumMatrix[x][z] = tiledMapVertices[x][z][0];
                         currentTile++;
                     }
                     else if (mapTilesInfluence[x][z] > 0)
                     {
                         verticesMatrix[currentTile] = new Vector3[4];
 						matrixColors[currentTile] = new Color[4];
+
                         //bottom left vertex
                         verticesMatrix[currentTile][0].x = mapPositions[x][z].x - 0.00375f;
                         verticesMatrix[currentTile][0].y = mapTilesInfluence[x][z] / 50;
@@ -343,8 +355,9 @@ public class TiledmapGeneration : MonoBehaviour {
 						for (int c = 0; c < 4; c++)
 						{
 							matrixColors[currentTile][c] = new Color(verticesMatrix[currentTile][c].y, 0, Math.Abs(1 - verticesMatrix[currentTile][c].y));
-						}
-						
+                            tiledMapColors[x][z][c] = new Color(verticesMatrix[currentTile][c].y, 0, Math.Abs(1 - verticesMatrix[currentTile][c].y));
+                        }
+                        verticesMaximumMatrix[x][z] = tiledMapVertices[x][z][0];
                         currentTile++;
                     }
                 }
@@ -390,17 +403,14 @@ public class TiledmapGeneration : MonoBehaviour {
 						for (int c = 0; c < 4; c++)
 						{
 							matrixColors[currentTile][c] = new Color(verticesMatrix[currentTile][c].y, 0, Math.Abs(1 - verticesMatrix[currentTile][c].y));
-						}
-						
-                        currentTile++;
-                        if(currentTile == 2403)
-                        {
-                            Debug.Log("bla");
+                            tiledMapColors[x][z][c] = new Color(verticesMatrix[currentTile][c].y, 0, Math.Abs(1 - verticesMatrix[currentTile][c].y));
                         }
+                        currentTile++;
                     }
                 }
             }
         }
+        //need to start from begining, to shift the top right vertex to the bottom left vertex of the top right tile
         currentTile = 0;
         if(gaussianCalculation)
         {
@@ -414,17 +424,20 @@ public class TiledmapGeneration : MonoBehaviour {
                         verticesMatrix[currentTile] = ChangeVertices(verticesMatrix[currentTile], tiledMapVertices[i][j + 1][0].y, tiledMapVertices[i][j - 1][3].y, tiledMapVertices[i + 1][j + 1][0].y,
                                                                      tiledMapVertices[i + 1][j][0].y, tiledMapVertices[i - 1][j - 1][3].y, tiledMapVertices[i - 1][j][3].y);
                         tiledMapVertices[i][j] = verticesMatrix[currentTile];
+                        verticesMaximumMatrix[i][j] = tiledMapVertices[i][j][3];
                         currentTile++;
                     }
                 }
             }
         }
+
         ConvertMatrixToArray();
     }
 
     //converts the matrix of vertices to an array
     private void ConvertMatrixToArray()
     {
+        ReturnPeaks();
         int nextVertex = 0;
         int nextTriangle = 0;
         vertices = new Vector3[counter * 4];
@@ -442,13 +455,29 @@ public class TiledmapGeneration : MonoBehaviour {
             for(int j=0; j<4; j++)
             {
                 vertices[nextVertex] = verticesMatrix[i][j];
-                colors[nextVertex] = matrixColors[i][j];
+                //colors[nextVertex] = matrixColors[i][j];
                 nextVertex++;
             }
             for(int k=0; k<trianglesMatrix[i].Length; k++)
             {
                 triangles[nextTriangle] = trianglesMatrix[i][k];
                 nextTriangle++;
+            }
+        }
+        nextVertex = 0;
+        Color defColor = new Color(0, 0, 0);
+        for(int i=0; i<200;i++)
+        {
+            for(int j=0; j<200; j++)
+            {
+                if(tiledMapColors[i][j][0].r >0 || tiledMapColors[i][j][0].b >0)
+                {
+                    for(int k=0; k<4; k++)
+                    {
+                        colors[nextVertex] = tiledMapColors[i][j][k];
+                        nextVertex++;
+                    }
+                }
             }
         }
         CreateMesh();
@@ -513,6 +542,7 @@ public class TiledmapGeneration : MonoBehaviour {
         gaussCoef.floorTileCounter = gaussCoef.matrixRowLength * gaussCoef.matrixRowLength;
         gaussCoef.gaussianPositionMatrix = new Vector3[gaussCoef.matrixRowLength][];
         gaussCoef.valuesCalculated = false;
+        peaks = new List<Vector3>();
         //thresholdPlane.SetActive(false);
     }
 
@@ -572,5 +602,83 @@ public class TiledmapGeneration : MonoBehaviour {
             }
         }
         return false;
+    }
+
+    private void ReturnPeaks()
+    {
+        for(int p=0; p<200;p++)
+        {
+            for(int r=0; r<200; r++)
+            {
+                /*if(verticesMaximumMatrix[p][r].y>0 && 
+                    verticesMaximumMatrix[p][r].y >= verticesMaximumMatrix[p-1][r-1].y &&
+                    verticesMaximumMatrix[p][r].y >= verticesMaximumMatrix[p-1][r].y &&
+                    verticesMaximumMatrix[p][r].y >= verticesMaximumMatrix[p-1][r+1].y &&
+                    verticesMaximumMatrix[p][r].y >= verticesMaximumMatrix[p][r-1].y &&
+                    verticesMaximumMatrix[p][r].y >= verticesMaximumMatrix[p][r+1].y &&
+                    verticesMaximumMatrix[p][r].y >= verticesMaximumMatrix[p+1][r-1].y &&
+                    verticesMaximumMatrix[p][r].y >= verticesMaximumMatrix[p+1][r].y &&
+                    verticesMaximumMatrix[p][r].y >= verticesMaximumMatrix[p+1][r+1].y)
+                {
+                    for(int i=0; i<4; i++)
+                    {
+                        tiledMapColors[p][r][i] = new Color(1, 1, 1);
+                    }
+                    peaks.Add(verticesMaximumMatrix[p][r]);
+                }*/
+
+                if(verticesMaximumMatrix[p][r].y>0)
+                {
+                    List<Vector3> plateauList = new List<Vector3>();
+                    plateauList.Add(verticesMaximumMatrix[p][r]);
+                    bool tileIsPeak = IterateAround(plateauList, p, r);
+                    isPeak[p][r] = tileIsPeak;
+                }
+
+                if (isPeak[p][r])
+                {
+                    for (int i = 0; i < 4; i++)
+                    {
+                        tiledMapColors[p][r][i] = new Color(1, 1, 1);
+                    }
+                }
+            }
+        }
+    }
+
+    bool IterateAround(List<Vector3> plateauList, int p, int r)
+    {
+        bool tileIsPeak = true;
+        for(int i = p-1; i<p+2; i++)
+        {
+            for(int j=r-1; j<r+2; j++)
+            {
+                if (plateauList.Contains(verticesMaximumMatrix[i][j])) continue;
+                if(verticesMaximumMatrix[i][j].y > verticesMaximumMatrix[p][r].y)
+                {
+                    isPeak[p][r] = false;
+                    return false;
+                }
+                else if(verticesMaximumMatrix[i][j].y < verticesMaximumMatrix[p][r].y)
+                {
+                    tileIsPeak = true;
+                }
+                else if(verticesMaximumMatrix[i][j].y == verticesMaximumMatrix[p][r].y)
+                {
+                    plateauList.Add(verticesMaximumMatrix[i][j]);
+                    tileIsPeak = IterateAround(plateauList, i, j);
+                    if(!tileIsPeak)
+                    {
+                        isPeak[i][j] = false;
+                        return false;
+                    }
+                }
+            }
+        }
+        if(tileIsPeak)
+        {
+            isPeak[p][r] = true;
+        }
+        return tileIsPeak;
     }
 }
