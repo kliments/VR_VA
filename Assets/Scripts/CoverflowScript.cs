@@ -55,6 +55,12 @@ public class CoverflowScript : MonoBehaviour {
                 {
                     foreach (Transform child in obj)
                     {
+                        if (child.GetComponent<GeneralCoverflowProperties>().isHovered)
+                        {
+                            child.transform.localRotation = Quaternion.Euler(0, 0, 0);
+                            child.transform.localPosition = Vector3.zero;
+                            child.GetComponent<GeneralCoverflowProperties>().SetLeftAndRightSideButtons();
+                        }
                         child.GetComponent<GeneralCoverflowProperties>().isHovered = false;
                     }
                 }
@@ -62,6 +68,12 @@ public class CoverflowScript : MonoBehaviour {
 
             else
             {
+                if (obj.GetComponent<GeneralCoverflowProperties>().isHovered)
+                {
+                    obj.transform.localRotation = Quaternion.Euler(0, 0, 0);
+                    obj.transform.localPosition = Vector3.zero;
+                    obj.GetComponent<GeneralCoverflowProperties>().SetLeftAndRightSideButtons();
+                }
                 obj.GetComponent<GeneralCoverflowProperties>().isHovered = false;
             }
         }
@@ -69,6 +81,7 @@ public class CoverflowScript : MonoBehaviour {
 
     public void SetCurrentButton()
     {
+        bool isHover = false;
         foreach (Transform obj in menuToRotate.transform)
         {
             if (menuToRotate.name == "ResponsiveMenu")
@@ -77,7 +90,7 @@ public class CoverflowScript : MonoBehaviour {
                 {
                     foreach (Transform child in obj)
                     {
-                        if(child.localRotation.z == 0)
+                        if(decimal.Round((decimal)child.localPosition.x , 2) == 0)
                         {
                             currentButton = child.gameObject;
                             currentButton.GetComponent<GeneralCoverflowProperties>().isHovered = true;
@@ -88,7 +101,8 @@ public class CoverflowScript : MonoBehaviour {
 
             else
             {
-                if(obj.localRotation.z == 0)
+                isHover = obj.GetComponent<GeneralCoverflowProperties>().isHovered;
+                if(decimal.Round((decimal)obj.localPosition.x, 2) == 0)
                 {
                     currentButton = obj.gameObject;
                     currentButton.GetComponent<GeneralCoverflowProperties>().isHovered = true;

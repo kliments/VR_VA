@@ -459,6 +459,10 @@ public LayerMask layersToIgnoreAdd = Physics.IgnoreRaycastLayer;
 
         if (start)
         {
+            if(selectedObject.name == "ThresholdPlane")
+            {
+                selectedObject.GetComponent<FixXandZPosition>().isTaken = true;
+            }
             selectedObject.transform.parent = gameObject.transform;
             //disallow the changing of the selection while the move is progress
             fixSelection = true;
@@ -467,6 +471,10 @@ public LayerMask layersToIgnoreAdd = Physics.IgnoreRaycastLayer;
         {
             selectedObject.transform.parent = null;
 
+            if (selectedObject.name == "ThresholdPlane")
+            {
+                selectedObject.GetComponent<FixXandZPosition>().isTaken = false;
+            }
             ////TODO remove for release? (restore parent if it changed)
             DesiredParent desiredParent = selectedObject.GetComponent<DesiredParent>();
             if (desiredParent != null)

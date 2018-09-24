@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class GeneralCoverflowProperties : MonoBehaviour {
-    public bool isHovered;
+    public bool isHovered, rotationFinished;
     public GameObject parent, highlight;
     public List<GameObject> leftSideButtons, rightSideButtons;
+    public GameObject ptr, menusParent;
     private List<GameObject> allButtons;
     private Quaternion originalRotation;
     private Vector3 mainPosition, ptrOldPos, ptrNewPos;
-    public GameObject ptr, menusParent;
 
     private float speed=0.5f;
     // Use this for initialization
@@ -51,29 +51,11 @@ public class GeneralCoverflowProperties : MonoBehaviour {
                 Vector3 tempPos = mainPosition;
                 foreach (GameObject obj in leftSideButtons)
                 {
-                    /*if (count == 0)
-                    {
-                        tempPos.x = mainPosition.x - 0.08f;
-                    }
-                    else
-                    {
-                        tempPos.x = mainPosition.x + (count * (-0.02f)) - 0.08f;
-                    }
-                    obj.transform.localPosition = tempPos;
-                    count--;
-                    obj.transform.localRotation = Quaternion.Euler(0, 0, -60);*/
-
-                    if(count == 0)
-                    {
-                        tempPos.x = mainPosition.x - 0.08f;
-                    }
-                    else
-                    {
-                        tempPos.x = mainPosition.x + (count * (-0.02f)) - 0.08f;
-                    }
-                    obj.transform.localPosition = Vector3.Lerp(obj.transform.localPosition, tempPos, 10f*Time.deltaTime);
+                    tempPos.x = mainPosition.x + (count * (-0.02f)) - 0.08f;
+                    obj.transform.localPosition = Vector3.Lerp(obj.transform.localPosition, tempPos, 10f * Time.deltaTime);
                     count--;
                     obj.transform.localRotation = Quaternion.Lerp(obj.transform.localRotation, Quaternion.Euler(0, 0, -60), 1f);
+
                 }
             }
             if (rightSideButtons.Count != 0)
@@ -82,28 +64,10 @@ public class GeneralCoverflowProperties : MonoBehaviour {
                 Vector3 tempPos = mainPosition;
                 foreach (GameObject obj in rightSideButtons)
                 {
-                    /*if (count == 0)
-                    {
-                        tempPos.x = mainPosition.x + 0.08f;
-                    }
-                    else
-                    {
-                        tempPos.x = mainPosition.x + (count * (0.02f)) + 0.08f;
-                    }
-                    obj.transform.localPosition = tempPos;
+                    tempPos.x = mainPosition.x + (count * (0.02f)) + 0.08f;
+                    obj.transform.localPosition = Vector3.Lerp(obj.transform.localPosition, tempPos, 10 * Time.deltaTime);
                     count++;
-                    obj.transform.localRotation = Quaternion.Euler(0, 0, 60);*/
-                    if (count == 0)
-                    {
-                        tempPos.x = mainPosition.x + 0.08f;
-                    }
-                    else
-                    {
-                        tempPos.x = mainPosition.x + (count * (0.02f)) + 0.08f;
-                    }
-                    obj.transform.localPosition = Vector3.Lerp(obj.transform.localPosition,tempPos,10*Time.deltaTime);
-                    count++;
-                    obj.transform.localRotation = Quaternion.Lerp(obj.transform.localRotation,Quaternion.Euler(0, 0, 60),10*Time.deltaTime);
+                    obj.transform.localRotation = Quaternion.Lerp(obj.transform.localRotation, Quaternion.Euler(0, 0, 60), 10 * Time.deltaTime);
                 }
             }
         }
@@ -114,6 +78,35 @@ public class GeneralCoverflowProperties : MonoBehaviour {
         else if(!isHovered && highlight.activeSelf)
         {
             highlight.SetActive(false);
+        }
+    }
+
+    public void SetLeftAndRightSideButtons()
+    {
+        if (leftSideButtons.Count != 0)
+        {
+            int count = leftSideButtons.Count - 1;
+            Vector3 tempPos = mainPosition;
+            foreach (GameObject obj in leftSideButtons)
+            {
+                tempPos.x = mainPosition.x + (count * (-0.02f)) - 0.08f;
+                obj.transform.localPosition = tempPos;
+                count--;
+                obj.transform.localRotation = Quaternion.Euler(0, 0, -60);
+
+            }
+        }
+        if (rightSideButtons.Count != 0)
+        {
+            int count = 0;
+            Vector3 tempPos = mainPosition;
+            foreach (GameObject obj in rightSideButtons)
+            {
+                tempPos.x = mainPosition.x + (count * (0.02f)) + 0.08f;
+                obj.transform.localPosition = tempPos;
+                count++;
+                obj.transform.localRotation = Quaternion.Euler(0, 0, 60);
+            }
         }
     }
 

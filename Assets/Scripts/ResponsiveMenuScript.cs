@@ -8,38 +8,39 @@ public class ResponsiveMenuScript : MonoBehaviour {
     public SteamVR_Controller.Device device;
     public GameObject pointer, datasetParent;
     public bool isActive, moveAndResize;
-    private bool wasTouched, slide;
-    private GameObject currentButton;
-    private Vector3 inactivePos, activePos, inactiveScale, activeScale, actualPos;
-    private Vector2 oldPos, newPos;
-    private int frameCounter;
+
+    private bool _wasTouched, _slide;
+    private GameObject _currentButton;
+    private Vector3 _inactivePos, _activePos, _inactiveScale, _activeScale, _actualPos;
+    private Vector2 _oldPos, _newPos;
+    private int _frameCounter;
     // Use this for initialization
     void Start () {
-        slide = true;
+        _slide = true;
         isShown = true;
         trackedObj = transform.parent.transform.parent.GetComponent<SteamVR_TrackedObject>();
         device = SteamVR_Controller.Input((int)trackedObj.index);
-        inactiveScale = new Vector3(0.7f, 0.7f, 0.7f);
-        activeScale = new Vector3(1, 1, 1);
-        actualPos = new Vector3();
+        _inactiveScale = new Vector3(0.7f, 0.7f, 0.7f);
+        _activeScale = new Vector3(1, 1, 1);
+        _actualPos = new Vector3();
         AssignValues();
-        frameCounter = 0;
+        _frameCounter = 0;
     }
 	
 	// Update is called once per frame
 	void Update () {
-        currentButton = transform.parent.gameObject.GetComponent<CoverflowScript>().currentButton;
+        _currentButton = transform.parent.gameObject.GetComponent<CoverflowScript>().currentButton;
         if (isActive)
         {
             if (moveAndResize)
             {
-                gameObject.transform.localScale = Vector3.Lerp(gameObject.transform.localScale, inactiveScale, Time.deltaTime * 10f);
-                gameObject.transform.localPosition = Vector3.Lerp(gameObject.transform.localPosition, inactivePos, Time.deltaTime * 10f);
-                if (Vector3.Distance(gameObject.transform.localPosition, inactivePos) < 0.00005f)
+                gameObject.transform.localScale = Vector3.Lerp(gameObject.transform.localScale, _inactiveScale, Time.deltaTime * 10f);
+                gameObject.transform.localPosition = Vector3.Lerp(gameObject.transform.localPosition, _inactivePos, Time.deltaTime * 10f);
+                if (Vector3.Distance(gameObject.transform.localPosition, _inactivePos) < 0.00005f)
                 {
                     //no more moving or resizing needed
                     moveAndResize = false;
-                    gameObject.transform.localPosition = inactivePos;
+                    gameObject.transform.localPosition = _inactivePos;
                 }
             }
         }
@@ -47,68 +48,68 @@ public class ResponsiveMenuScript : MonoBehaviour {
         {
             if (moveAndResize)
             {
-                gameObject.transform.localScale = Vector3.Lerp(gameObject.transform.localScale, activeScale, Time.deltaTime * 10f);
-                gameObject.transform.localPosition = Vector3.Lerp(gameObject.transform.localPosition, activePos, Time.deltaTime * 10f);
-                if (Vector3.Distance(gameObject.transform.localPosition, activePos) < 0.00005f)
+                gameObject.transform.localScale = Vector3.Lerp(gameObject.transform.localScale, _activeScale, Time.deltaTime * 10f);
+                gameObject.transform.localPosition = Vector3.Lerp(gameObject.transform.localPosition, _activePos, Time.deltaTime * 10f);
+                if (Vector3.Distance(gameObject.transform.localPosition, _activePos) < 0.00005f)
                 {
                     //no more moving or resizing needed
                     moveAndResize = false;
-                    gameObject.transform.localPosition = activePos;
+                    gameObject.transform.localPosition = _activePos;
                 }
             }
         }
         if (device.GetTouchDown(SteamVR_Controller.ButtonMask.Touchpad))
         {
-            newPos = device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
-            oldPos = newPos;
+            _newPos = device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
+            _oldPos = _newPos;
         }
         //for moving pointer around when touching the touchpad
-        if (device.GetTouch(SteamVR_Controller.ButtonMask.Touchpad) && slide)
+        if (device.GetTouch(SteamVR_Controller.ButtonMask.Touchpad) && _slide)
         {
-            currentButton = transform.parent.gameObject.GetComponent<CoverflowScript>().currentButton;
-            oldPos = newPos;
-            newPos = device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
-            Vector2 difference = newPos - oldPos;
+            _currentButton = transform.parent.gameObject.GetComponent<CoverflowScript>().currentButton;
+            _oldPos = _newPos;
+            _newPos = device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
+            Vector2 difference = _newPos - _oldPos;
 
-            if (currentButton.tag == "increaseDecrease" && Mathf.Abs(difference.y) > 0.05f)
+            if (_currentButton.tag == "increaseDecrease" && Mathf.Abs(difference.y) > 0.05f)
             {
-                currentButton.GetComponent<UniversalButtonScript>().difference = difference.y;
-                currentButton.GetComponent<UniversalButtonScript>().Press();
-                slide = false;
+                _currentButton.GetComponent<UniversalButtonScript>().difference = difference.y;
+                _currentButton.GetComponent<UniversalButtonScript>().Press();
+                _slide = false;
             }
 
             else if (Mathf.Abs(difference.x) > 0.03f)
             {
-                actualPos.x = difference.x * 0.1f;
+                _actualPos.x = difference.x * 0.1f;
                 
-                actualPos.z = 0;
-                actualPos.y = 0;
+                _actualPos.z = 0;
+                _actualPos.y = 0;
                 if (pointer.transform.localPosition.x < -0.28f && difference.x < 0)
                 {
-                    actualPos.x = 0;
+                    _actualPos.x = 0;
                 }
 
                 if (pointer.transform.localPosition.x > 0.28f && difference.x > 0)
                 {
-                    actualPos.x = 0;
+                    _actualPos.x = 0;
                 }
-                pointer.transform.localPosition += actualPos;
-                slide = false;
+                pointer.transform.localPosition += _actualPos;
+                _slide = false;
             }
         }
 
         if(device.GetTouchUp(SteamVR_Controller.ButtonMask.Touchpad))
         {
-            slide = true;
-            frameCounter = 0;
-            oldPos = new Vector2(0, 0);
-            newPos = new Vector2(0, 0);
-            currentButton.GetComponent<UniversalButtonScript>().CancelAllCalls();
+            _slide = true;
+            _frameCounter = 0;
+            _oldPos = new Vector2(0, 0);
+            _newPos = new Vector2(0, 0);
+            _currentButton.GetComponent<UniversalButtonScript>().CancelAllCalls();
         }
 
         if (device.GetPressDown(SteamVR_Controller.ButtonMask.Trigger) && gameObject.name == "ResponsiveMenu")
         {
-            currentButton.GetComponent<UniversalButtonScript>().Press();
+            _currentButton.GetComponent<UniversalButtonScript>().Press();
         }
         
     }
@@ -165,12 +166,12 @@ public class ResponsiveMenuScript : MonoBehaviour {
     {
         if(gameObject.name == "ResponsiveMenu")
         {
-            inactivePos = new Vector3(0f, -0.03f, 0.235f);
+            _inactivePos = new Vector3(0f, -0.03f, 0.235f);
         }
         else
         {
-            inactivePos = new Vector3(0f, -0.03f, 0.065f);
+            _inactivePos = new Vector3(0f, -0.03f, 0.065f);
         }
-        activePos = new Vector3(0, 0, 0.15f);
+        _activePos = new Vector3(0, 0, 0.15f);
     }
 }
