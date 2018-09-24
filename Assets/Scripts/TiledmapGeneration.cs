@@ -11,10 +11,12 @@ public class TiledmapGeneration : MonoBehaviour {
     public bool gaussianCalculation;
     //plus/minus neighbourhood cubes around the center cube in the matrix
     public int halfLengthOfNeighbourhood;
-    public float influence;
+    public float threshold;
     public GameObject thresholdPlane;
     public List<Vector3> peaks;
     public bool resizeMesh;
+    public KMeansAlgorithm kMeans;
+    public DBScanAlgorithm dbscan;
 
     private GameObject obj;
     private Mesh mesh;
@@ -33,13 +35,13 @@ public class TiledmapGeneration : MonoBehaviour {
     private bool[][] isPeak;
     // Use this for initialization
     void Start () {
-        gaussianCalculation = true;
+        gaussianCalculation = false;
         x = -0.25f;
         y = 0;
         z = -0.25f;
         halfLengthOfNeighbourhood = 3;
         counter = 0;
-        influence = 3;
+        threshold = 0.000001f;
         obj = new GameObject();
 
         list = new List<GameObject>();
@@ -90,6 +92,8 @@ public class TiledmapGeneration : MonoBehaviour {
 
     public void StartDenclue()
     {
+        kMeans.ResetMe();
+        dbscan.ResetMe();
         ResetMe();
         IncreaseInfluence();
         obj.transform.localScale = startSize;
@@ -172,11 +176,11 @@ public class TiledmapGeneration : MonoBehaviour {
                     }
                     if (gaussianCalculation)
                     {
-                        mapTilesInfluence[xPos][zPos] += gaussCoef.gaussianCoef[gaussX][gaussZ] * influence / 3;
+                        mapTilesInfluence[xPos][zPos] += gaussCoef.gaussianCoef[gaussX][gaussZ];
                     }
                     else
                     {
-                        mapTilesInfluence[xPos][zPos] += influence / 3;
+                        mapTilesInfluence[xPos][zPos]++;
                     }
                     gaussZ++;
                 }
@@ -245,22 +249,22 @@ public class TiledmapGeneration : MonoBehaviour {
                         int count = (currentTile + 1) * 4;
                         //bottom left vertex
                         verticesMatrix[currentTile][0].x = mapPositions[x][z].x - 0.00375f;
-                        verticesMatrix[currentTile][0].y = mapTilesInfluence[x][z] / 50;
+                        verticesMatrix[currentTile][0].y = mapTilesInfluence[x][z] / 100;
                         verticesMatrix[currentTile][0].z = mapPositions[x][z].z - 0.00375f;
                         tiledMapVertices[x][z][0] = verticesMatrix[currentTile][0];
                         //bottom right vertex
                         verticesMatrix[currentTile][1].x = mapPositions[x][z].x + 0.00375f;
-                        verticesMatrix[currentTile][1].y = mapTilesInfluence[x][z] / 50;
+                        verticesMatrix[currentTile][1].y = mapTilesInfluence[x][z] / 100;
                         verticesMatrix[currentTile][1].z = mapPositions[x][z].z - 0.00375f;
                         tiledMapVertices[x][z][1] = verticesMatrix[currentTile][1];
                         //top left vertex
                         verticesMatrix[currentTile][2].x = mapPositions[x][z].x - 0.00375f;
-                        verticesMatrix[currentTile][2].y = mapTilesInfluence[x][z] / 50;
+                        verticesMatrix[currentTile][2].y = mapTilesInfluence[x][z] / 100;
                         verticesMatrix[currentTile][2].z = mapPositions[x][z].z + 0.00375f;
                         tiledMapVertices[x][z][2] = verticesMatrix[currentTile][2];
                         //top right vertex
                         verticesMatrix[currentTile][3].x = mapPositions[x][z].x + 0.00375f;
-                        verticesMatrix[currentTile][3].y = mapTilesInfluence[x][z] / 50;
+                        verticesMatrix[currentTile][3].y = mapTilesInfluence[x][z] / 100;
                         verticesMatrix[currentTile][3].z = mapPositions[x][z].z + 0.00375f;
                         tiledMapVertices[x][z][3] = verticesMatrix[currentTile][3];
 
@@ -305,22 +309,22 @@ public class TiledmapGeneration : MonoBehaviour {
 
                         //bottom left vertex
                         verticesMatrix[currentTile][0].x = mapPositions[x][z].x - 0.00375f;
-                        verticesMatrix[currentTile][0].y = mapTilesInfluence[x][z] / 50;
+                        verticesMatrix[currentTile][0].y = mapTilesInfluence[x][z] / 100;
                         verticesMatrix[currentTile][0].z = mapPositions[x][z].z - 0.00375f;
                         tiledMapVertices[x][z][0] = verticesMatrix[currentTile][0];
                         //bottom right vertex
                         verticesMatrix[currentTile][1].x = mapPositions[x][z].x + 0.00375f;
-                        verticesMatrix[currentTile][1].y = mapTilesInfluence[x][z] / 50;
+                        verticesMatrix[currentTile][1].y = mapTilesInfluence[x][z] / 100;
                         verticesMatrix[currentTile][1].z = mapPositions[x][z].z - 0.00375f;
                         tiledMapVertices[x][z][1] = verticesMatrix[currentTile][1];
                         //top left vertex
                         verticesMatrix[currentTile][2].x = mapPositions[x][z].x - 0.00375f;
-                        verticesMatrix[currentTile][2].y = mapTilesInfluence[x][z] / 50;
+                        verticesMatrix[currentTile][2].y = mapTilesInfluence[x][z] / 100;
                         verticesMatrix[currentTile][2].z = mapPositions[x][z].z + 0.00375f;
                         tiledMapVertices[x][z][2] = verticesMatrix[currentTile][2];
                         //top right vertex
                         verticesMatrix[currentTile][3].x = mapPositions[x][z].x + 0.00375f;
-                        verticesMatrix[currentTile][3].y = mapTilesInfluence[x][z] / 50;
+                        verticesMatrix[currentTile][3].y = mapTilesInfluence[x][z] / 100;
                         verticesMatrix[currentTile][3].z = mapPositions[x][z].z + 0.00375f;
                         tiledMapVertices[x][z][3] = verticesMatrix[currentTile][3];
 
@@ -369,22 +373,22 @@ public class TiledmapGeneration : MonoBehaviour {
 						matrixColors[currentTile] = new Color[4];
                         //bottom left vertex
                         verticesMatrix[currentTile][0].x = mapPositions[x][z].x - 0.00375f;
-                        verticesMatrix[currentTile][0].y = mapTilesInfluence[x][z] / 50;
+                        verticesMatrix[currentTile][0].y = mapTilesInfluence[x][z] / 100;
                         verticesMatrix[currentTile][0].z = mapPositions[x][z].z - 0.00375f;
                         tiledMapVertices[x][z][0] = verticesMatrix[currentTile][0];
                         //bottom right vertex
                         verticesMatrix[currentTile][1].x = mapPositions[x][z].x + 0.00375f;
-                        verticesMatrix[currentTile][1].y = mapTilesInfluence[x][z] / 50;
+                        verticesMatrix[currentTile][1].y = mapTilesInfluence[x][z] / 100;
                         verticesMatrix[currentTile][1].z = mapPositions[x][z].z - 0.00375f;
                         tiledMapVertices[x][z][1] = verticesMatrix[currentTile][1];
                         //top left vertex
                         verticesMatrix[currentTile][2].x = mapPositions[x][z].x - 0.00375f;
-                        verticesMatrix[currentTile][2].y = mapTilesInfluence[x][z] / 50;
+                        verticesMatrix[currentTile][2].y = mapTilesInfluence[x][z] / 100;
                         verticesMatrix[currentTile][2].z = mapPositions[x][z].z + 0.00375f;
                         tiledMapVertices[x][z][2] = verticesMatrix[currentTile][2];
                         //top right vertex
                         verticesMatrix[currentTile][3].x = mapPositions[x][z].x + 0.00375f;
-                        verticesMatrix[currentTile][3].y = mapTilesInfluence[x][z] / 50;
+                        verticesMatrix[currentTile][3].y = mapTilesInfluence[x][z] / 100;
                         verticesMatrix[currentTile][3].z = mapPositions[x][z].z + 0.00375f;
                         tiledMapVertices[x][z][3] = verticesMatrix[currentTile][3];
 
@@ -610,23 +614,6 @@ public class TiledmapGeneration : MonoBehaviour {
         {
             for(int r=0; r<200; r++)
             {
-                /*if(verticesMaximumMatrix[p][r].y>0 && 
-                    verticesMaximumMatrix[p][r].y >= verticesMaximumMatrix[p-1][r-1].y &&
-                    verticesMaximumMatrix[p][r].y >= verticesMaximumMatrix[p-1][r].y &&
-                    verticesMaximumMatrix[p][r].y >= verticesMaximumMatrix[p-1][r+1].y &&
-                    verticesMaximumMatrix[p][r].y >= verticesMaximumMatrix[p][r-1].y &&
-                    verticesMaximumMatrix[p][r].y >= verticesMaximumMatrix[p][r+1].y &&
-                    verticesMaximumMatrix[p][r].y >= verticesMaximumMatrix[p+1][r-1].y &&
-                    verticesMaximumMatrix[p][r].y >= verticesMaximumMatrix[p+1][r].y &&
-                    verticesMaximumMatrix[p][r].y >= verticesMaximumMatrix[p+1][r+1].y)
-                {
-                    for(int i=0; i<4; i++)
-                    {
-                        tiledMapColors[p][r][i] = new Color(1, 1, 1);
-                    }
-                    peaks.Add(verticesMaximumMatrix[p][r]);
-                }*/
-
                 if(verticesMaximumMatrix[p][r].y>0)
                 {
                     List<Vector3> plateauList = new List<Vector3>();

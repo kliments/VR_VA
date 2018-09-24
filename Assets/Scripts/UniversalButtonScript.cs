@@ -260,24 +260,7 @@ public class UniversalButtonScript : MonoBehaviour {
         else if(transform.parent == denclueParent.transform)
         {
             menusParent.GetComponent<CoverflowScript>().AssignValues(denclueParent);
-            if(this.name == "neighbourhood")
-            {
-                increaseDecreseObj = GetComponent<IncreaseDecrease>();
-                Vector2 pos = controller.device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
-                if (difference > 0f)
-                {
-
-                    if (IsInvoking("DecreaseNeighborhood")) CancelInvoke("DecreaseNeighborhood");
-                    if (!IsInvoking("IncreaseNeighborhood")) InvokeRepeating("IncreaseNeighborhood", 0, 0.2f);
-                }
-                else if (difference < 0f)
-                {
-
-                    if (IsInvoking("IncreaseNeighborhood")) CancelInvoke("IncreaseNeighborhood");
-                    if (!IsInvoking("DecreaseNeighborhood")) InvokeRepeating("DecreaseNeighborhood", 0, 0.2f);
-                }
-            }
-            else if(this.name == "influence")
+            if(this.name == "influence")
             {
                 increaseDecreseObj = GetComponent<IncreaseDecrease>();
                 Vector2 pos = controller.device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
@@ -292,6 +275,23 @@ public class UniversalButtonScript : MonoBehaviour {
 
                     if (IsInvoking("IncreaseInfluence")) CancelInvoke("IncreaseInfluence");
                     if (!IsInvoking("DecreaseInfluence")) InvokeRepeating("DecreaseInfluence", 0, 0.2f);
+                }
+            }
+            else if(this.name == "threshold")
+            {
+                increaseDecreseObj = GetComponent<IncreaseDecrease>();
+                Vector2 pos = controller.device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
+                if (difference > 0f)
+                {
+
+                    if (IsInvoking("DecreaseThreshold")) CancelInvoke("DecreaseThreshold");
+                    if (!IsInvoking("IncreaseThreshold")) InvokeRepeating("IncreaseThreshold", 0, 0.2f);
+                }
+                else if (difference < 0f)
+                {
+
+                    if (IsInvoking("IncreaseThreshold")) CancelInvoke("IncreaseThreshold");
+                    if (!IsInvoking("DecreaseThreshold")) InvokeRepeating("DecreaseThreshold", 0, 0.2f);
                 }
             }
             else if(this.name == "SquareGaussian")
@@ -362,16 +362,6 @@ public class UniversalButtonScript : MonoBehaviour {
         increaseDecreseObj.DecreaseMinPts();
     }
 
-    void IncreaseNeighborhood()
-    {
-        increaseDecreseObj.IncreaseNeighborhood();
-    }
-
-    void DecreaseNeighborhood()
-    {
-        increaseDecreseObj.DecreaseNeighborhood();
-    }
-
     void IncreaseInfluence()
     {
         increaseDecreseObj.IncreaseInfluence();
@@ -380,6 +370,16 @@ public class UniversalButtonScript : MonoBehaviour {
     void DecreaseInfluence()
     {
         increaseDecreseObj.DecreaseInfluence();
+    }
+
+    void IncreaseThreshold()
+    {
+        increaseDecreseObj.IncreaseThreshold();
+    }
+
+    void DecreaseThreshold()
+    {
+        increaseDecreseObj.DecreaseThreshold();
     }
 
     public void CancelAllCalls()
