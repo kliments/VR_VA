@@ -707,11 +707,16 @@ public class TiledmapGeneration : MonoBehaviour {
         {
             for(int j=0; j<200; j++)
             {
-                if(_tiledMapVertices[i][j][0].y * 0.6599995 > threshold && !_clustered[i][j])
+                if((_tiledMapVertices[i][j][0].y * 0.66f) + 0.002f > threshold && !_clustered[i][j])
                 {
                     List<Vector3> clusterList = new List<Vector3>();
+                    _clustered[i][j] = true;
                     _clusterColor = new Color(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f));
                     clusterList.Add(_tiledMapVertices[i][j][0]);
+                    for (int c = 0; c < 4; c++)
+                    {
+                        _tiledMapColors[i][j][c] = _clusterColor;
+                    }
                     IterateMultiCenterClusterAround(clusterList, i, j);
                 }
             }
@@ -725,8 +730,33 @@ public class TiledmapGeneration : MonoBehaviour {
             for(int l=j-1; l<j+2; l++)
             {
                 if (clusterList.Contains(_tiledMapVertices[k][l][0])) continue;
-                else if (_tiledMapVertices[k][l][0].y * 0.6599995 < threshold) continue;
-                else if(_tiledMapVertices[k][l][0].y * 0.6599995 >= threshold)
+                else if ((_tiledMapVertices[k][l][0].y * 0.66f) + 0.002f < threshold)
+                {
+                    //tile on the left
+                    if(k==i-1 && l==j)
+                    {
+                        _tiledMapColors[k][l][1] = _clusterColor;
+                        _tiledMapColors[k][l][3] = _clusterColor;
+                    }
+                    //tile above
+                    else if(k==i && l==j+1)
+                    {
+                        _tiledMapColors[k][l][0] = _clusterColor;
+                        _tiledMapColors[k][l][1] = _clusterColor;
+                    }
+                    //tile on the right
+                    else if (k == i+1 && l == j)
+                    {
+                        _tiledMapColors[k][l][0] = _clusterColor;
+                        _tiledMapColors[k][l][2] = _clusterColor;
+                    }
+                    else if(k==i && l==j-1)
+                    {
+                        _tiledMapColors[k][l][2] = _clusterColor;
+                        _tiledMapColors[k][l][3] = _clusterColor;
+                    }
+                }
+                else if((_tiledMapVertices[k][l][0].y * 0.66f) + 0.002f >= threshold)
                 {
                     clusterList.Add(_tiledMapVertices[k][l][0]);
                     _clustered[k][l] = true;
