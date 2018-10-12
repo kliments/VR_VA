@@ -42,7 +42,7 @@ public class TiledmapGeneration : MonoBehaviour {
         _z = -0.25f;
         halfLengthOfNeighbourhood = 3;
         _counter = 0;
-        threshold = 0.001f;
+        threshold = 0.0021f;
         _obj = new GameObject();
 
         _list = new List<GameObject>();
