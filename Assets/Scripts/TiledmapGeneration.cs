@@ -36,7 +36,6 @@ public class TiledmapGeneration : MonoBehaviour {
     private bool[][] _isPeak, _clustered;
     // Use this for initialization
     void Start () {
-        gaussianCalculation = false;
         _x = -0.25f;
         _y = 0;
         _z = -0.25f;
@@ -399,22 +398,22 @@ public class TiledmapGeneration : MonoBehaviour {
 						_matrixColors[currentTile] = new Color[4];
                         //bottom left vertex
                         _verticesMatrix[currentTile][0].x = _mapPositions[x][z].x - 0.00375f;
-                        _verticesMatrix[currentTile][0].y = mapTilesInfluence[x][z] / 100;
+                        _verticesMatrix[currentTile][0].y = mapTilesInfluence[x][z] / 50;
                         _verticesMatrix[currentTile][0].z = _mapPositions[x][z].z - 0.00375f;
                         _tiledMapVertices[x][z][0] = _verticesMatrix[currentTile][0];
                         //bottom right vertex
                         _verticesMatrix[currentTile][1].x = _mapPositions[x][z].x + 0.00375f;
-                        _verticesMatrix[currentTile][1].y = mapTilesInfluence[x][z] / 100;
+                        _verticesMatrix[currentTile][1].y = mapTilesInfluence[x][z] / 50;
                         _verticesMatrix[currentTile][1].z = _mapPositions[x][z].z - 0.00375f;
                         _tiledMapVertices[x][z][1] = _verticesMatrix[currentTile][1];
                         //top left vertex
                         _verticesMatrix[currentTile][2].x = _mapPositions[x][z].x - 0.00375f;
-                        _verticesMatrix[currentTile][2].y = mapTilesInfluence[x][z] / 100;
+                        _verticesMatrix[currentTile][2].y = mapTilesInfluence[x][z] / 50;
                         _verticesMatrix[currentTile][2].z = _mapPositions[x][z].z + 0.00375f;
                         _tiledMapVertices[x][z][2] = _verticesMatrix[currentTile][2];
                         //top right vertex
                         _verticesMatrix[currentTile][3].x = _mapPositions[x][z].x + 0.00375f;
-                        _verticesMatrix[currentTile][3].y = mapTilesInfluence[x][z] / 100;
+                        _verticesMatrix[currentTile][3].y = mapTilesInfluence[x][z] / 50;
                         _verticesMatrix[currentTile][3].z = _mapPositions[x][z].z + 0.00375f;
                         _tiledMapVertices[x][z][3] = _verticesMatrix[currentTile][3];
 
@@ -429,12 +428,7 @@ public class TiledmapGeneration : MonoBehaviour {
                         _trianglesMatrix[currentTile][3] = count - 2;
                         _trianglesMatrix[currentTile][4] = count - 1;
                         _trianglesMatrix[currentTile][5] = count - 3;
-						
-						for (int c = 0; c < 4; c++)
-						{
-							_matrixColors[currentTile][c] = new Color(_verticesMatrix[currentTile][c].y, 0, Math.Abs(1 - _verticesMatrix[currentTile][c].y));
-                            _tiledMapColors[x][z][c] = new Color(_verticesMatrix[currentTile][c].y, 0, Math.Abs(1 - _verticesMatrix[currentTile][c].y));
-                        }
+
                         currentTile++;
                     }
                 }
@@ -455,6 +449,12 @@ public class TiledmapGeneration : MonoBehaviour {
                                                                      _tiledMapVertices[i + 1][j][0].y, _tiledMapVertices[i - 1][j - 1][3].y, _tiledMapVertices[i - 1][j][3].y);
                         _tiledMapVertices[i][j] = _verticesMatrix[currentTile];
                         _verticesMaximumMatrix[i][j] = _tiledMapVertices[i][j][3];
+
+                        for (int c = 0; c < 4; c++)
+                        {
+                            _matrixColors[currentTile][c] = new Color(_verticesMatrix[currentTile][c].y, 0, Math.Abs(1 - _verticesMatrix[currentTile][c].y));
+                            _tiledMapColors[i][j][c] = new Color(_verticesMatrix[currentTile][c].y, 0, Math.Abs(1 - _verticesMatrix[currentTile][c].y));
+                        }
                         currentTile++;
                     }
                 }
