@@ -34,7 +34,7 @@ public class GaussianCoefficients : MonoBehaviour {
                 gaussianCoef[x] = new float[matrixRowLength];
                 x++;
             }
-            gaussianCoef[x - 1][y] = Mathf.Exp(-(Mathf.Pow((normalizedPositions[x - 1][y].x - center.x), 2) + Mathf.Pow((normalizedPositions[x - 1][y].z - center.z), 2)) / 2 * (Mathf.Pow(4, 2)));
+            gaussianCoef[x - 1][y] = (float) (System.Math.Truncate(100000 * Mathf.Exp(-(Mathf.Pow((normalizedPositions[x - 1][y].x - center.x), 2) + Mathf.Pow((normalizedPositions[x - 1][y].z - center.z), 2)) / 2 * (Mathf.Pow(4, 2))))) / 100000;
             y++;
         }
     }

@@ -34,6 +34,7 @@ public class TiledmapGeneration : MonoBehaviour {
     private Color[] _colors;
     private Color _clusterColor;
     private bool[][] _isPeak, _clustered;
+    private bool _skip;
     // Use this for initialization
     void Start () {
         _x = -0.25f;
@@ -41,7 +42,7 @@ public class TiledmapGeneration : MonoBehaviour {
         _z = -0.25f;
         halfLengthOfNeighbourhood = 3;
         _counter = 0;
-        threshold = 0.0021f;
+        threshold = 0.0022f;
         _obj = new GameObject();
 
         _list = new List<GameObject>();
@@ -434,8 +435,9 @@ public class TiledmapGeneration : MonoBehaviour {
                 }
             }
         }
-        //need to start from begining, to shift the top right vertex to the bottom left vertex of the top right tile
+        //need to start from begining, to reposition vertices on each tile to create smooth mesh
         currentTile = 0;
+        
         if(gaussianCalculation)
         {
             for (int i = 0; i < mapTilesInfluence.Length; i++)
@@ -445,10 +447,37 @@ public class TiledmapGeneration : MonoBehaviour {
                     if (mapTilesInfluence[i][j] > 0)
                     {
 
-                        _verticesMatrix[currentTile] = ChangeVertices(_verticesMatrix[currentTile], _tiledMapVertices[i][j + 1][0].y, _tiledMapVertices[i][j - 1][3].y, _tiledMapVertices[i + 1][j + 1][0].y,
-                                                                     _tiledMapVertices[i + 1][j][0].y, _tiledMapVertices[i - 1][j - 1][3].y, _tiledMapVertices[i - 1][j][3].y);
+                        /*_verticesMatrix[currentTile] = ChangeVertices(_verticesMatrix[currentTile], _tiledMapVertices[i][j + 1][0].y, _tiledMapVertices[i][j - 1][3].y, _tiledMapVertices[i + 1][j + 1][0].y,
+                                                                     _tiledMapVertices[i + 1][j][0].y, _tiledMapVertices[i - 1][j - 1][3].y, _tiledMapVertices[i - 1][j][3].y);*/
+                        
+                        _verticesMatrix[currentTile] = ChangeVertices(_tiledMapVertices[i][j], _tiledMapVertices[i][j + 1], _tiledMapVertices[i - 1][j + 1],
+                                                                      _tiledMapVertices[i + 1][j + 1], _tiledMapVertices[i][j - 1], _tiledMapVertices[i - 1][j - 1],
+                                                                      _tiledMapVertices[i + 1][j - 1], _tiledMapVertices[i - 1][j], _tiledMapVertices[i + 1][j], i, j);
                         _tiledMapVertices[i][j] = _verticesMatrix[currentTile];
-                        _verticesMaximumMatrix[i][j] = _tiledMapVertices[i][j][3];
+                        if(_tiledMapVertices[i][j][0].y > _tiledMapVertices[i][j][1].y &&
+                            _tiledMapVertices[i][j][0].y > _tiledMapVertices[i][j][2].y &&
+                            _tiledMapVertices[i][j][0].y > _tiledMapVertices[i][j][3].y)
+                        {
+                            _verticesMaximumMatrix[i][j] = _tiledMapVertices[i][j][0];
+                        }
+                        else if(_tiledMapVertices[i][j][1].y > _tiledMapVertices[i][j][0].y &&
+                            _tiledMapVertices[i][j][1].y > _tiledMapVertices[i][j][2].y &&
+                            _tiledMapVertices[i][j][1].y > _tiledMapVertices[i][j][3].y)
+                        {
+                            _verticesMaximumMatrix[i][j] = _tiledMapVertices[i][j][1];
+                        }
+                        else if (_tiledMapVertices[i][j][2].y > _tiledMapVertices[i][j][0].y &&
+                            _tiledMapVertices[i][j][2].y > _tiledMapVertices[i][j][1].y &&
+                            _tiledMapVertices[i][j][2].y > _tiledMapVertices[i][j][3].y)
+                        {
+                            _verticesMaximumMatrix[i][j] = _tiledMapVertices[i][j][2];
+                        }
+                        else if (_tiledMapVertices[i][j][3].y > _tiledMapVertices[i][j][0].y &&
+                            _tiledMapVertices[i][j][3].y > _tiledMapVertices[i][j][1].y &&
+                            _tiledMapVertices[i][j][3].y > _tiledMapVertices[i][j][2].y)
+                        {
+                            _verticesMaximumMatrix[i][j] = _tiledMapVertices[i][j][3];
+                        }
 
                         for (int c = 0; c < 4; c++)
                         {
@@ -460,7 +489,7 @@ public class TiledmapGeneration : MonoBehaviour {
                 }
             }
         }
-
+        
         ConvertMatrixToArray();
     }
 
@@ -523,24 +552,103 @@ public class TiledmapGeneration : MonoBehaviour {
         _obj.AddComponent<MeshRenderer>();
         _obj.GetComponent<MeshFilter>().mesh = _mesh;
         _obj.GetComponent<MeshRenderer>().material = mat;
-        _obj.transform.localPosition = new Vector3(0.819f, 0.002f, 0.751f);
+        _obj.transform.localPosition = new Vector3(0.819f, 0.0022f, 0.751f);
         _obj.transform.localRotation = new Quaternion(0, 180, 0,0);
         _obj.transform.localScale = new Vector3(0.6600493f, 0.6600493f, 0.6600493f);
         //thresholdPlane.SetActive(true);
     }    
 
-    private Vector3[] ChangeVertices(Vector3[] actualVertex, float top,float down, float topRight, float right, float downLeft, float left)
+    private Vector3[] ChangeVertices(Vector3[] actualVertex, Vector3[] top, Vector3[] topLeft, Vector3[] topRight, 
+                                     Vector3[] down, Vector3[] downLeft, Vector3[] downRight, Vector3[] left, Vector3[] right, int i, int j)
     {
-        Vector3[] vertex = new Vector3[4];
         if(actualVertex[0].y > 0)
+        {
+            /*actualVertex[0].y = downLeft;
+            actualVertex[1].y = down;
+            actualVertex[2].y = left;
+            actualVertex[3].y = (top + topRight + right) / 3;*/
+
+            //the top
+            if(mapTilesInfluence[i][j] > mapTilesInfluence[i-1][j] && mapTilesInfluence[i][j] > mapTilesInfluence[i+1][j]
+            && mapTilesInfluence[i][j] > mapTilesInfluence[i][j-1] && mapTilesInfluence[i][j] > mapTilesInfluence[i][j+1])
             {
-                actualVertex[0].y = downLeft;
-                actualVertex[1].y = down;
-                actualVertex[2].y = left;
-                actualVertex[3].y = (top + topRight + right) / 3;
-                vertex = actualVertex;
+                actualVertex[0].y = downLeft[3].y;
+                actualVertex[1].y = downRight[2].y;
+                actualVertex[2].y = topLeft[1].y;
+                actualVertex[3].y = topRight[0].y;
             }
-        return vertex;
+            //rising upwards to the right
+            else if(mapTilesInfluence[i][j] > mapTilesInfluence[i-1][j-1] && mapTilesInfluence[i][j] < mapTilesInfluence[i+1][j+1]
+                 && mapTilesInfluence[i][j] > mapTilesInfluence[i][j-1] && mapTilesInfluence[i][j] < mapTilesInfluence[i][j+1])
+            {
+                actualVertex[0].y = downLeft[3].y;
+                actualVertex[1].y = down[3].y;
+                actualVertex[2].y = left[3].y;
+            }
+
+            //rising upwards to the left
+            else if(mapTilesInfluence[i][j] > mapTilesInfluence[i+1][j-1] && mapTilesInfluence[i][j] < mapTilesInfluence[i-1][j+1]
+                 && mapTilesInfluence[i][j] > mapTilesInfluence[i][j-1] && mapTilesInfluence[i][j] < mapTilesInfluence[i][j+1])
+            {
+                actualVertex[0].y = down[2].y;
+                actualVertex[1].y = downRight[2].y;
+                actualVertex[3].y = right[2].y;
+            }
+
+            //decreasing downwards to the right
+            else if(mapTilesInfluence[i][j] > mapTilesInfluence[i+1][j+1] && mapTilesInfluence[i][j] < mapTilesInfluence[i-1][j-1]
+                 && mapTilesInfluence[i][j] > mapTilesInfluence[i][j+1] && mapTilesInfluence[i][j] < mapTilesInfluence[i][j-1])
+            {
+                actualVertex[1].y = right[0].y;
+                actualVertex[2].y = top[0].y;
+                actualVertex[3].y = topRight[0].y;
+            }
+
+            //decreasing downwards to the left
+            else if(mapTilesInfluence[i][j] > mapTilesInfluence[i-1][j+1] && mapTilesInfluence[i][j] < mapTilesInfluence[i+1][j-1]
+                 && mapTilesInfluence[i][j] > mapTilesInfluence[i][j+1] && mapTilesInfluence[i][j] < mapTilesInfluence[i][j-1])
+            {
+                actualVertex[0].y = left[1].y;
+                actualVertex[2].y = topLeft[1].y;
+                actualVertex[3].y = top[1].y;
+            }
+
+            //cascade upwards forward
+            else if (mapTilesInfluence[i][j] > mapTilesInfluence[i][j - 1] && mapTilesInfluence[i][j] < mapTilesInfluence[i][j + 1])
+            {
+                actualVertex[0].y = downLeft[3].y;
+                actualVertex[1].y = downRight[2].y;
+                actualVertex[2].y = left[3].y;
+                actualVertex[3].y = right[2].y;
+            }
+
+            //cascade downwards forward
+            else if (mapTilesInfluence[i][j] < mapTilesInfluence[i - 1][j] && mapTilesInfluence[i][j] < mapTilesInfluence[i + 1][j])
+            {
+                actualVertex[0].y = left[1].y;
+                actualVertex[1].y = right[0].y;
+                actualVertex[2].y = topLeft[1].y;
+                actualVertex[3].y = topRight[0].y;
+            }
+            //cascade upwards right
+            else if (mapTilesInfluence[i][j] > mapTilesInfluence[i - 1][j] && mapTilesInfluence[i][j] < mapTilesInfluence[i + 1][j])
+            {
+                actualVertex[0].y = downLeft[3].y;
+                actualVertex[1].y = down[3].y;
+                actualVertex[2].y = topLeft[1].y;
+                actualVertex[3].y = top[1].y;
+            }
+
+            //cascade downwards right
+            else if (mapTilesInfluence[i][j] < mapTilesInfluence[i - 1][j] && mapTilesInfluence[i][j] > mapTilesInfluence[i + 1][j])
+            {
+                actualVertex[0].y = down[2].y;
+                actualVertex[1].y = downRight[2].y;
+                actualVertex[2].y = top[0].y;
+                actualVertex[3].y = topRight[0].y;
+            }
+        }
+        return actualVertex;
     }
 
     public void ResetMe()
@@ -646,13 +754,13 @@ public class TiledmapGeneration : MonoBehaviour {
                     _isPeak[p][r] = tileIsPeak;
                 }
                 //set the peak color to white
-                if (_isPeak[p][r])
+                /*if (_isPeak[p][r])
                 {
-                    /*for (int i = 0; i < 4; i++)
+                    for (int i = 0; i < 4; i++)
                     {
                         _tiledMapColors[p][r][i] = new Color(1, 1, 1);
-                    }*/
-                }
+                    }
+                }*/
             }
         }
     }
@@ -707,7 +815,20 @@ public class TiledmapGeneration : MonoBehaviour {
         {
             for(int j=0; j<200; j++)
             {
-                if((_tiledMapVertices[i][j][0].y * 0.66f) + 0.002f > threshold && !_clustered[i][j])
+                /*_skip = false;
+                for(int v=0; v<4; v++)
+                {
+                    if((_tiledMapVertices[i][j][v].y * 0.66f + 0.0022f)< threshold)
+                    {
+                        _skip = true;
+                    }
+                }
+                if (_skip)
+                {
+                    continue;
+                }*/
+                
+                if((_tiledMapVertices[i][j][0].y * 0.66f) + 0.0022f > threshold && !_clustered[i][j])
                 {
                     List<Vector3> clusterList = new List<Vector3>();
                     _clustered[i][j] = true;
@@ -730,7 +851,7 @@ public class TiledmapGeneration : MonoBehaviour {
             for(int l=j-1; l<j+2; l++)
             {
                 if (clusterList.Contains(_tiledMapVertices[k][l][0])) continue;
-                else if ((_tiledMapVertices[k][l][0].y * 0.66f) + 0.002f < threshold)
+                /*else if ((_tiledMapVertices[k][l][0].y * 0.66f) + 0.0022f < threshold)
                 {
                     //tile on the left
                     if(k==i-1 && l==j)
@@ -755,8 +876,22 @@ public class TiledmapGeneration : MonoBehaviour {
                         _tiledMapColors[k][l][2] = _clusterColor;
                         _tiledMapColors[k][l][3] = _clusterColor;
                     }
+                }*/
+                /*
+                _skip = false;
+                for (int v = 0; v < 4; v++)
+                {
+                    if ((_tiledMapVertices[k][l][v].y * 0.66f + 0.0022f) < threshold)
+                    {
+                        _skip = true;
+                    }
                 }
-                else if((_tiledMapVertices[k][l][0].y * 0.66f) + 0.002f >= threshold)
+                if (_skip)
+                {
+                    continue;
+                }*/
+
+                else if((_tiledMapVertices[k][l][0].y * 0.66f) + 0.0022f >= threshold)
                 {
                     clusterList.Add(_tiledMapVertices[k][l][0]);
                     _clustered[k][l] = true;
