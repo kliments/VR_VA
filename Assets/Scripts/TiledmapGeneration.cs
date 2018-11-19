@@ -5,37 +5,39 @@ using UnityEngine;
 
 public class TiledmapGeneration : MonoBehaviour {
     public float[][] mapTilesInfluence;
+    public float threshold;
     public Vector3[] positions;
-    public GaussianCoefficients gaussCoef;
-    public Material mat;
-    public bool gaussianCalculation;
+    public List<Vector3> peaks;
+    public Material mat, mat2;
+    public bool gaussianCalculation, resizeMesh, paintRed;
     //plus/minus neighbourhood cubes around the center cube in the matrix
     public int halfLengthOfNeighbourhood;
-    public float threshold;
     public GameObject thresholdPlane;
-    public List<Vector3> peaks;
-    public bool resizeMesh, paintRed;
+    public GaussianCoefficients gaussCoef;
     public KMeansAlgorithm kMeans;
     public DBScanAlgorithm dbscan;
 
-    private GameObject _obj;
+    private GameObject _obj, _additionalObj;
     private Mesh _mesh;
-    private int _counter;
     private List<GameObject> _list;
     private Vector3[][][] _tiledMapVertices;
     private Vector3[][] _mapPositions, _verticesMatrix, _verticesMaximumMatrix;
     private Vector3[] _vertices;
+    private Vector3 _startSize, _finishSize, _pos0, _pos1, _pos2, _pos3;
+    private List<Vector3> _additionalVertices;
     private int[][] _trianglesMatrix, _countersMatrix;
     private int[] _triangles;
+    private List<List<int>> _additionalTriangles;
+    private int _additionalCounter, _counter, _tile0, _tile1, _tile2, _tile3;
     private float _x, _y, _z;
-    private Vector3 _startSize, _finishSize;
     private Color[][][] _tiledMapColors;
     private Color[][] _matrixColors;
     private Color[] _colors;
     private Color _clusterColor;
+    private List<Color> _additionalVerticesColor;
     private bool[][] _isPeak, _clustered;
-
-    private int COUNTERR = 0;
+    private bool _skip;
+    private RaycastHit _hit;
     // Use this for initialization
     void Start () {
         _x = -0.25f;
@@ -43,8 +45,8 @@ public class TiledmapGeneration : MonoBehaviour {
         _z = -0.25f;
         halfLengthOfNeighbourhood = 3;
         _counter = 0;
-        threshold = 0.0021f;
         _obj = new GameObject();
+        _additionalObj = new GameObject();
 
         _list = new List<GameObject>();
         //set initial abstract positions, to refer to float influence
@@ -82,8 +84,12 @@ public class TiledmapGeneration : MonoBehaviour {
         _startSize = new Vector3(1, 0.001f, 1);
         _finishSize = new Vector3(1, 1, 1);
 
+        _additionalVertices = new List<Vector3>();
+        _additionalTriangles = new List<List<int>>();
+        _additionalVerticesColor = new List<Color>();
         paintRed = false;
-	}
+        _additionalCounter = 0;
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -95,6 +101,7 @@ public class TiledmapGeneration : MonoBehaviour {
         if(paintRed)
         {
             paintRed = false;
+            _additionalTriangles = new List<List<int>>();
             MultiCenteredClusters();
             int nextVertex = 0;
             for (int i = 0; i < 200; i++)
@@ -112,6 +119,8 @@ public class TiledmapGeneration : MonoBehaviour {
                 }
             }
             _mesh.colors = _colors;
+
+            CreateAdditionalMesh();
         }
 		
 	}
@@ -122,8 +131,8 @@ public class TiledmapGeneration : MonoBehaviour {
         dbscan.ResetMe();
         ResetMe();
         IncreaseInfluence();
-        _obj.transform.localScale = _startSize;
-        resizeMesh = true;
+        _obj.transform.localScale = _finishSize;
+        //resizeMesh = true;
     }
     
     //increasing influence if "tiles" belong in neighbourhood
@@ -266,7 +275,9 @@ public class TiledmapGeneration : MonoBehaviour {
             {
                 _tiledMapVertices[x][z] = new Vector3[4];
                 _tiledMapColors[x][z] = new Color[4];
-                if(!gaussianCalculation)
+
+                //if it is Square wave mesh
+                if (!gaussianCalculation)
                 { 
                     //first check for border tiles, to create fictional vertices to access later for creating the walls of the mesh
                     if (mapTilesInfluence[x][z] == 0 && HasNeighbours(x, z))
@@ -392,6 +403,8 @@ public class TiledmapGeneration : MonoBehaviour {
                         currentTile++;
                     }
                 }
+
+                //if it is Gaussian mesh
                 else
                 {
                     if (mapTilesInfluence[x][z] > 0)
@@ -436,7 +449,7 @@ public class TiledmapGeneration : MonoBehaviour {
                 }
             }
         }
-        //need to start from begining, to shift the top right vertex to the bottom left vertex of the top right tile
+        //need to start from begining, to reposition vertices in Gaussian mesh
         currentTile = 0;
         if(gaussianCalculation)
         {
@@ -477,9 +490,9 @@ public class TiledmapGeneration : MonoBehaviour {
     //converts the matrix of vertices to an array
     private void ConvertMatrixToArray()
     {
-        ReturnPeaks();
         int nextVertex = 0;
         int nextTriangle = 0;
+        List<int> temp = new List<int>();
         _vertices = new Vector3[_counter * 4];
 		_colors = new Color[_counter * 4];
         if(!gaussianCalculation)
@@ -495,6 +508,7 @@ public class TiledmapGeneration : MonoBehaviour {
             for(int j=0; j<4; j++)
             {
                 _vertices[nextVertex] = _verticesMatrix[i][j];
+                _additionalVertices.Add(_verticesMatrix[i][j]);
                 nextVertex++;
             }
             for(int k=0; k<_trianglesMatrix[i].Length; k++)
@@ -513,12 +527,14 @@ public class TiledmapGeneration : MonoBehaviour {
                     for(int k=0; k<4; k++)
                     {
                         _colors[nextVertex] = _tiledMapColors[i][j][k];
+                        _additionalVerticesColor.Add(_tiledMapColors[i][j][k]);
                         nextVertex++;
                     }
                 }
             }
         }
         CreateMesh();
+        ReturnPeaks();
     }
 
     //creates mesh
@@ -534,29 +550,22 @@ public class TiledmapGeneration : MonoBehaviour {
         _obj.GetComponent<MeshFilter>().mesh = _mesh;
         _obj.GetComponent<MeshRenderer>().material = mat;
         _obj.transform.localPosition = new Vector3(-0.581f, 0.002f, -0.63f);
-        //_obj.transform.localRotation = new Quaternion(0, 180, 0,0);
-        //_obj.transform.localScale = new Vector3(0.6600493f, 0.6600493f, 0.6600493f);
-        CreateCubePeaks();
-        //thresholdPlane.SetActive(true);
     }    
-
-    private void CreateCubePeaks()
-    {
-    }
-
-    private Vector3[] ChangeVertices(Vector3[] actualVertex, float top,float down, float topRight, float right, float downLeft, float left)
+    
+    private Vector3[] ChangeVertices(Vector3[] actualVertex, float top, float down, float topRight, float right, float downLeft, float left)
     {
         Vector3[] vertex = new Vector3[4];
-        if(actualVertex[0].y > 0)
-            {
-                actualVertex[0].y = downLeft;
-                actualVertex[1].y = down;
-                actualVertex[2].y = left;
-                actualVertex[3].y = (top + topRight + right) / 3;
-                vertex = actualVertex;
-            }
+        if (actualVertex[0].y > 0)
+        {
+            actualVertex[0].y = downLeft;
+            actualVertex[1].y = down;
+            actualVertex[2].y = left;
+            actualVertex[3].y = (top + topRight + right) / 3;
+            vertex = actualVertex;
+        }
         return vertex;
     }
+
 
     public void ResetMe()
     {
@@ -586,6 +595,11 @@ public class TiledmapGeneration : MonoBehaviour {
         gaussCoef.gaussianPositionMatrix = new Vector3[gaussCoef.matrixRowLength][];
         gaussCoef.valuesCalculated = false;
         peaks = new List<Vector3>();
+
+        _additionalVertices = new List<Vector3>();
+        _additionalTriangles = new List<List<int>>();
+        _additionalVerticesColor = new List<Color>();
+        _additionalCounter = 0;
         //thresholdPlane.SetActive(false);
     }
 
@@ -664,10 +678,14 @@ public class TiledmapGeneration : MonoBehaviour {
                 /*if (_isPeak[p][r])
                 {
                     int tile = _countersMatrix[p][r]*4 +3;
-                    var pos = thresholdPlane.transform.TransformPoint(_vertices[tile]);
+                    var pos = _obj.transform.TransformPoint(_vertices[tile]);
                     var obj = GameObject.CreatePrimitive(PrimitiveType.Cube);
                     obj.transform.position = pos;
-                    obj.transform.localScale = new Vector3(0.002f, 0.002f, 0.002f);
+                    obj.transform.localScale = new Vector3(0.00002f, 0.00002f, 0.00002f);
+                    for (int i = 0; i < 4; i++)
+                    {
+                        _tiledMapColors[p][r][i] = new Color(1, 1, 1);
+                    }
                 }*/
             }
         }
@@ -723,105 +741,313 @@ public class TiledmapGeneration : MonoBehaviour {
         {
             for(int j=0; j<200; j++)
             {
-                if(AllVerticesAbove(_tiledMapVertices[i][j], threshold) && !_clustered[i][j])
+                _tile0 = _countersMatrix[i][j] * 4;
+                _tile1 = _countersMatrix[i][j] * 4 + 1;
+                _tile2 = _countersMatrix[i][j] * 4 + 2;
+                _tile3 = _countersMatrix[i][j] * 4 + 3;
+                //if(_verticesMaximumMatrix[i][j].y + 0.002f > threshold && !_clustered[i][j])
+                if (AllVerticesAbove(_tiledMapVertices[i][j], threshold) && !_clustered[i][j])
                 {
-                    List<Vector3[]> clusterList = new List<Vector3[]>();
-                    _clustered[i][j] = true;
+                    List<Vector3> clusterList = new List<Vector3>();
                     _clusterColor = new Color(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f));
-                    clusterList.Add(_tiledMapVertices[i][j]);
-                    for (int c = 0; c < 4; c++)
-                    {
-                        _tiledMapColors[i][j][c] = _clusterColor;
-                    }
+                    _additionalVerticesColor[_tile0] = _clusterColor;
+                    _additionalVerticesColor[_tile1] = _clusterColor;
+                    _additionalVerticesColor[_tile2] = _clusterColor;
+                    _additionalVerticesColor[_tile3] = _clusterColor;
+                    clusterList.Add(_verticesMaximumMatrix[i][j]);
+                    _clustered[i][j] = true;
                     IterateMultiCenterClusterAround(clusterList, i, j);
                 }
+
+                else if (_clustered[i][j]) continue;
             }
         }
     }
 
-    private void IterateMultiCenterClusterAround(List<Vector3[]> clusterList, int i, int j)
+    private void IterateMultiCenterClusterAround(List<Vector3> clusterList, int i, int j)
     {
         for(int k = i-1; k<i+2; k++)
         {
-            for(int l=j-1; l<j+2; l++)
+            for (int l = j - 1; l < j + 2; l++)
             {
-                if (clusterList.Contains(_tiledMapVertices[k][l])) continue;
-                else if (AllVerticesBelow(_tiledMapVertices[k][l], threshold)) continue;
-                /*else if ((_tiledMapVertices[k][l][0].y * 0.66f) + 0.002f < threshold)
-                {
-                    //tile on the left
-                    if(k==i-1 && l==j)
-                    {
-                        _tiledMapColors[k][l][1] = _clusterColor;
-                        _tiledMapColors[k][l][3] = _clusterColor;
-                    }
-                    //tile above
-                    else if(k==i && l==j+1)
-                    {
-                        _tiledMapColors[k][l][0] = _clusterColor;
-                        _tiledMapColors[k][l][1] = _clusterColor;
-                    }
-                    //tile on the right
-                    else if (k == i+1 && l == j)
-                    {
-                        _tiledMapColors[k][l][0] = _clusterColor;
-                        _tiledMapColors[k][l][2] = _clusterColor;
-                    }
-                    else if(k==i && l==j-1)
-                    {
-                        _tiledMapColors[k][l][2] = _clusterColor;
-                        _tiledMapColors[k][l][3] = _clusterColor;
-                    }
-                }*/
-                // case where all of the vertices are above the threshold
-                // paint all vertices with the cluster color and continue searching
+                _tile0 = _countersMatrix[k][l] * 4;
+                _pos0 = _obj.transform.TransformPoint(_vertices[_tile0]);
+                _tile1 = _countersMatrix[k][l] * 4 + 1;
+                _pos1 = _obj.transform.TransformPoint(_vertices[_tile1]);
+                _tile2 = _countersMatrix[k][l] * 4 + 2;
+                _pos2 = _obj.transform.TransformPoint(_vertices[_tile2]);
+                _tile3 = _countersMatrix[k][l] * 4 + 3;
+                _pos3 = _obj.transform.TransformPoint(_vertices[_tile3]);
+                Vector3 vertex;
+                //if already belongs to cluster or if the maximum point is below the threshold, continue
+                if (_clustered[k][l] || (_verticesMaximumMatrix[k][l].y + 0.002f < threshold)) continue;
+                //paint all vertices if all of them above the threshold
                 else if (AllVerticesAbove(_tiledMapVertices[k][l], threshold))
                 {
-                    clusterList.Add(_tiledMapVertices[k][l]);
+                    clusterList.Add(_verticesMaximumMatrix[k][l]);
                     _clustered[k][l] = true;
-                    for (int c = 0; c < 4; c++)
-                    {
-                        _tiledMapColors[k][l][c] = _clusterColor;
-                    }
+                    _additionalVerticesColor[_tile0] = _clusterColor;
+                    _additionalVerticesColor[_tile1] = _clusterColor;
+                    _additionalVerticesColor[_tile2] = _clusterColor;
+                    _additionalVerticesColor[_tile3] = _clusterColor;
                     IterateMultiCenterClusterAround(clusterList, k, l);
                 }
-
-                // case where the top, left and right vertex are above the threshold, but bottom is below
-                // calculate points where threshold cuts the tile and assign colors
-                else if (IZEAbove(_tiledMapVertices[k][l][1], _tiledMapVertices[k][l][2], _tiledMapVertices[k][l][3], threshold))
+                //if 1,2,3 vertices are above the threshold, find points where it cuts the thresholdPlane
+                else if (ThreeVerticesAbove(_tiledMapVertices[k][l][1],_tiledMapVertices[k][l][2],_tiledMapVertices[k][l][3], threshold))
                 {
-                    int tile0 = _countersMatrix[l][l] * 4 + 0;
-                    int tile1 = _countersMatrix[l][l] * 4 + 1;
-                    int tile2 = _countersMatrix[l][l] * 4 + 2;
-                    //var pos = thresholdPlane.transform.TransformPoint(_vertices[tile]);
-                    var pos0 = _obj.GetComponent<MeshFilter>().mesh.vertices[tile0];
-                    pos0.x -= 0.581f;
-                    pos0.y += 0.002f;
-                    pos0.z -= 0.63f;
-                    var pos1 = _obj.GetComponent<MeshFilter>().mesh.vertices[tile1];
-                    pos1.x -= 0.581f;
-                    pos1.y += 0.002f;
-                    pos1.z -= 0.63f;
-                    var pos2 = _obj.GetComponent<MeshFilter>().mesh.vertices[tile2];
-                    pos2.x -= 0.581f;
-                    pos2.y += 0.002f;
-                    pos2.z -= 0.63f;
-                    RaycastHit hit;
-                    if (Physics.Raycast(pos1, pos2-pos1, out hit, 5f) && COUNTERR < 15)
+                    if (Physics.Raycast(_pos1, _pos0 - _pos1, out _hit, 5f))
                     {
-                        var obj1 = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                        obj1.transform.position = pos1;
-                        obj1.transform.localScale = new Vector3(0.002f, 0.002f, 0.002f);
-                        obj1.GetComponent<MeshRenderer>().material.color = Color.blue;
-                        obj1.name = COUNTERR.ToString();
-
-                        var obj2 = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                        obj2.transform.position = hit.point;
-                        obj2.transform.localScale = new Vector3(0.002f, 0.002f, 0.002f);
-                        obj2.GetComponent<MeshRenderer>().material.color = Color.red;
-                        obj2.name = COUNTERR.ToString();
+                        vertex = _hit.point;
+                        vertex.x += 0.581f;
+                        vertex.y -= 0.002f;
+                        vertex.z += 0.63f;
+                        _additionalVertices.Add(vertex); // -4
+                        _additionalVertices.Add(vertex); // -3
+                        _additionalVerticesColor.Add(_clusterColor);
+                        _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1-vertex.y)));
+                        _additionalCounter++;
                     }
-                    COUNTERR++;
+                    if(Physics.Raycast(_pos2, _pos0 - _pos2, out _hit, 5f))
+                    {
+                        vertex = _hit.point;
+                        vertex.x += 0.581f;
+                        vertex.y -= 0.002f;
+                        vertex.z += 0.63f;
+                        _additionalVertices.Add(vertex); // -2
+                        _additionalVertices.Add(vertex); // -1
+                        _additionalVerticesColor.Add(_clusterColor);
+                        _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                        _additionalCounter++;
+                    }
+                    //upper triangles with cluster color
+                    List<int> temp = new List<int>();
+                    temp.Add(_tile1);
+                    temp.Add(_additionalVertices.Count - 4);
+                    temp.Add(_tile3);
+                    _additionalTriangles.Add(temp);
+
+                    temp = new List<int>();
+                    temp.Add(_additionalVertices.Count - 4);
+                    temp.Add(_additionalVertices.Count - 2);
+                    temp.Add(_tile3);
+                    _additionalTriangles.Add(temp);
+
+                    temp = new List<int>();
+                    temp.Add(_additionalVertices.Count - 2);
+                    temp.Add(_tile2);
+                    temp.Add(_tile3);
+                    _additionalTriangles.Add(temp);
+
+                    //lower triangles with original color
+                    temp = new List<int>();
+                    temp.Add(_tile0);
+                    temp.Add(_additionalVertices.Count - 1);
+                    temp.Add(_additionalVertices.Count - 3);
+                    _additionalTriangles.Add(temp);
+
+                    //remove previous triangles
+                    for(int t = 0; t < 6; t++)
+                    {
+                        _triangles[_countersMatrix[k][l] * 6 + t] = 0;
+                    }
+
+                    _additionalVerticesColor[_tile1] = _clusterColor;
+                    _additionalVerticesColor[_tile2] = _clusterColor;
+                    _additionalVerticesColor[_tile3] = _clusterColor;
+                    _clustered[k][l] = true;
+                }
+                //if 0,2,3 vertices are above the threshold, find points where it cuts the thresholdPlane
+                else if (ThreeVerticesAbove(_tiledMapVertices[k][l][0], _tiledMapVertices[k][l][2], _tiledMapVertices[k][l][3], threshold))
+                {
+                    if (Physics.Raycast(_pos0, _pos1 - _pos0, out _hit, 5f))
+                    {
+                        vertex = _hit.point;
+                        vertex.x += 0.581f;
+                        vertex.y -= 0.002f;
+                        vertex.z += 0.63f;
+                        _additionalVertices.Add(vertex); // -4
+                        _additionalVertices.Add(vertex); // -3
+                        _additionalVerticesColor.Add(_clusterColor);
+                        _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                        _additionalCounter++;
+                    }
+                    if (Physics.Raycast(_pos3, _pos1 - _pos3, out _hit, 5f))
+                    {
+                        vertex = _hit.point;
+                        vertex.x += 0.581f;
+                        vertex.y -= 0.002f;
+                        vertex.z += 0.63f;
+                        _additionalVertices.Add(vertex); // -2
+                        _additionalVertices.Add(vertex); // -1
+                        _additionalVerticesColor.Add(_clusterColor);
+                        _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                        _additionalCounter++;
+                    }
+
+                    //upper triangles with cluster color
+                    List<int> temp = new List<int>();
+                    temp.Add(_tile0);
+                    temp.Add(_tile2);
+                    temp.Add(_additionalVertices.Count - 4);
+                    _additionalTriangles.Add(temp);
+
+                    temp = new List<int>();
+                    temp.Add(_additionalVertices.Count - 4);
+                    temp.Add(_tile2);
+                    temp.Add(_additionalVertices.Count - 2);
+                    _additionalTriangles.Add(temp);
+
+                    temp = new List<int>();
+                    temp.Add(_additionalVertices.Count - 2);
+                    temp.Add(_tile2);
+                    temp.Add(_tile3);
+                    _additionalTriangles.Add(temp);
+
+                    //lower triangles with original color
+                    temp = new List<int>();
+                    temp.Add(_tile1);
+                    temp.Add(_additionalVertices.Count - 3);
+                    temp.Add(_additionalVertices.Count - 1);
+                    _additionalTriangles.Add(temp);
+
+                    //remove previous triangles
+                    for (int t = 0; t < 6; t++)
+                    {
+                        _triangles[_countersMatrix[k][l] * 6 + t] = 0;
+                    }
+
+                    _additionalVerticesColor[_tile0] = _clusterColor;
+                    _additionalVerticesColor[_tile2] = _clusterColor;
+                    _additionalVerticesColor[_tile3] = _clusterColor;
+                    _clustered[k][l] = true;
+                }
+                //if 0,1,3 vertices are above the threshold, find points where it cuts the thresholdPlane
+                else if (ThreeVerticesAbove(_tiledMapVertices[k][l][0], _tiledMapVertices[k][l][1], _tiledMapVertices[k][l][3], threshold))
+                {
+                    if (Physics.Raycast(_pos0, _pos2 - _pos0, out _hit, 5f))
+                    {
+                        vertex = _hit.point;
+                        vertex.x += 0.581f;
+                        vertex.y -= 0.002f;
+                        vertex.z += 0.63f;
+                        _additionalVertices.Add(vertex); // -4
+                        _additionalVertices.Add(vertex); // -3
+                        _additionalVerticesColor.Add(_clusterColor);
+                        _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                        _additionalCounter++;
+                    }
+                    if (Physics.Raycast(_pos3, _pos2 - _pos3, out _hit, 5f))
+                    {
+                        vertex = _hit.point;
+                        vertex.x += 0.581f;
+                        vertex.y -= 0.002f;
+                        vertex.z += 0.63f;
+                        _additionalVertices.Add(vertex); // -2
+                        _additionalVertices.Add(vertex); // -1
+                        _additionalVerticesColor.Add(_clusterColor);
+                        _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                        _additionalCounter++;
+                    }
+                    //upper triangles with cluster color
+                    List<int> temp = new List<int>();
+                    temp.Add(_tile0);
+                    temp.Add(_additionalVertices.Count - 4);
+                    temp.Add(_tile1);
+                    _additionalTriangles.Add(temp);
+
+                    temp = new List<int>();
+                    temp.Add(_tile1);
+                    temp.Add(_additionalVertices.Count - 4);
+                    temp.Add(_additionalVertices.Count - 2);
+                    _additionalTriangles.Add(temp);
+
+                    temp = new List<int>();
+                    temp.Add(_tile1);
+                    temp.Add(_additionalVertices.Count - 2);
+                    temp.Add(_tile3);
+                    _additionalTriangles.Add(temp);
+
+                    //lower triangles with original color
+                    temp = new List<int>();
+                    temp.Add(_tile2);
+                    temp.Add(_additionalVertices.Count - 1);
+                    temp.Add(_additionalVertices.Count - 3);
+                    _additionalTriangles.Add(temp);
+
+                    //remove previous triangles
+                    for (int t = 0; t < 6; t++)
+                    {
+                        _triangles[_countersMatrix[k][l] * 6 + t] = 0;
+                    }
+
+                    _additionalVerticesColor[_tile0] = _clusterColor;
+                    _additionalVerticesColor[_tile1] = _clusterColor;
+                    _additionalVerticesColor[_tile3] = _clusterColor;
+                    _clustered[k][l] = true;
+                }
+                //if 0,1,2 vertices are above the threshold, find points where it cuts the thresholdPlane
+                else if (ThreeVerticesAbove(_tiledMapVertices[k][l][0], _tiledMapVertices[k][l][1], _tiledMapVertices[k][l][2], threshold))
+                {
+                    if (Physics.Raycast(_pos2, _pos3 - _pos2, out _hit, 5f))
+                    {
+                        vertex = _hit.point;
+                        vertex.x += 0.581f;
+                        vertex.y -= 0.002f;
+                        vertex.z += 0.63f;
+                        _additionalVertices.Add(vertex); // -4
+                        _additionalVertices.Add(vertex); // -3
+                        _additionalVerticesColor.Add(_clusterColor);
+                        _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                        _additionalCounter++;
+                    }
+                    if (Physics.Raycast(_pos1, _pos3 - _pos1, out _hit, 5f))
+                    {
+                        vertex = _hit.point;
+                        vertex.x += 0.581f;
+                        vertex.y -= 0.002f;
+                        vertex.z += 0.63f;
+                        _additionalVertices.Add(vertex); // -2
+                        _additionalVertices.Add(vertex); // -1
+                        _additionalVerticesColor.Add(_clusterColor);
+                        _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                        _additionalCounter++;
+                    }
+                    //upper triangles with cluster color
+                    List<int> temp = new List<int>();
+                    temp.Add(_tile0);
+                    temp.Add(_tile2);
+                    temp.Add(_additionalVertices.Count - 4);
+                    _additionalTriangles.Add(temp);
+
+                    temp = new List<int>();
+                    temp.Add(_tile0);
+                    temp.Add(_additionalVertices.Count - 4);
+                    temp.Add(_additionalVertices.Count - 2);
+                    _additionalTriangles.Add(temp);
+
+                    temp = new List<int>();
+                    temp.Add(_tile0);
+                    temp.Add(_additionalVertices.Count - 2);
+                    temp.Add(_tile1);
+                    _additionalTriangles.Add(temp);
+                    
+                    //lower triangles with original color
+                    temp = new List<int>();
+                    temp.Add(_tile3);
+                    temp.Add(_additionalVertices.Count - 1);
+                    temp.Add(_additionalVertices.Count - 3);
+                    _additionalTriangles.Add(temp);
+
+                    //remove previous triangles
+                    for (int t = 0; t < 6; t++)
+                    {
+                        _triangles[_countersMatrix[k][l] * 6 + t] = 0;
+                    }
+
+                    _additionalVerticesColor[_tile0] = _clusterColor;
+                    _additionalVerticesColor[_tile1] = _clusterColor;
+                    _additionalVerticesColor[_tile2] = _clusterColor;
+                    _clustered[k][l] = true;
                 }
             }
         }
@@ -829,32 +1055,62 @@ public class TiledmapGeneration : MonoBehaviour {
 
     private bool AllVerticesAbove(Vector3[] tile, float threshold)
     {
-        foreach(Vector3 vertex in tile)
+        foreach (Vector3 vertex in tile)
         {
-            if ((vertex.y * 0.66f + 0.002f) < threshold)
+            if ((vertex.y + 0.002f) < threshold)
                 return false;
         }
         return true;
     }
 
-    private bool AllVerticesBelow(Vector3[] tile, float threshold)
+    //three vertices are above the threshold, find two points where it cuts with threshold plane and add to mesh
+    private bool ThreeVerticesAbove(Vector3 a, Vector3 b, Vector3 c, float threshold)
     {
-        foreach(Vector3 vertex in tile)
-        {
-            if ((vertex.y * 0.66f + 0.002f) > threshold)
-                return false;
-        }
-        return true;
-    }
-
-    //1,2,3 vertices are above
-    //I=1, Z=2, E=3
-    private bool IZEAbove(Vector3 I, Vector3 Z, Vector3 E, float threshold)
-    {
-        if((I.y * 0.66f + 0.002f) >= threshold && (Z.y * 0.66f + 0.002f) >= threshold && (E.y * 0.66f + 0.002f) >= threshold)
+        if ((a.y + 0.002f) >= threshold && (b.y + 0.002f) >= threshold && (c.y + 0.002f) >= threshold)
         {
             return true;
         }
         return false;
+    }
+
+    private void CreateAdditionalMesh()
+    {
+        Mesh mesh = new Mesh();
+        Vector3[] tempVertices = new Vector3[_additionalVertices.Count];
+        Color[] tempColors = new Color[_additionalVerticesColor.Count];
+        //int[] tempTriangles = new int[_additionalTriangles.Count * 3];
+        int[] tempTriangles = new int[_additionalTriangles.Count * 3 + _triangles.Length];
+        for(int i=0; i<_additionalVertices.Count; i++)
+        {
+            tempVertices[i] = _additionalVertices[i];
+            tempColors[i] = _additionalVerticesColor[i];
+        }
+        int x = 0;
+        int y = 0;
+        int z = 0;
+        for(int i=0; i<_triangles.Length; i++)
+        {
+            tempTriangles[i] = _triangles[i];
+            x = i+1;
+        }
+        for(int i=0; i<_additionalTriangles.Count; i++)
+        {
+            for(int j=0; j<_additionalTriangles[i].Count; j++)
+            {
+                tempTriangles[x] = _additionalTriangles[i][j];
+                x++;
+            }
+        }
+        mesh.vertices = tempVertices;
+        mesh.triangles = tempTriangles;
+        mesh.colors = tempColors;
+        mesh.RecalculateBounds();
+        _obj.GetComponent<MeshFilter>().mesh = null;
+        _obj.GetComponent<MeshFilter>().mesh = mesh;
+    }
+
+    private void Check3VerticesAround(int i, int j)
+    {
+
     }
 }

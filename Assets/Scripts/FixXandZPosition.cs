@@ -32,10 +32,10 @@ public class FixXandZPosition : MonoBehaviour {
         {
             transform.parent = null;
         }
-        if(transform.position.y < 0.0021f)
+        if(transform.position.y < 0.0022f)
         {
             newPos = transform.position;
-            newPos.y = 0.0021f;
+            newPos.y = 0.0022f;
             transform.position = newPos;
         }
 	}

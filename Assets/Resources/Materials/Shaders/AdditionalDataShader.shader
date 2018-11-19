@@ -1,6 +1,6 @@
 ﻿// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
 
-Shader "Custom/DataShader"
+Shader "Custom/AdditionalDataShader"
 {
 	Properties
 	{
@@ -67,7 +67,7 @@ Shader "Custom/DataShader"
 
 		SubShader
 	{
-		Tags{ "RenderType" = "Opaque" "PerformanceChecks" = "False" }
+		Tags{ "RenderType" = "Opaque" "PerformanceChecks" = "False" "Queue" = "Overlay" }
 		LOD 300
 
 
@@ -76,11 +76,12 @@ Shader "Custom/DataShader"
 		Pass
 	{
 		Name "FORWARD"
-		Tags{"Queue" = "Background" "LightMode" = "ForwardBase" }
+		Tags{ "LightMode" = "ForwardBase" }
 
 		Blend[_SrcBlend][_DstBlend]
-		ZWrite[_ZWrite]
-		Offset 1, 1
+		ZWrite Off
+		ZTest LEqual
+		Offset -1, -1
 
 
 
@@ -113,15 +114,16 @@ Shader "Custom/DataShader"
 	}
 		// ------------------------------------------------------------------
 		//  Additive forward pass (one light per pass)
+		Tags { "Queue" = "Overlay" }
 		Pass
 	{
 		Name "FORWARD_DELTA"
-		Tags{"Queue" = "Background" "LightMode" = "ForwardAdd" }
+		Tags{ "LightMode" = "ForwardAdd" }
 		Blend[_SrcBlend] One
 		Fog{ Color(0,0,0,0) } // in additive pass fog should be black
 		ZWrite Off
 		ZTest LEqual
-		Offset 1, 1
+		Offset -1, -1
 
 		CGPROGRAM
 #pragma target 3.0
@@ -148,16 +150,20 @@ Shader "Custom/DataShader"
 		ENDCG
 	}
 		// ------------------------------------------------------------------
+		Tags{ "Queue" = "Overlay" }
+		 
 		//  Shadow rendering pass
 		// Pass to render object as a shadow caster
 			Pass{
 			Name "ShadowCaster"
-			Tags{ "Queue" = "Background" "LightMode" = "ShadowCaster" }
+			Tags{ "LightMode" = "ShadowCaster" }
 
 			Fog{ Mode Off }
-			ZWrite On ZTest Less Cull Off
-			Offset 1, 1
-
+			ZWrite Off
+			ZTest LEqual
+			Cull Off
+			Offset -1, -1
+			
 			CGPROGRAM
 #pragma vertex vert
 #pragma fragment frag
