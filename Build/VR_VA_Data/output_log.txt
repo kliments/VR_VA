@@ -1,0 +1,78 @@
+Initialize engine version: 5.6.1f1 (2860b30f0b54)
+GfxDevice: creating device client; threaded=1
+Direct3D:
+    Version:  Direct3D 11.0 [level 11.1]
+    Renderer: NVIDIA GeForce GTX 1080 (ID=0x1b80)
+    Vendor:   NVIDIA
+    VRAM:     8086 MB
+    Driver:   23.21.13.8813
+Begin MonoManager ReloadAssembly
+Platform assembly: D:\kliment\VR_VA\Build\VR_VA_Data\Managed\UnityEngine.dll (this message is harmless)
+Loading D:\kliment\VR_VA\Build\VR_VA_Data\Managed\UnityEngine.dll into Unity Child Domain
+Platform assembly: D:\kliment\VR_VA\Build\VR_VA_Data\Managed\Assembly-CSharp-firstpass.dll (this message is harmless)
+Loading D:\kliment\VR_VA\Build\VR_VA_Data\Managed\Assembly-CSharp-firstpass.dll into Unity Child Domain
+Platform assembly: D:\kliment\VR_VA\Build\VR_VA_Data\Managed\Assembly-CSharp.dll (this message is harmless)
+Loading D:\kliment\VR_VA\Build\VR_VA_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
+Platform assembly: D:\kliment\VR_VA\Build\VR_VA_Data\Managed\UnityEngine.UI.dll (this message is harmless)
+Loading D:\kliment\VR_VA\Build\VR_VA_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
+Platform assembly: D:\kliment\VR_VA\Build\VR_VA_Data\Managed\UnityEngine.Networking.dll (this message is harmless)
+Loading D:\kliment\VR_VA\Build\VR_VA_Data\Managed\UnityEngine.Networking.dll into Unity Child Domain
+Platform assembly: D:\kliment\VR_VA\Build\VR_VA_Data\Managed\UnityEngine.Analytics.dll (this message is harmless)
+Loading D:\kliment\VR_VA\Build\VR_VA_Data\Managed\UnityEngine.Analytics.dll into Unity Child Domain
+Platform assembly: D:\kliment\VR_VA\Build\VR_VA_Data\Managed\UnityEngine.VR.dll (this message is harmless)
+Loading D:\kliment\VR_VA\Build\VR_VA_Data\Managed\UnityEngine.VR.dll into Unity Child Domain
+Platform assembly: D:\kliment\VR_VA\Build\VR_VA_Data\Managed\alglibnet2.dll (this message is harmless)
+Loading D:\kliment\VR_VA\Build\VR_VA_Data\Managed\alglibnet2.dll into Unity Child Domain
+- Completed reload, in  0.162 seconds
+Platform assembly: D:\kliment\VR_VA\Build\VR_VA_Data\Managed\System.Core.dll (this message is harmless)
+Platform assembly: D:\kliment\VR_VA\Build\VR_VA_Data\Managed\System.dll (this message is harmless)
+<RI> Initializing input.
+<RI> Input initialized.
+desktop: 1920x1080 60Hz; virtual: 3840x1200 at -1920,0
+<RI> Initialized touch support.
+OpenVR initialized!
+ 
+(Filename:  Line: 424)
+
+UnloadTime: 0.612478 ms
+Connected to lighthouse:LHR-FACB6BC0
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Setting up 4 worker threads for Enlighten.
+  Thread -> id: 1d58 -> priority: 1 
+  Thread -> id: b4c -> priority: 1 
+  Thread -> id: 2364 -> priority: 1 
+  Thread -> id: 1d98 -> priority: 1 
+Model override is really only meant to be used in the scene view for lining things up; using it at runtime is discouraged.  Use tracked device index instead to ensure the correct model is displayed for all users.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Unloading 5 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 19.885057 ms
+Model override is really only meant to be used in the scene view for lining things up; using it at runtime is discouraged.  Use tracked device index instead to ensure the correct model is displayed for all users.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+
+Unloading 16617 unused Assets to reduce memory usage. Loaded Objects now: 2041.
+Total: 41.339161 ms (FindLiveObjects: 1.304362 ms CreateObjectMapping: 2.467559 ms MarkObjects: 0.729168 ms  DeleteObjects: 36.837219 ms)
+
+Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 1.185680 ms
+Model override is really only meant to be used in the scene view for lining things up; using it at runtime is discouraged.  Use tracked device index instead to ensure the correct model is displayed for all users.
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+
+Unloading 25 unused Assets to reduce memory usage. Loaded Objects now: 2041.
+Total: 0.855534 ms (FindLiveObjects: 0.147712 ms CreateObjectMapping: 0.043260 ms MarkObjects: 0.624432 ms  DeleteObjects: 0.039276 ms)
+
+secondary menu shown
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+OpenVR Shutdown
+ 
+(Filename:  Line: 889)
+
