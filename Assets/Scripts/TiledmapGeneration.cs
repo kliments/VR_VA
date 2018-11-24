@@ -1404,11 +1404,188 @@ public class TiledmapGeneration : MonoBehaviour {
                     temp.Add(l);
                     _indexIterationBuffer.Add(temp);
                 }
+
+                //tilted tile
+                else if(TwoVerticesAbove(_tiledMapVertices[k][l][1], _tiledMapVertices[k][l][2], threshold))
+                {
+                    if (Physics.Raycast(_pos1, _pos0 - _pos1, out _hit, 5f))
+                    {
+                        vertex = _hit.point;
+                        vertex.x += 0.581f;
+                        vertex.y -= 0.002f;
+                        vertex.z += 0.63f;
+                        _additionalVertices.Add(vertex); // -8
+                        _additionalVertices.Add(vertex); // -7
+                        _additionalVerticesColor.Add(_clusterColor);
+                        _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                    }
+                    if (Physics.Raycast(_pos2, _pos0 - _pos2, out _hit, 5f))
+                    {
+                        vertex = _hit.point;
+                        vertex.x += 0.581f;
+                        vertex.y -= 0.002f;
+                        vertex.z += 0.63f;
+                        _additionalVertices.Add(vertex); // -6
+                        _additionalVertices.Add(vertex); // -5
+                        _additionalVerticesColor.Add(_clusterColor);
+                        _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                    }
+                    if (Physics.Raycast(_pos1, _pos3 - _pos1, out _hit, 5f))
+                    {
+                        vertex = _hit.point;
+                        vertex.x += 0.581f;
+                        vertex.y -= 0.002f;
+                        vertex.z += 0.63f;
+                        _additionalVertices.Add(vertex); // -4
+                        _additionalVertices.Add(vertex); // -3
+                        _additionalVerticesColor.Add(_clusterColor);
+                        _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                    }
+                    if (Physics.Raycast(_pos2, _pos3 - _pos2, out _hit, 5f))
+                    {
+                        vertex = _hit.point;
+                        vertex.x += 0.581f;
+                        vertex.y -= 0.002f;
+                        vertex.z += 0.63f;
+                        _additionalVertices.Add(vertex); // -2
+                        _additionalVertices.Add(vertex); // -1
+                        _additionalVerticesColor.Add(_clusterColor);
+                        _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                    }
+                    // upper triangles with cluster color
+                    List<int> temp = new List<int>();
+                    temp.Add(_tile1);
+                    temp.Add(_additionalVertices.Count - 8);
+                    temp.Add(_tile2);
+                    _additionalTriangles.Add(temp);
+
+                    temp = new List<int>();
+                    temp.Add(_additionalVertices.Count - 8);
+                    temp.Add(_additionalVertices.Count - 6);
+                    temp.Add(_tile2);
+                    _additionalTriangles.Add(temp);
+
+                    temp = new List<int>();
+                    temp.Add(_tile1);
+                    temp.Add(_tile2);
+                    temp.Add(_additionalVertices.Count - 4);
+                    _additionalTriangles.Add(temp);
+
+                    temp = new List<int>();
+                    temp.Add(_tile2);
+                    temp.Add(_additionalVertices.Count - 2);
+                    temp.Add(_additionalVertices.Count - 4);
+                    _additionalTriangles.Add(temp);
+
+                    //remove previous triangles
+                    for (int t = 0; t < 6; t++)
+                    {
+                        _triangles[_countersMatrix[k][l] * 6 + t] = 0;
+                    }
+
+                    _additionalVerticesColor[_tile1] = _clusterColor;
+                    _additionalVerticesColor[_tile2] = _clusterColor;
+                    _clustered[k][l] = true;
+
+                    //add indexes for later iteration
+                    temp = new List<int>();
+                    temp.Add(k);
+                    temp.Add(l);
+                    _indexIterationBuffer.Add(temp);
+                }
+
+                else if (TwoVerticesAbove(_tiledMapVertices[k][l][0], _tiledMapVertices[k][l][3], threshold))
+                {
+                    if (Physics.Raycast(_pos0, _pos1 - _pos0, out _hit, 5f))
+                    {
+                        vertex = _hit.point;
+                        vertex.x += 0.581f;
+                        vertex.y -= 0.002f;
+                        vertex.z += 0.63f;
+                        _additionalVertices.Add(vertex); // -8
+                        _additionalVertices.Add(vertex); // -7
+                        _additionalVerticesColor.Add(_clusterColor);
+                        _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                    }
+                    if (Physics.Raycast(_pos3, _pos1 - _pos3, out _hit, 5f))
+                    {
+                        vertex = _hit.point;
+                        vertex.x += 0.581f;
+                        vertex.y -= 0.002f;
+                        vertex.z += 0.63f;
+                        _additionalVertices.Add(vertex); // -6
+                        _additionalVertices.Add(vertex); // -5
+                        _additionalVerticesColor.Add(_clusterColor);
+                        _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                    }
+                    if (Physics.Raycast(_pos0, _pos2 - _pos0, out _hit, 5f))
+                    {
+                        vertex = _hit.point;
+                        vertex.x += 0.581f;
+                        vertex.y -= 0.002f;
+                        vertex.z += 0.63f;
+                        _additionalVertices.Add(vertex); // -4
+                        _additionalVertices.Add(vertex); // -3
+                        _additionalVerticesColor.Add(_clusterColor);
+                        _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                    }
+                    if (Physics.Raycast(_pos3, _pos2 - _pos3, out _hit, 5f))
+                    {
+                        vertex = _hit.point;
+                        vertex.x += 0.581f;
+                        vertex.y -= 0.002f;
+                        vertex.z += 0.63f;
+                        _additionalVertices.Add(vertex); // -2
+                        _additionalVertices.Add(vertex); // -1
+                        _additionalVerticesColor.Add(_clusterColor);
+                        _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                    }
+                    // upper triangles with cluster color
+                    List<int> temp = new List<int>();
+                    temp.Add(_tile0);
+                    temp.Add(_tile3);
+                    temp.Add(_additionalVertices.Count - 8);
+                    _additionalTriangles.Add(temp);
+
+                    temp = new List<int>();
+                    temp.Add(_additionalVertices.Count - 8);
+                    temp.Add(_tile3);
+                    temp.Add(_additionalVertices.Count - 6);
+                    _additionalTriangles.Add(temp);
+
+                    temp = new List<int>();
+                    temp.Add(_tile0);
+                    temp.Add(_additionalVertices.Count - 4);
+                    temp.Add(_tile3);
+                    _additionalTriangles.Add(temp);
+
+                    temp = new List<int>();
+                    temp.Add(_additionalVertices.Count - 4);
+                    temp.Add(_additionalVertices.Count - 2);
+                    temp.Add(_tile3);
+                    _additionalTriangles.Add(temp);
+
+                    //remove previous triangles
+                    for (int t = 0; t < 6; t++)
+                    {
+                        _triangles[_countersMatrix[k][l] * 6 + t] = 0;
+                    }
+
+                    _additionalVerticesColor[_tile0] = _clusterColor;
+                    _additionalVerticesColor[_tile3] = _clusterColor;
+                    _clustered[k][l] = true;
+
+                    //add indexes for later iteration
+                    temp = new List<int>();
+                    temp.Add(k);
+                    temp.Add(l);
+                    _indexIterationBuffer.Add(temp);
+                }
                 #endregion
 
                 //one vertex is above the threshold, find two points where it cuts with threshold plane and add to mesh
                 #region 1VertexAbove
-                
+
                 else if ((_tiledMapVertices[k][l][0].y + 0.002f) > threshold)
                 {
                     if (Physics.Raycast(_pos0, _pos1 - _pos0, out _hit, 5f))
@@ -1475,6 +1652,72 @@ public class TiledmapGeneration : MonoBehaviour {
                     temp.Add(l);
                     _indexIterationBuffer.Add(temp);
                 }
+                else if (_tiledMapVertices[k][l][2].y + 0.002f > threshold)
+                {
+                    if (Physics.Raycast(_pos2, _pos0 - _pos2, out _hit, 5f))
+                    {
+                        vertex = _hit.point;
+                        vertex.x += 0.581f;
+                        vertex.y -= 0.002f;
+                        vertex.z += 0.63f;
+                        _additionalVertices.Add(vertex); // -4
+                        _additionalVertices.Add(vertex); // -3
+                        _additionalVerticesColor.Add(_clusterColor);
+                        _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                    }
+                    if (Physics.Raycast(_pos2, _pos3 - _pos2, out _hit, 5f))
+                    {
+                        vertex = _hit.point;
+                        vertex.x += 0.581f;
+                        vertex.y -= 0.002f;
+                        vertex.z += 0.63f;
+                        _additionalVertices.Add(vertex); // -2
+                        _additionalVertices.Add(vertex); // -1
+                        _additionalVerticesColor.Add(_clusterColor);
+                        _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                    }
+
+                    //upper triangle with cluster color
+                    List<int> temp = new List<int>();
+                    temp.Add(_tile2);
+                    temp.Add(_additionalVertices.Count - 2);
+                    temp.Add(_additionalVertices.Count - 4);
+                    _additionalTriangles.Add(temp);
+
+                    //lower triangles with normal color
+                    temp = new List<int>();
+                    temp.Add(_additionalVertices.Count - 3);
+                    temp.Add(_additionalVertices.Count - 1);
+                    temp.Add(_tile0);
+                    _additionalTriangles.Add(temp);
+
+                    temp = new List<int>();
+                    temp.Add(_additionalVertices.Count - 1);
+                    temp.Add(_tile3);
+                    temp.Add(_tile0);
+                    _additionalTriangles.Add(temp);
+
+                    temp = new List<int>();
+                    temp.Add(_tile3);
+                    temp.Add(_tile1);
+                    temp.Add(_tile0);
+                    _additionalTriangles.Add(temp);
+
+                    //remove previous triangles
+                    for (int t = 0; t < 6; t++)
+                    {
+                        _triangles[_countersMatrix[k][l] * 6 + t] = 0;
+                    }
+
+                    _additionalVerticesColor[_tile2] = _clusterColor;
+                    _clustered[k][l] = true;
+
+                    //add indexes for later iteration
+                    temp = new List<int>();
+                    temp.Add(k);
+                    temp.Add(l);
+                    _indexIterationBuffer.Add(temp);
+                }
                 else if((_tiledMapVertices[k][l][1].y + 0.002f) > threshold)
                 {
                     if (Physics.Raycast(_pos1, _pos0 - _pos1, out _hit, 5f))
@@ -1533,72 +1776,6 @@ public class TiledmapGeneration : MonoBehaviour {
                     }
 
                     _additionalVerticesColor[_tile1] = _clusterColor;
-                    _clustered[k][l] = true;
-
-                    //add indexes for later iteration
-                    temp = new List<int>();
-                    temp.Add(k);
-                    temp.Add(l);
-                    _indexIterationBuffer.Add(temp);
-                }
-                else if(_tiledMapVertices[k][l][2].y + 0.002f > threshold)
-                {
-                    if (Physics.Raycast(_pos2, _pos0 - _pos2, out _hit, 5f))
-                    {
-                        vertex = _hit.point;
-                        vertex.x += 0.581f;
-                        vertex.y -= 0.002f;
-                        vertex.z += 0.63f;
-                        _additionalVertices.Add(vertex); // -4
-                        _additionalVertices.Add(vertex); // -3
-                        _additionalVerticesColor.Add(_clusterColor);
-                        _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
-                    }
-                    if (Physics.Raycast(_pos2, _pos3 - _pos2, out _hit, 5f))
-                    {
-                        vertex = _hit.point;
-                        vertex.x += 0.581f;
-                        vertex.y -= 0.002f;
-                        vertex.z += 0.63f;
-                        _additionalVertices.Add(vertex); // -2
-                        _additionalVertices.Add(vertex); // -1
-                        _additionalVerticesColor.Add(_clusterColor);
-                        _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
-                    }
-
-                    //upper triangle with cluster color
-                    List<int> temp = new List<int>();
-                    temp.Add(_tile2);
-                    temp.Add(_additionalVertices.Count - 2);
-                    temp.Add(_additionalVertices.Count - 4);
-                    _additionalTriangles.Add(temp);
-
-                    //lower triangles with normal color
-                    temp = new List<int>();
-                    temp.Add(_additionalVertices.Count - 3);
-                    temp.Add(_additionalVertices.Count - 1);
-                    temp.Add(_tile0);
-                    _additionalTriangles.Add(temp);
-
-                    temp = new List<int>();
-                    temp.Add(_additionalVertices.Count - 1);
-                    temp.Add(_tile3);
-                    temp.Add(_tile0);
-                    _additionalTriangles.Add(temp);
-
-                    temp = new List<int>();
-                    temp.Add(_tile3);
-                    temp.Add(_tile1);
-                    temp.Add(_tile0);
-                    _additionalTriangles.Add(temp);
-
-                    //remove previous triangles
-                    for (int t = 0; t < 6; t++)
-                    {
-                        _triangles[_countersMatrix[k][l] * 6 + t] = 0;
-                    }
-
-                    _additionalVerticesColor[_tile2] = _clusterColor;
                     _clustered[k][l] = true;
 
                     //add indexes for later iteration
