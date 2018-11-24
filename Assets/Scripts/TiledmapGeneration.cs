@@ -9,7 +9,7 @@ public class TiledmapGeneration : MonoBehaviour {
     public Vector3[] positions;
     public List<Vector3> peaks;
     public Material mat, mat2;
-    public bool gaussianCalculation, resizeMesh, paintRed;
+    public bool gaussianCalculation, resizeMesh, _multiCenteredGaussian, _multiCenteredSquareWave;
     //plus/minus neighbourhood cubes around the center cube in the matrix
     public int halfLengthOfNeighbourhood;
     public GameObject thresholdPlane;
@@ -88,7 +88,8 @@ public class TiledmapGeneration : MonoBehaviour {
         _additionalTriangles = new List<List<int>>();
         _additionalVerticesColor = new List<Color>();
         _indexIterationBuffer = new List<List<int>>();
-        paintRed = false;
+        _multiCenteredGaussian = false;
+        _multiCenteredSquareWave = false;
     }
 	
 	// Update is called once per frame
@@ -98,11 +99,11 @@ public class TiledmapGeneration : MonoBehaviour {
             _obj.transform.localScale = Vector3.Lerp(_obj.transform.localScale, _finishSize, Time.deltaTime*1);
         }
 
-        if(paintRed)
+        if(_multiCenteredGaussian)
         {
-            paintRed = false;
+            _multiCenteredGaussian = false;
             _additionalTriangles = new List<List<int>>();
-            MultiCenteredClusters();
+            MultiCenteredGaussianClusters();
             int nextVertex = 0;
             for (int i = 0; i < 200; i++)
             {
@@ -121,6 +122,10 @@ public class TiledmapGeneration : MonoBehaviour {
             _mesh.colors = _colors;
 
             CreateAdditionalMesh();
+        }
+        if(_multiCenteredSquareWave)
+        {
+            _multiCenteredSquareWave = false;
         }
 		
 	}
@@ -555,6 +560,7 @@ public class TiledmapGeneration : MonoBehaviour {
         _obj.transform.localPosition = new Vector3(-0.581f, 0.002f, -0.63f);
     }    
     
+    //change vertices of tiles to look like single mesh
     private Vector3[] ChangeVertices(Vector3[] actualVertex, float top, float down, float topRight, float right, float downLeft, float left)
     {
         Vector3[] vertex = new Vector3[4];
@@ -568,7 +574,6 @@ public class TiledmapGeneration : MonoBehaviour {
         }
         return vertex;
     }
-
 
     public void ResetMe()
     {
@@ -730,7 +735,7 @@ public class TiledmapGeneration : MonoBehaviour {
         return tileIsPeak;
     }
 
-    private void MultiCenteredClusters()
+    private void MultiCenteredGaussianClusters()
     {
         ResetMesh();
         for (int a = 0; a < 200; a++)
@@ -761,7 +766,7 @@ public class TiledmapGeneration : MonoBehaviour {
                     _additionalVerticesColor[_tile2] = _clusterColor;
                     _additionalVerticesColor[_tile3] = _clusterColor;
                     _clustered[i][j] = true;
-                    IterateMultiCenterClusterAround(i, j);
+                    IterateMultiCenterGaussianClusterAround(i, j);
                 }
                 else if (ThreeVerticesAbove(_tiledMapVertices[i][j][0], _tiledMapVertices[i][j][1], _tiledMapVertices[i][j][2], threshold) ||
                          ThreeVerticesAbove(_tiledMapVertices[i][j][0], _tiledMapVertices[i][j][1], _tiledMapVertices[i][j][3], threshold) ||
@@ -769,7 +774,7 @@ public class TiledmapGeneration : MonoBehaviour {
                          ThreeVerticesAbove(_tiledMapVertices[i][j][1], _tiledMapVertices[i][j][2], _tiledMapVertices[i][j][3], threshold))
                 {
                     _clusterColor = new Color(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f));
-                    IterateMultiCenterClusterAround(i, j);
+                    IterateMultiCenterGaussianClusterAround(i, j);
                 }
 
                 else if (TwoVerticesAbove(_tiledMapVertices[i][j][0], _tiledMapVertices[i][j][1], threshold) ||
@@ -778,20 +783,20 @@ public class TiledmapGeneration : MonoBehaviour {
                          TwoVerticesAbove(_tiledMapVertices[i][j][1], _tiledMapVertices[i][j][3], threshold))
                 {
                     _clusterColor = new Color(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f));
-                    IterateMultiCenterClusterAround(i, j);
+                    IterateMultiCenterGaussianClusterAround(i, j);
                 }
                 else if(_tiledMapVertices[i][j][0].y + 0.002f > threshold || _tiledMapVertices[i][j][1].y + 0.002f > threshold ||
                         _tiledMapVertices[i][j][2].y + 0.002f > threshold || _tiledMapVertices[i][j][3].y + 0.002f > threshold)
                 {
                     _clusterColor = new Color(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f));
-                    IterateMultiCenterClusterAround(i, j);
+                    IterateMultiCenterGaussianClusterAround(i, j);
                 }
                 //iterate over buffer of indexes already colored with cluster color
                 if(_indexIterationBuffer.Count != 0)
                 {
                     for(int b=0; b<_indexIterationBuffer.Count; b++)
                     {
-                        IterateMultiCenterClusterAround(_indexIterationBuffer[b][0], _indexIterationBuffer[b][1]);
+                        IterateMultiCenterGaussianClusterAround(_indexIterationBuffer[b][0], _indexIterationBuffer[b][1]);
                     }
                     _indexIterationBuffer = new List<List<int>>();
                 }
@@ -818,7 +823,7 @@ public class TiledmapGeneration : MonoBehaviour {
         _obj.GetComponent<MeshFilter>().mesh.triangles = _triangles;
     }
 
-    private void IterateMultiCenterClusterAround(int i, int j)
+    private void IterateMultiCenterGaussianClusterAround(int i, int j)
     {
         for(int k = i-1; k<i+2; k++)
         {
@@ -1493,7 +1498,7 @@ public class TiledmapGeneration : MonoBehaviour {
                     temp.Add(l);
                     _indexIterationBuffer.Add(temp);
                 }
-
+                //tilted tile
                 else if (TwoVerticesAbove(_tiledMapVertices[k][l][0], _tiledMapVertices[k][l][3], threshold))
                 {
                     if (Physics.Raycast(_pos0, _pos1 - _pos0, out _hit, 5f))
@@ -1851,6 +1856,71 @@ public class TiledmapGeneration : MonoBehaviour {
                     _indexIterationBuffer.Add(temp);
                 }
                 #endregion
+            }
+        }
+    }
+
+    private void MultiCenteredSquaredWaveClusters()
+    {
+        ResetMesh();
+        for(int a = 0; a<200; a++)
+        {
+            for(int b=0; b<200; b++)
+            {
+                _clustered[a][b] = false;
+            }
+        }
+        for(int i=0; i<200; i++)
+        {
+            for(int j=0; j<200; j++)
+            {
+                _tile0 = _countersMatrix[i][j] * 4;
+                _tile1 = _countersMatrix[i][j] * 4 + 1;
+                _tile2 = _countersMatrix[i][j] * 4 + 2;
+                _tile3 = _countersMatrix[i][j] * 4 + 3;
+
+                //if tile already belongs to cluster or if it is below the threshold continue
+                if (_clustered[i][j] || (_tiledMapVertices[i][j][0].y + 0.002f) < threshold) continue;
+                else
+                {
+                    _clusterColor = new Color(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f));
+                    _additionalVerticesColor[_tile0] = _clusterColor;
+                    _additionalVerticesColor[_tile1] = _clusterColor;
+                    _additionalVerticesColor[_tile2] = _clusterColor;
+                    _additionalVerticesColor[_tile3] = _clusterColor;
+                    _clustered[i][j] = true;
+                    IterateMultiCenterSquaredWaveClusterAround(i, j);
+                }
+                //iterate over buffer of indexes already colored with cluster color
+                if (_indexIterationBuffer.Count != 0)
+                {
+                    for (int b = 0; b < _indexIterationBuffer.Count; b++)
+                    {
+                        IterateMultiCenterSquaredWaveClusterAround(_indexIterationBuffer[b][0], _indexIterationBuffer[b][1]);
+                    }
+                    _indexIterationBuffer = new List<List<int>>();
+                }
+            }
+        }
+    }
+
+    private void IterateMultiCenterSquaredWaveClusterAround(int i, int j)
+    {
+        for(int k = i-1; k<i+2; k++)
+        {
+            for(int l = j-1; l<j+2; l++)
+            {
+                if (_clustered[k][l] || (_tiledMapVertices[k][l][0].y + 0.002f) < threshold) continue;
+                _clustered[k][l] = true;
+                Vector3 vertex;
+                _tile0 = _countersMatrix[k][l] * 4;
+                _pos0 = _obj.transform.TransformPoint(_vertices[_tile0]);
+                _tile1 = _countersMatrix[k][l] * 4 + 1;
+                _pos1 = _obj.transform.TransformPoint(_vertices[_tile1]);
+                _tile2 = _countersMatrix[k][l] * 4 + 2;
+                _pos2 = _obj.transform.TransformPoint(_vertices[_tile2]);
+                _tile3 = _countersMatrix[k][l] * 4 + 3;
+                _pos3 = _obj.transform.TransformPoint(_vertices[_tile3]);
             }
         }
     }
