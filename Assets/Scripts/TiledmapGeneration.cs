@@ -126,6 +126,25 @@ public class TiledmapGeneration : MonoBehaviour {
         if(_multiCenteredSquareWave)
         {
             _multiCenteredSquareWave = false;
+            _additionalTriangles = new List<List<int>>();
+            MultiCenteredSquaredWaveClusters();
+            /*int nextVertex = 0;
+            for (int i=0; i<200; i++)
+            {
+                for(int j=0; j<200; j++)
+                {
+                    if (_tiledMapColors[i][j][0].r > 0 || _tiledMapColors[i][j][0].b > 0 )
+                    {
+                        for (int k = 0; k < 4; k++)
+                        {
+                            _colors[nextVertex] = _tiledMapColors[i][j][k];
+                            nextVertex++;
+                        }
+                    }
+                }
+            }
+            _mesh.colors = _colors;*/
+            CreateAdditionalMesh();
         }
 		
 	}
@@ -375,28 +394,28 @@ public class TiledmapGeneration : MonoBehaviour {
                         _countersMatrix[x][z] = currentTile;
 
                         int count = (currentTile + 1) * 4;
-                        //need to create 5 extra rectangles around a tile, to look like a cube
+                        //need to create 2 extra rectangles around a tile
                         //center rectangle
                         _trianglesMatrix[currentTile] = new int[18];
-                        _trianglesMatrix[currentTile][0] = count - 4; // vertex 0
-                        _trianglesMatrix[currentTile][1] = count - 2; // 2
-                        _trianglesMatrix[currentTile][2] = count - 3; // 1
-                        _trianglesMatrix[currentTile][3] = count - 2; // 2
-                        _trianglesMatrix[currentTile][4] = count - 1; // 3
-                        _trianglesMatrix[currentTile][5] = count - 3; // 1
-                                                                     //left rectangle
-                        _trianglesMatrix[currentTile][6] = count - 2; // 2
-                        _trianglesMatrix[currentTile][7] = count - 4; // 0
-                        _trianglesMatrix[currentTile][8] = (_countersMatrix[x - 1][z] + 1) * 4 - 1; // vertex 3 from tile on the left
-                        _trianglesMatrix[currentTile][9] = count - 4;                      // 0
+                        _trianglesMatrix[currentTile][0] = count - 4;                                // vertex 0
+                        _trianglesMatrix[currentTile][1] = count - 2;                                // 2
+                        _trianglesMatrix[currentTile][2] = count - 3;                                // 1
+                        _trianglesMatrix[currentTile][3] = count - 2;                                // 2
+                        _trianglesMatrix[currentTile][4] = count - 1;                                // 3
+                        _trianglesMatrix[currentTile][5] = count - 3;                                // 1
+                        //left rectangle
+                        _trianglesMatrix[currentTile][6] = count - 2;                                // 2
+                        _trianglesMatrix[currentTile][7] = count - 4;                                // 0
+                        _trianglesMatrix[currentTile][8] = (_countersMatrix[x - 1][z] + 1) * 4 - 1;  // vertex 3 from tile on the left
+                        _trianglesMatrix[currentTile][9] = count - 4;                                // 0
                         _trianglesMatrix[currentTile][10] = (_countersMatrix[x - 1][z] + 1) * 4 - 3; // 1 from tile on the left
                         _trianglesMatrix[currentTile][11] = (_countersMatrix[x - 1][z] + 1) * 4 - 1; // 3 from tile on the left
-                                                                                                   //down rectangle
-                        _trianglesMatrix[currentTile][12] = count - 4;                      // vertex 0
-                        _trianglesMatrix[currentTile][13] = count - 3;                      // 1
+                        //down rectangle
+                        _trianglesMatrix[currentTile][12] = count - 4;                                 // vertex 0
+                        _trianglesMatrix[currentTile][13] = count - 3;                                 // 1
                         _trianglesMatrix[currentTile][14] = (_countersMatrix[x][z - 1] + 1) * 4 - 2;   // 2 from tile down
                         _trianglesMatrix[currentTile][15] = (_countersMatrix[x][z - 1] + 1) * 4 - 2;   // 2 from tile down
-                        _trianglesMatrix[currentTile][16] = count - 3;                      // 1
+                        _trianglesMatrix[currentTile][16] = count - 3;                                 // 1
                         _trianglesMatrix[currentTile][17] = (_countersMatrix[x][z - 1] + 1) * 4 - 1;   // 3 from tile down
 						
 						for (int c = 0; c < 4; c++)
@@ -1888,7 +1907,6 @@ public class TiledmapGeneration : MonoBehaviour {
                     _additionalVerticesColor[_tile1] = _clusterColor;
                     _additionalVerticesColor[_tile2] = _clusterColor;
                     _additionalVerticesColor[_tile3] = _clusterColor;
-                    _clustered[i][j] = true;
                     IterateMultiCenterSquaredWaveClusterAround(i, j);
                 }
                 //iterate over buffer of indexes already colored with cluster color
@@ -1913,6 +1931,7 @@ public class TiledmapGeneration : MonoBehaviour {
                 if (_clustered[k][l] || (_tiledMapVertices[k][l][0].y + 0.002f) < threshold) continue;
                 _clustered[k][l] = true;
                 Vector3 vertex;
+                List<int> temp = new List<int>();
                 _tile0 = _countersMatrix[k][l] * 4;
                 _pos0 = _obj.transform.TransformPoint(_vertices[_tile0]);
                 _tile1 = _countersMatrix[k][l] * 4 + 1;
@@ -1921,6 +1940,258 @@ public class TiledmapGeneration : MonoBehaviour {
                 _pos2 = _obj.transform.TransformPoint(_vertices[_tile2]);
                 _tile3 = _countersMatrix[k][l] * 4 + 3;
                 _pos3 = _obj.transform.TransformPoint(_vertices[_tile3]);
+
+                //left tile
+                int _leftTile1 = _countersMatrix[k - 1][l] * 4 + 1;
+                int _leftTile3 = _countersMatrix[k - 1][l] * 4 + 3;
+                Vector3 _leftPos1 = _obj.transform.TransformPoint(_vertices[_leftTile1]);
+                Vector3 _leftPos3 = _obj.transform.TransformPoint(_vertices[_leftTile3]);
+
+                //down tile
+                int _downTile2 = _countersMatrix[k][l - 1] * 4 + 2;
+                int _downTile3 = _countersMatrix[k][l - 1] * 4 + 3;
+                Vector3 _downPos2 = _obj.transform.TransformPoint(_vertices[_downTile2]);
+                Vector3 _downPos3 = _obj.transform.TransformPoint(_vertices[_downTile3]);
+
+                //right tile
+                int _rightTile0 = _countersMatrix[k + 1][l] * 4;
+                int _rightTile2 = _countersMatrix[k + 1][l] * 4 + 2;
+                Vector3 _rightPos0 = _obj.transform.TransformPoint(_vertices[_rightTile0]);
+                Vector3 _rightPos2 = _obj.transform.TransformPoint(_vertices[_rightTile2]);
+
+                //up tile
+                int _upTile0 = _countersMatrix[k][l + 1] * 4;
+                int _upTile1 = _countersMatrix[k][l + 1] * 4 + 1;
+                Vector3 _upPos0 = _obj.transform.TransformPoint(_vertices[_upTile0]);
+                Vector3 _upPos1 = _obj.transform.TransformPoint(_vertices[_upTile1]);
+
+                //if current tile is higher than down tile
+                if (_pos0.y > _downPos2.y && _downPos2.y + 0.002f < threshold)
+                {
+                    if(Physics.Raycast(_pos0, _downPos2 - _pos0, out _hit, 5f))
+                    {
+                        vertex = _hit.point;
+                        vertex.x += 0.581f;
+                        vertex.y -= 0.002f;
+                        vertex.z += 0.63f;
+                        _additionalVertices.Add(vertex); // -4
+                        _additionalVertices.Add(vertex); // -3
+                        _additionalVerticesColor.Add(_clusterColor);
+                        _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                    }
+                    if (Physics.Raycast(_pos1, _downPos3 - _pos1, out _hit, 5f))
+                    {
+                        vertex = _hit.point;
+                        vertex.x += 0.581f;
+                        vertex.y -= 0.002f;
+                        vertex.z += 0.63f;
+                        _additionalVertices.Add(vertex); // -2
+                        _additionalVertices.Add(vertex); // -1
+                        _additionalVerticesColor.Add(_clusterColor);
+                        _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                    }
+                    //upper triangles with cluster color
+                    temp = new List<int>();
+                    temp.Add(_tile0);
+                    temp.Add(_tile1);
+                    temp.Add(_additionalVertices.Count - 4);
+                    _additionalTriangles.Add(temp);
+                    temp = new List<int>();
+                    temp.Add(_tile1);
+                    temp.Add(_additionalVertices.Count - 2);
+                    temp.Add(_additionalVertices.Count - 4);
+                    _additionalTriangles.Add(temp);
+                    //lower triangles with original color
+                    temp = new List<int>();
+                    temp.Add(_additionalVertices.Count - 3);
+                    temp.Add(_additionalVertices.Count - 1);
+                    temp.Add(_downTile2);
+                    _additionalTriangles.Add(temp);
+                    temp = new List<int>();
+                    temp.Add(_additionalVertices.Count - 1);
+                    temp.Add(_downTile3);
+                    temp.Add(_downTile2);
+                    _additionalTriangles.Add(temp);
+
+                    for(int t=12; t<18; t++)
+                    {
+                        _triangles[_countersMatrix[k][l] * 18 + t] = 0;
+                    }
+                }
+                //if current tile is higher than left tile that is lower than threshold
+                if (_pos0.y > _leftPos1.y && _leftPos1.y + 0.002f < threshold)
+                {
+                    if(Physics.Raycast(_pos0, _leftPos1 - _pos0, out _hit, 5f))
+                    {
+                        vertex = _hit.point;
+                        vertex.x += 0.581f;
+                        vertex.y -= 0.002f;
+                        vertex.z += 0.63f;
+                        _additionalVertices.Add(vertex); // -4
+                        _additionalVertices.Add(vertex); // -3
+                        _additionalVerticesColor.Add(_clusterColor);
+                        _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                    }
+                    if (Physics.Raycast(_pos2, _leftPos3 - _pos2, out _hit, 5f))
+                    {
+                        vertex = _hit.point;
+                        vertex.x += 0.581f;
+                        vertex.y -= 0.002f;
+                        vertex.z += 0.63f;
+                        _additionalVertices.Add(vertex); // -2
+                        _additionalVertices.Add(vertex); // -1
+                        _additionalVerticesColor.Add(_clusterColor);
+                        _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                    }
+
+                    //upper triangles with cluster color
+                    temp = new List<int>();
+                    temp.Add(_tile0);
+                    temp.Add(_additionalVertices.Count - 4);
+                    temp.Add(_tile2);
+                    _additionalTriangles.Add(temp);
+                    temp = new List<int>();
+                    temp.Add(_tile2);
+                    temp.Add(_additionalVertices.Count - 4);
+                    temp.Add(_additionalVertices.Count - 2);
+                    _additionalTriangles.Add(temp);
+                    //lower triangles with original color
+                    temp = new List<int>();
+                    temp.Add(_additionalVertices.Count - 3);
+                    temp.Add(_leftTile1);
+                    temp.Add(_additionalVertices.Count - 1);
+                    _additionalTriangles.Add(temp);
+                    temp = new List<int>();
+                    temp.Add(_additionalVertices.Count - 1);
+                    temp.Add(_leftTile1);
+                    temp.Add(_leftTile3);
+                    _additionalTriangles.Add(temp);
+                    
+                    for (int t = 6; t < 12; t++)
+                    {
+                        _triangles[_countersMatrix[k][l] * 18 + t] = 0;
+                    }
+                }
+                //if current tile is higher than right tile
+                if (_pos1.y > _rightPos0.y && _rightPos0.y + 0.002f < threshold)
+                {
+                    if (Physics.Raycast(_pos1, _rightPos0 - _pos1, out _hit, 5f))
+                    {
+                        vertex = _hit.point;
+                        vertex.x += 0.581f;
+                        vertex.y -= 0.002f;
+                        vertex.z += 0.63f;
+                        _additionalVertices.Add(vertex); // -4
+                        _additionalVertices.Add(vertex); // -3
+                        _additionalVerticesColor.Add(_clusterColor);
+                        _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                    }
+                    if (Physics.Raycast(_pos3, _rightPos2 - _pos3, out _hit, 5f))
+                    {
+                        vertex = _hit.point;
+                        vertex.x += 0.581f;
+                        vertex.y -= 0.002f;
+                        vertex.z += 0.63f;
+                        _additionalVertices.Add(vertex); // -2
+                        _additionalVertices.Add(vertex); // -1
+                        _additionalVerticesColor.Add(_clusterColor);
+                        _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                    }
+                    
+                    //upper triangles with cluster color
+                    temp = new List<int>();
+                    temp.Add(_tile1);
+                    temp.Add(_additionalVertices.Count - 2);
+                    temp.Add(_additionalVertices.Count - 4);
+                    _additionalTriangles.Add(temp);
+                    temp = new List<int>();
+                    temp.Add(_tile3);
+                    temp.Add(_additionalVertices.Count - 2);
+                    temp.Add(_tile1);
+                    _additionalTriangles.Add(temp);
+                    //lower triangles with original color
+                    temp = new List<int>();
+                    temp.Add(_additionalVertices.Count - 3);
+                    temp.Add(_rightTile2);
+                    temp.Add(_rightTile0);
+                    _additionalTriangles.Add(temp);
+                    temp = new List<int>();
+                    temp.Add(_additionalVertices.Count - 1);
+                    temp.Add(_rightTile2);
+                    temp.Add(_additionalVertices.Count - 3);
+                    _additionalTriangles.Add(temp);
+
+                    for(int t=6; t<12; t++)
+                    {
+                        _triangles[_countersMatrix[k+1][l] * 18 + t] = 0;
+                    }
+                }
+                //if current tile is higher than up tile
+                if(_pos2.y > _upPos0.y && _upPos0.y + 0.002f < threshold)
+                {
+                    if (Physics.Raycast(_pos2, _upPos0 - _pos2, out _hit, 5f))
+                    {
+                        vertex = _hit.point;
+                        vertex.x += 0.581f;
+                        vertex.y -= 0.002f;
+                        vertex.z += 0.63f;
+                        _additionalVertices.Add(vertex); // -4
+                        _additionalVertices.Add(vertex); // -3
+                        _additionalVerticesColor.Add(_clusterColor);
+                        _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                    }
+                    if (Physics.Raycast(_pos3, _upPos1 - _pos3, out _hit, 5f))
+                    {
+                        vertex = _hit.point;
+                        vertex.x += 0.581f;
+                        vertex.y -= 0.002f;
+                        vertex.z += 0.63f;
+                        _additionalVertices.Add(vertex); // -2
+                        _additionalVertices.Add(vertex); // -1
+                        _additionalVerticesColor.Add(_clusterColor);
+                        _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                    }
+
+                    //upper triangles with cluster color
+                    temp = new List<int>();
+                    temp.Add(_tile2);
+                    temp.Add(_additionalVertices.Count - 2);
+                    temp.Add(_tile3);
+                    _additionalTriangles.Add(temp);
+                    temp = new List<int>();
+                    temp.Add(_tile2);
+                    temp.Add(_additionalVertices.Count - 4);
+                    temp.Add(_additionalVertices.Count - 2);
+                    _additionalTriangles.Add(temp);
+                    //lower triangles with original color
+                    temp = new List<int>();
+                    temp.Add(_additionalVertices.Count - 3);
+                    temp.Add(_upTile0);
+                    temp.Add(_upTile1);
+                    _additionalTriangles.Add(temp);
+                    temp = new List<int>();
+                    temp.Add(_additionalVertices.Count - 3);
+                    temp.Add(_upTile1);
+                    temp.Add(_additionalVertices.Count - 1);
+                    _additionalTriangles.Add(temp);
+                    
+                    for (int t = 12; t < 18; t++)
+                    {
+                        _triangles[_countersMatrix[k][l+1] * 18 + t] = 0;
+                    }
+                }
+
+                _additionalVerticesColor[_tile0] = _clusterColor;
+                _additionalVerticesColor[_tile1] = _clusterColor;
+                _additionalVerticesColor[_tile2] = _clusterColor;
+                _additionalVerticesColor[_tile3] = _clusterColor;
+                _clustered[k][l] = true;
+
+                //add indexes for later iteration
+                temp = new List<int>();
+                temp.Add(k);
+                temp.Add(l);
+                _indexIterationBuffer.Add(temp);
             }
         }
     }
