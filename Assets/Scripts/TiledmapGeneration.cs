@@ -128,22 +128,6 @@ public class TiledmapGeneration : MonoBehaviour {
             _multiCenteredSquareWave = false;
             _additionalTriangles = new List<List<int>>();
             MultiCenteredSquaredWaveClusters();
-            /*int nextVertex = 0;
-            for (int i=0; i<200; i++)
-            {
-                for(int j=0; j<200; j++)
-                {
-                    if (_tiledMapColors[i][j][0].r > 0 || _tiledMapColors[i][j][0].b > 0 )
-                    {
-                        for (int k = 0; k < 4; k++)
-                        {
-                            _colors[nextVertex] = _tiledMapColors[i][j][k];
-                            nextVertex++;
-                        }
-                    }
-                }
-            }
-            _mesh.colors = _colors;*/
             CreateAdditionalMesh();
         }
 		

@@ -474,6 +474,15 @@ public LayerMask layersToIgnoreAdd = Physics.IgnoreRaycastLayer;
             if (selectedObject.name == "ThresholdPlane")
             {
                 selectedObject.GetComponent<FixXandZPosition>().isTaken = false;
+                selectedObject.GetComponent<FixXandZPosition>().denclue.GetComponent<TiledmapGeneration>().threshold = selectedObject.transform.position.y;
+                if (selectedObject.GetComponent<FixXandZPosition>().denclue.GetComponent<TiledmapGeneration>().gaussianCalculation)
+                {
+                    selectedObject.GetComponent<FixXandZPosition>().denclue.GetComponent<TiledmapGeneration>()._multiCenteredGaussian = true;
+                }
+                else
+                {
+                    selectedObject.GetComponent<FixXandZPosition>().denclue.GetComponent<TiledmapGeneration>()._multiCenteredSquareWave = true;
+                }
             }
             ////TODO remove for release? (restore parent if it changed)
             DesiredParent desiredParent = selectedObject.GetComponent<DesiredParent>();
