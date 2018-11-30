@@ -38,5 +38,13 @@ public class FixXandZPosition : MonoBehaviour {
             newPos.y = 0.0022f;
             transform.position = newPos;
         }
+        oldPos = newPos;
+        newPos = transform.position;
+        if(oldPos != newPos)
+        {
+            denclue.GetComponent<TiledmapGeneration>().threshold = transform.position.y;
+            if (denclue.GetComponent<TiledmapGeneration>().gaussianCalculation) denclue.GetComponent<TiledmapGeneration>()._multiCenteredGaussian = true;
+            else denclue.GetComponent<TiledmapGeneration>()._multiCenteredSquareWave = true;
+        }
 	}
 }

@@ -16,6 +16,8 @@ public class TiledmapGeneration : MonoBehaviour {
     public GaussianCoefficients gaussCoef;
     public KMeansAlgorithm kMeans;
     public DBScanAlgorithm dbscan;
+    public int colorCounter = 0;
+    public List<Color> clusterColors;
 
     private GameObject _obj, _additionalObj;
     private Mesh _mesh;
@@ -740,6 +742,7 @@ public class TiledmapGeneration : MonoBehaviour {
 
     private void MultiCenteredGaussianClusters()
     {
+        colorCounter = 0;
         ResetMesh();
         for (int a = 0; a < 200; a++)
         {
@@ -763,21 +766,23 @@ public class TiledmapGeneration : MonoBehaviour {
 
                 if (AllVerticesAbove(_tiledMapVertices[i][j], threshold))
                 {
-                    _clusterColor = new Color(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f));
+                    _clusterColor = clusterColors[colorCounter];
                     _additionalVerticesColor[_tile0] = _clusterColor;
                     _additionalVerticesColor[_tile1] = _clusterColor;
                     _additionalVerticesColor[_tile2] = _clusterColor;
                     _additionalVerticesColor[_tile3] = _clusterColor;
                     _clustered[i][j] = true;
                     IterateMultiCenterGaussianClusterAround(i, j);
+                    colorCounter++;
                 }
                 else if (ThreeVerticesAbove(_tiledMapVertices[i][j][0], _tiledMapVertices[i][j][1], _tiledMapVertices[i][j][2], threshold) ||
                          ThreeVerticesAbove(_tiledMapVertices[i][j][0], _tiledMapVertices[i][j][1], _tiledMapVertices[i][j][3], threshold) ||
                          ThreeVerticesAbove(_tiledMapVertices[i][j][0], _tiledMapVertices[i][j][2], _tiledMapVertices[i][j][3], threshold) ||
                          ThreeVerticesAbove(_tiledMapVertices[i][j][1], _tiledMapVertices[i][j][2], _tiledMapVertices[i][j][3], threshold))
                 {
-                    _clusterColor = new Color(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f));
+                    _clusterColor = clusterColors[colorCounter];
                     IterateMultiCenterGaussianClusterAround(i, j);
+                    colorCounter++;
                 }
 
                 else if (TwoVerticesAbove(_tiledMapVertices[i][j][0], _tiledMapVertices[i][j][1], threshold) ||
@@ -785,14 +790,16 @@ public class TiledmapGeneration : MonoBehaviour {
                          TwoVerticesAbove(_tiledMapVertices[i][j][0], _tiledMapVertices[i][j][2], threshold) ||
                          TwoVerticesAbove(_tiledMapVertices[i][j][1], _tiledMapVertices[i][j][3], threshold))
                 {
-                    _clusterColor = new Color(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f));
+                    _clusterColor = clusterColors[colorCounter];
                     IterateMultiCenterGaussianClusterAround(i, j);
+                    colorCounter++;
                 }
                 else if(_tiledMapVertices[i][j][0].y + 0.002f > threshold || _tiledMapVertices[i][j][1].y + 0.002f > threshold ||
                         _tiledMapVertices[i][j][2].y + 0.002f > threshold || _tiledMapVertices[i][j][3].y + 0.002f > threshold)
                 {
-                    _clusterColor = new Color(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f));
+                    _clusterColor = clusterColors[colorCounter];
                     IterateMultiCenterGaussianClusterAround(i, j);
+                    colorCounter++;
                 }
                 //iterate over buffer of indexes already colored with cluster color
                 if(_indexIterationBuffer.Count != 0)
@@ -1865,6 +1872,7 @@ public class TiledmapGeneration : MonoBehaviour {
 
     private void MultiCenteredSquaredWaveClusters()
     {
+        colorCounter = 0;
         ResetMesh();
         for(int a = 0; a<200; a++)
         {
@@ -1886,12 +1894,20 @@ public class TiledmapGeneration : MonoBehaviour {
                 if (_clustered[i][j] || (_tiledMapVertices[i][j][0].y + 0.002f) < threshold) continue;
                 else
                 {
-                    _clusterColor = new Color(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f));
+                    /*if (test == 0)
+                    {
+                        test++;
+                        GameObject ob = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                        ob.transform.localScale = new Vector3(0.001f, 0.001f, 0.001f);
+                        ob.transform.position = _obj.transform.TransformPoint(_vertices[_tile0]);
+                    }*/
+                    _clusterColor = clusterColors[colorCounter];
                     _additionalVerticesColor[_tile0] = _clusterColor;
                     _additionalVerticesColor[_tile1] = _clusterColor;
                     _additionalVerticesColor[_tile2] = _clusterColor;
                     _additionalVerticesColor[_tile3] = _clusterColor;
                     IterateMultiCenterSquaredWaveClusterAround(i, j);
+                    colorCounter++;
                 }
                 //iterate over buffer of indexes already colored with cluster color
                 if (_indexIterationBuffer.Count != 0)
@@ -1950,7 +1966,7 @@ public class TiledmapGeneration : MonoBehaviour {
                 Vector3 _upPos1 = _obj.transform.TransformPoint(_vertices[_upTile1]);
 
                 //if current tile is higher than down tile
-                if (_pos0.y > _downPos2.y && _downPos2.y + 0.002f < threshold)
+                if (_pos0.y > _downPos2.y && _downPos2.y <= threshold)
                 {
                     if(Physics.Raycast(_pos0, _downPos2 - _pos0, out _hit, 5f))
                     {
@@ -2003,7 +2019,7 @@ public class TiledmapGeneration : MonoBehaviour {
                     }
                 }
                 //if current tile is higher than left tile that is lower than threshold
-                if (_pos0.y > _leftPos1.y && _leftPos1.y + 0.002f < threshold)
+                if (_pos0.y > _leftPos1.y && _leftPos1.y <= threshold)
                 {
                     if(Physics.Raycast(_pos0, _leftPos1 - _pos0, out _hit, 5f))
                     {
@@ -2057,7 +2073,7 @@ public class TiledmapGeneration : MonoBehaviour {
                     }
                 }
                 //if current tile is higher than right tile
-                if (_pos1.y > _rightPos0.y && _rightPos0.y + 0.002f < threshold)
+                if (_pos1.y > _rightPos0.y && _rightPos0.y <= threshold)
                 {
                     if (Physics.Raycast(_pos1, _rightPos0 - _pos1, out _hit, 5f))
                     {
@@ -2111,7 +2127,7 @@ public class TiledmapGeneration : MonoBehaviour {
                     }
                 }
                 //if current tile is higher than up tile
-                if(_pos2.y > _upPos0.y && _upPos0.y + 0.002f < threshold)
+                if(_pos2.y > _upPos0.y && _upPos0.y <= threshold)
                 {
                     if (Physics.Raycast(_pos2, _upPos0 - _pos2, out _hit, 5f))
                     {
