@@ -11,7 +11,7 @@ public class TrackpadTouchPointer : MonoBehaviour {
     void Start () {
         trackedObj = GetComponent<SteamVR_TrackedObject>();
         device = SteamVR_Controller.Input((int)trackedObj.index);
-        trackpadTouch.GetComponent<MeshRenderer>().material = mat;
+        if(trackpadTouch.GetComponent<MeshRenderer>()!=null) trackpadTouch.GetComponent<MeshRenderer>().material = mat;
     }
 
     // Update is called once per frame

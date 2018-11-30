@@ -19,7 +19,7 @@ public class TiledmapGeneration : MonoBehaviour {
     public int colorCounter = 0;
     public List<Color> clusterColors;
 
-    private GameObject _obj, _additionalObj;
+    private GameObject _obj;
     private Mesh _mesh;
     private List<GameObject> _list;
     private Vector3[][][] _tiledMapVertices;
@@ -48,7 +48,6 @@ public class TiledmapGeneration : MonoBehaviour {
         halfLengthOfNeighbourhood = 3;
         _counter = 0;
         _obj = new GameObject();
-        _additionalObj = new GameObject();
 
         _list = new List<GameObject>();
         //set initial abstract positions, to refer to float influence
@@ -322,16 +321,6 @@ public class TiledmapGeneration : MonoBehaviour {
                         {
                             _trianglesMatrix[currentTile][t] = count - 4;
                         }
-                        // if there is an neighbour down of current tile, create a square that represents wall to the ground
-                        if (HasNeighbourDown(x, z))
-                        {
-                            _trianglesMatrix[currentTile][0] = count - 4;                                // vertex 0
-                            _trianglesMatrix[currentTile][1] = count - 3;                                // 1
-                            _trianglesMatrix[currentTile][2] = (_countersMatrix[x][z - 1] + 1) * 4 - 2;   // 2 from tile down
-                            _trianglesMatrix[currentTile][3] = (_countersMatrix[x][z - 1] + 1) * 4 - 2;   // 2 from tile down
-                            _trianglesMatrix[currentTile][4] = count - 3;                                // 1
-                            _trianglesMatrix[currentTile][5] = (_countersMatrix[x][z - 1] + 1) * 4 - 1;   // 3 from tile down
-                        }
                         if (HasNeighbourOnTheLeft(x, z))
                         {
                             _trianglesMatrix[currentTile][6] = count - 2;                               // 2
@@ -341,8 +330,18 @@ public class TiledmapGeneration : MonoBehaviour {
                             _trianglesMatrix[currentTile][10] = (_countersMatrix[x - 1][z] + 1) * 4 - 3; // 1 from tile on the left
                             _trianglesMatrix[currentTile][11] = (_countersMatrix[x - 1][z] + 1) * 4 - 1; // 3 from tile on the left
                         }
-						//set the current tile to blue, since it is a "wall tile" on the ground
-						for (int c = 0; c < 4; c++)
+                        // if there is an neighbour down of current tile, create a square that represents wall to the ground
+                        if (HasNeighbourDown(x, z))
+                        {
+                            _trianglesMatrix[currentTile][12] = count - 4;                                // vertex 0
+                            _trianglesMatrix[currentTile][13] = count - 3;                                // 1
+                            _trianglesMatrix[currentTile][14] = (_countersMatrix[x][z - 1] + 1) * 4 - 2;   // 2 from tile down
+                            _trianglesMatrix[currentTile][15] = (_countersMatrix[x][z - 1] + 1) * 4 - 2;   // 2 from tile down
+                            _trianglesMatrix[currentTile][16] = count - 3;                                // 1
+                            _trianglesMatrix[currentTile][17] = (_countersMatrix[x][z - 1] + 1) * 4 - 1;   // 3 from tile down
+                        }
+                        //set the current tile to blue, since it is a "wall tile" on the ground
+                        for (int c = 0; c < 4; c++)
 						{
 							_matrixColors[currentTile][c] = new Color(0, 0, Math.Abs(1-_verticesMatrix[currentTile][c].y));
                             _tiledMapColors[x][z][c] = new Color(0, 0, Math.Abs(1 - _verticesMatrix[currentTile][c].y));
@@ -1931,6 +1930,10 @@ public class TiledmapGeneration : MonoBehaviour {
                 if (_clustered[k][l] || (_tiledMapVertices[k][l][0].y + 0.002f) < threshold) continue;
                 _clustered[k][l] = true;
                 Vector3 vertex;
+                if (k == 30 && l == 140)
+                {
+                    Debug.Log("here");
+                }
                 List<int> temp = new List<int>();
                 _tile0 = _countersMatrix[k][l] * 4;
                 _pos0 = _obj.transform.TransformPoint(_vertices[_tile0]);

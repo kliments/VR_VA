@@ -11,7 +11,8 @@ public class FixXandZPosition : MonoBehaviour {
     public Text buttonText;
     // Use this for initialization
     void Start () {
-        oldPos = transform.localPosition;
+        oldPos = transform.position;
+        newPos = transform.position;
         rot = transform.localRotation;
         isTaken = false;
 	}
