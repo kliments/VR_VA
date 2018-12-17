@@ -7,7 +7,7 @@ public class FixXandZPosition : MonoBehaviour {
     Vector3 oldPos, newPos;
     Quaternion rot;
     public bool isTaken;
-    public GameObject denclue;
+    public TiledmapGeneration denclue;
     public Text buttonText;
     // Use this for initialization
     void Start () {
@@ -15,7 +15,8 @@ public class FixXandZPosition : MonoBehaviour {
         newPos = transform.position;
         rot = transform.localRotation;
         isTaken = false;
-	}
+        denclue = (TiledmapGeneration)FindObjectOfType(typeof(TiledmapGeneration));
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -26,7 +27,7 @@ public class FixXandZPosition : MonoBehaviour {
             newPos.z = oldPos.z;
             transform.position = newPos;
             transform.rotation = rot;
-            denclue.GetComponent<TiledmapGeneration>().threshold = transform.position.y;
+            denclue.threshold = transform.position.y;
             buttonText.text = "ξ: " + decimal.Round((decimal)transform.position.y).ToString();
         }
         else if(!isTaken && transform.parent!= null)
@@ -43,9 +44,16 @@ public class FixXandZPosition : MonoBehaviour {
         newPos = transform.position;
         if(oldPos != newPos)
         {
-            denclue.GetComponent<TiledmapGeneration>().threshold = transform.position.y;
-            if (denclue.GetComponent<TiledmapGeneration>().gaussianCalculation) denclue.GetComponent<TiledmapGeneration>()._multiCenteredGaussian = true;
-            else denclue.GetComponent<TiledmapGeneration>()._multiCenteredSquareWave = true;
+            denclue.threshold = transform.position.y;
+            if (denclue.gaussianCalculation)
+            {
+                if(denclue.multiCentered) denclue._multiCenteredGaussian = true;
+            }
+            else
+            {
+                if (denclue.multiCentered) denclue._multiCenteredSquareWave = true;
+                else denclue._singleCenteredSquaredWave = true;
+            }
         }
 	}
 }
