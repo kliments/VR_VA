@@ -12,6 +12,16 @@ public class ResponsiveMenuDatasetsGenerator : MonoBehaviour {
     private float x, y, z;
     // Use this for initialization
     void Start () {
+
+    }
+	
+	// Update is called once per frame
+	void Update () {
+
+	}
+
+    private void Awake()
+    {
         spr = new Sprite();
         int s = 1;
         x = -0.24f;
@@ -43,12 +53,6 @@ public class ResponsiveMenuDatasetsGenerator : MonoBehaviour {
             }
 
         }
-
     }
-	
-	// Update is called once per frame
-	void Update () {
 
-	}
-    
 }

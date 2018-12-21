@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class AutomaticLoadDataVisDenclue : MonoBehaviour {
     public GameObject data, viz, denclue;
+    public int i;
 	// Use this for initialization
 	void Start () {
 	}
@@ -15,8 +16,8 @@ public class AutomaticLoadDataVisDenclue : MonoBehaviour {
 
     void LoadData()
     {
-        data.transform.GetChild(0).gameObject.GetComponent<datasetChangerScript>().isSelected = true;
-        data.transform.GetChild(0).gameObject.GetComponent<UniversalButtonScript>().loadDataset = true;
+        data.transform.GetChild(i).gameObject.GetComponent<datasetChangerScript>().isSelected = true;
+        data.transform.GetChild(i).gameObject.GetComponent<UniversalButtonScript>().loadDataset = true;
     }
     void LoadVis()
     {
@@ -30,8 +31,8 @@ public class AutomaticLoadDataVisDenclue : MonoBehaviour {
 
     private void OnEnable()
     {
-        Invoke("LoadData", 0.5f);
-        Invoke("LoadVis", 0.6f);
+        Invoke("LoadData", 1f);
+        Invoke("LoadVis", 1.1f);
         Invoke("LoadDenclue", 1.2f);
     }
 }

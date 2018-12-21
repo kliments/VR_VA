@@ -731,21 +731,16 @@ public class TiledmapGeneration : MonoBehaviour {
                     }
                     else
                     {// vertex 0 is peak
-                        if (_tiledMapVertices[p][r][0].y > _tiledMapVertices[p][r][1].y && _tiledMapVertices[p][r][0].y > _tiledMapVertices[p][r][2].y &&
+                        if (_tiledMapVertices[p][r][0].y > _tiledMapVertices[p][r][1].y && _tiledMapVertices[p][r][0].y > _tiledMapVertices[p][r][2].y && 
                            _tiledMapVertices[p][r][0].y > _tiledMapVertices[p - 1][r][0].y && _tiledMapVertices[p][r][0].y > _tiledMapVertices[p - 1][r][3].y &&
                            _tiledMapVertices[p][r][0].y > _tiledMapVertices[p - 1][r - 1][1].y && _tiledMapVertices[p][r][0].y > _tiledMapVertices[p - 1][r - 1][2].y &&
                            _tiledMapVertices[p][r][0].y > _tiledMapVertices[p][r - 1][0].y && _tiledMapVertices[p][r][0].y > _tiledMapVertices[p][r - 1][3].y)
                         {
                             _isPeak[p][r] = true;
-                        }
-                        // vertex 1 is peak
-                        else if
-                          (_tiledMapVertices[p][r][1].y > _tiledMapVertices[p][r][0].y && _tiledMapVertices[p][r][1].y > _tiledMapVertices[p][r][3].y &&
-                           _tiledMapVertices[p][r][1].y > _tiledMapVertices[p][r - 1][1].y && _tiledMapVertices[p][r][1].y > _tiledMapVertices[p][r - 1][2].y &&
-                           _tiledMapVertices[p][r][1].y > _tiledMapVertices[p + 1][r - 1][0].y && _tiledMapVertices[p][r][1].y > _tiledMapVertices[p + 1][r - 1][3].y &&
-                           _tiledMapVertices[p][r][1].y > _tiledMapVertices[p + 1][r][1].y && _tiledMapVertices[p][r][1].y > _tiledMapVertices[p + 1][r][2].y)
-                        {
-                            _isPeak[p][r] = true;
+
+                            if (_tiledMapVertices[p][r][0].y < _tiledMapVertices[p - 1][r - 1][0].y && !Is12Tilted(_tiledMapVertices[p - 1][r - 1])) _isPeak[p][r] = false;
+                            if (_tiledMapVertices[p][r][0].y < _tiledMapVertices[p - 1][r][2].y) _isPeak[p][r] = false;
+                            if (_tiledMapVertices[p][r][0].y < _tiledMapVertices[p][r - 1][1].y) _isPeak[p][r] = false;
                         }
                         // vertex 2 is peak
                         else if
@@ -755,6 +750,23 @@ public class TiledmapGeneration : MonoBehaviour {
                            _tiledMapVertices[p][r][2].y > _tiledMapVertices[p][r + 1][1].y && _tiledMapVertices[p][r][2].y > _tiledMapVertices[p][r + 1][2].y)
                         {
                             _isPeak[p][r] = true;
+                            if (_tiledMapVertices[p][r][2].y < _tiledMapVertices[p][r][1].y) _isPeak[p][r] = false;
+                            if (_tiledMapVertices[p][r][2].y < _tiledMapVertices[p - 1][r][0].y && !Is12Tilted(_tiledMapVertices[p - 1][r])) _isPeak[p][r] = false;
+                            if (_tiledMapVertices[p][r][2].y < _tiledMapVertices[p - 1][r + 1][2].y) _isPeak[p][r] = false;
+                            if (_tiledMapVertices[p][r][2].y < _tiledMapVertices[p][r + 1][3].y && !Is12Tilted(_tiledMapVertices[p][r + 1])) _isPeak[p][r] = false;
+                        }
+                        // vertex 1 is peak
+                        else if
+                          (_tiledMapVertices[p][r][1].y > _tiledMapVertices[p][r][0].y && _tiledMapVertices[p][r][1].y > _tiledMapVertices[p][r][3].y &&
+                           _tiledMapVertices[p][r][1].y > _tiledMapVertices[p][r - 1][1].y && _tiledMapVertices[p][r][1].y > _tiledMapVertices[p][r - 1][2].y &&
+                           _tiledMapVertices[p][r][1].y > _tiledMapVertices[p + 1][r - 1][0].y && _tiledMapVertices[p][r][1].y > _tiledMapVertices[p + 1][r - 1][3].y &&
+                           _tiledMapVertices[p][r][1].y > _tiledMapVertices[p + 1][r][1].y && _tiledMapVertices[p][r][1].y > _tiledMapVertices[p + 1][r][2].y)
+                        {
+                            _isPeak[p][r] = true;
+
+                            if (_tiledMapVertices[p][r][1].y < _tiledMapVertices[p][r - 1][0].y && !Is12Tilted(_tiledMapVertices[p][r - 1])) _isPeak[p][r] = false;
+                            if(_tiledMapVertices[p][r][1].y < _tiledMapVertices[p + 1][ r - 1][1].y) _isPeak[p][r] = false;
+                            if (_tiledMapVertices[p][r][1].y < _tiledMapVertices[p + 1][r][3].y && !Is12Tilted(_tiledMapVertices[p + 1][r])) _isPeak[p][r] = false;
                         }
                         // vertex 3 is peak
                         else if
@@ -764,6 +776,10 @@ public class TiledmapGeneration : MonoBehaviour {
                            _tiledMapVertices[p][r][3].y > _tiledMapVertices[p][r + 1][0].y && _tiledMapVertices[p][r][3].y > _tiledMapVertices[p][r + 1][3].y)
                         {
                             _isPeak[p][r] = true;
+
+                            if (_tiledMapVertices[p][r][3].y < _tiledMapVertices[p + 1][r][1].y) _isPeak[p][r] = false;
+                            if (_tiledMapVertices[p][r][3].y < _tiledMapVertices[p + 1][r + 1][3].y && !Is12Tilted(_tiledMapVertices[p + 1][r + 1])) _isPeak[p][r] = false;
+                            if (_tiledMapVertices[p][r][3].y < _tiledMapVertices[p][r + 1][2].y) _isPeak[p][r] = false;
                         }
                         else _isPeak[p][r] = false;
                     }
@@ -800,6 +816,14 @@ public class TiledmapGeneration : MonoBehaviour {
                 }
             }
         }
+    }
+
+    //when vertices 1 and 2 are smaller than vertices 0 and 3
+    private bool Is12Tilted(Vector3[] tile)
+    {
+        if (tile[1].y < tile[0].y && tile[1].y < tile[3].y &&
+            tile[2].y < tile[0].y && tile[2].y < tile[3].y) return true;
+        return false;
     }
 
     private void SingleCenteredSquaredWave()
