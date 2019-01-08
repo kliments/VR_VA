@@ -16,17 +16,19 @@ public class AutomaticLoadDataVisDenclue : MonoBehaviour {
 
     void LoadData()
     {
-        data.transform.GetChild(i).gameObject.GetComponent<datasetChangerScript>().isSelected = true;
-        data.transform.GetChild(i).gameObject.GetComponent<UniversalButtonScript>().loadDataset = true;
+        /*data.transform.GetChild(i).gameObject.GetComponent<datasetChangerScript>().isSelected = true;
+        data.transform.GetChild(i).gameObject.GetComponent<UniversalButtonScript>().loadDataset = true;*/
+        data.transform.GetChild(i).gameObject.GetComponent<datasetChangerScript>().startTargetedAction();
     }
     void LoadVis()
     {
-        viz.GetComponent<VisualizationChangerScript>().isSelected = true;
-        viz.GetComponent<UniversalButtonScript>().loadVis = true;
+        /*viz.GetComponent<VisualizationChangerScript>().isSelected = true;
+        viz.GetComponent<UniversalButtonScript>().loadVis = true;*/
+        viz.GetComponent<VisualizationChangerScript>().startSelectedAction();
     }
     void LoadDenclue()
     {
-        denclue.GetComponent<UniversalButtonScript>().startDenclue = true;
+        denclue.GetComponent<UniversalButtonScript>().denclue.StartDenclue();
     }
 
     private void OnEnable()

@@ -14,7 +14,7 @@ public class UniversalButtonScript : MonoBehaviour {
     private PointerEventListener ptEvtLsnr;
     private BackButtonMenu menusParent;
     private SwapBetweenMenus swapScript;
-    private TiledmapGeneration denclue;
+    public TiledmapGeneration denclue;
 
     //for debugging
     public bool loadDataset, loadVis, startDenclue;
