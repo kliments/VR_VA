@@ -34,7 +34,7 @@ public class TiledmapGeneration : MonoBehaviour {
     private Color[][] _matrixColors;
     private Color[] _colors;
     private Color _clusterColor;
-    private bool[][] _isPeak, _clustered, _colorIsChangedToOtherCluster;
+    private bool[][] _isPeak, _clustered, _pathFinderChecked;
     private bool _skip;
     private int[][] _trianglesMatrix, _countersMatrix;
     private int[] _triangles, _originalTriangles;
@@ -289,7 +289,7 @@ public class TiledmapGeneration : MonoBehaviour {
         _countersMatrix = new int[150][];
         _counterIndexes = new List<List<int>>();
         _isPeak = new bool[150][];
-        _colorIsChangedToOtherCluster = new bool[150][];
+        _pathFinderChecked = new bool[150][];
 		_matrixColors = new Color[_counter][];
         _verticesMaximumMatrix = new Vector3[150][];
         _clustered = new bool[150][];
@@ -304,7 +304,7 @@ public class TiledmapGeneration : MonoBehaviour {
             _verticesMaximumMatrix[x] = new Vector3[150];
             _tiledMapColors[x] = new Color[150][];
             _isPeak[x] = new bool[150];
-            _colorIsChangedToOtherCluster[x] = new bool[150];
+            _pathFinderChecked[x] = new bool[150];
             _clustered[x] = new bool[150];
             for (int z = 0; z < mapTilesInfluence[x].Length; z++)
             {
@@ -420,10 +420,6 @@ public class TiledmapGeneration : MonoBehaviour {
                         _trianglesMatrix[currentTile][4] = count - 1;                                // 3
                         _trianglesMatrix[currentTile][5] = count - 3;                                // 1
                         //left rectangle
-                        if (x == 84 && z == 89)
-                        {
-                            Debug.Log("");
-                        }
                         _trianglesMatrix[currentTile][6] = count - 2;                                // 2
                         _trianglesMatrix[currentTile][7] = count - 4;                                // 0
                         _trianglesMatrix[currentTile][8] = (_countersMatrix[x - 1][z] + 1) * 4 - 1;  // vertex 3 from tile on the left
@@ -563,10 +559,6 @@ public class TiledmapGeneration : MonoBehaviour {
             }
             for(int k=0; k<_trianglesMatrix[i].Length; k++)
             {
-                if (i == 3402)
-                {
-                    Debug.Log("");
-                }
                 _triangles[nextTriangle] = _trianglesMatrix[i][k];
                 _originalTriangles[nextTriangle] = _trianglesMatrix[i][k];
                 nextTriangle++;
@@ -626,7 +618,7 @@ public class TiledmapGeneration : MonoBehaviour {
         _mesh = new Mesh();
         _extraVerticesCounter = new List<int>[150][];
         _extraVertices = new List<Vector3>[150][];
-        _colorIsChangedToOtherCluster = new bool[150][];
+        _pathFinderChecked = new bool[150][];
         if (_obj.GetComponent<MeshFilter>()!=null)
         {
             _obj.GetComponent<MeshFilter>().mesh = _mesh;
@@ -638,7 +630,7 @@ public class TiledmapGeneration : MonoBehaviour {
             mapTilesInfluence[m] = new float[150];
             _extraVerticesCounter[m] = new List<int>[150];
             _extraVertices[m] = new List<Vector3>[150];
-            _colorIsChangedToOtherCluster[m] = new bool[150];
+            _pathFinderChecked[m] = new bool[150];
             for (int l = 0; l < mapTilesInfluence[m].Length; l++)
             {
                 mapTilesInfluence[m][l] = 0;
@@ -903,7 +895,7 @@ public class TiledmapGeneration : MonoBehaviour {
                             }
                         }
                     }
-                    mainList = SortList(mainList);
+                    mainList = SortListByHeight(mainList);
                     for(int l=0; l<mainList.Count; l++)
                     {
                         int x = _counterIndexes[mainList[l]][0];
@@ -919,14 +911,79 @@ public class TiledmapGeneration : MonoBehaviour {
         {
             for(int j=0; j<150; j++)
             {
-                if ((_verticesMaximumMatrix[i][j].y + 0.002f) > threshold && !_colorIsChangedToOtherCluster[i][j])
+                if ((_verticesMaximumMatrix[i][j].y + 0.002f) > threshold && !_pathFinderChecked[i][j])
                 {
-
+                    List<int> list = new List<int>();
+                    _pathFinderChecked[i][j] = true;
+                    bool peakReached = false;
+                    list.Add(_countersMatrix[i][j]);
+                    for(int r=0; r<list.Count; r++)
+                    {
+                        peakReached = PeakReached(_counterIndexes[list[r]][0], _counterIndexes[list[r]][1], list);
+                        if (peakReached) break;
+                    }
+                    if (!peakReached)
+                    {
+                        foreach(var tile in list)
+                        {
+                            int m = _counterIndexes[tile][0];
+                            int n = _counterIndexes[tile][1];
+                            bool toBreak = false;
+                            //Debug.Log(m + "  " + n);
+                            //Debug.Log((_verticesMaximumMatrix[m][n].x - 0.581f).ToString() + " " + (_verticesMaximumMatrix[m][n].y + 0.002f).ToString() + " " + (_verticesMaximumMatrix[m][n].z - 0.63f).ToString());
+                            for(int m1 = m-1; m1<= m+1; m1++)
+                            {
+                                for(int n1 = n-1; n1 <= n+1; n1++)
+                                {
+                                    if (m != m1 && n != n1) continue;
+                                    if(_verticesMaximumMatrix[m][n].y <= _verticesMaximumMatrix[m1][n1].y &&
+                                        _additionalVerticesColor[tile*4] != _additionalVerticesColor[_countersMatrix[m1][n1] * 4])
+                                    {
+                                        ColorTiles(m, n, _additionalVerticesColor[_countersMatrix[m1][n1] * 4]);
+                                        toBreak = true;
+                                        break;
+                                    }
+                                }
+                                if (toBreak) break;
+                            }
+                        }
+                    }
                 }
             }
         }
     }
-    private List<int> SortList(List<int> list)
+    //path finder from tile to peak
+    private bool PeakReached(int i, int j, List<int> list)
+    {
+        bool peakReached = false;
+        int countIJ = _countersMatrix[i][j];
+        int countKL;
+        for (int k = i - 1; k <= i + 1; k++)
+        {
+            for (int l = j - 1; l <= j + 1; l++)
+            {
+                countKL = _countersMatrix[k][l];
+                if (_isPeak[k][l])
+                {
+                    peakReached = true;
+                    return true;
+                }
+                else if (_verticesMaximumMatrix[k][l].y + 0.002f < threshold) continue;
+                else if (k == i && l == j) continue;
+                else if (list.Contains(countKL)) continue;
+                else if (_additionalVerticesColor[countKL * 4] != _additionalVerticesColor[countIJ * 4]) continue;
+                else
+                {
+                    _pathFinderChecked[k][l] = true;
+                    list.Add(_countersMatrix[k][l]);
+                }
+            }
+        }
+        return peakReached;
+    }
+
+    //sorts and returns a list of tiles by their height descending
+    private List<int> SortListByHeight(List<int> list)
     {
         list.Sort((a, b) => _verticesMaximumMatrix[_counterIndexes[b][0]][_counterIndexes[b][1]].y.CompareTo(_verticesMaximumMatrix[_counterIndexes[a][0]][_counterIndexes[a][1]].y));
         return list;
@@ -995,7 +1052,6 @@ public class TiledmapGeneration : MonoBehaviour {
                             if (Vector2.Distance(_tilePos2, _currentPeak) < Vector2.Distance(_tilePos2, _tilePrevPeak))
                             {
                                 currentNeighbours.Add(_countersMatrix[k][l]);
-                                _colorIsChangedToOtherCluster[k][l] = true;
                                 foreach (var item in _extraVerticesCounter[k][l])
                                 {
                                     _additionalVerticesColor[item] = _clusterColor;
@@ -1010,7 +1066,7 @@ public class TiledmapGeneration : MonoBehaviour {
                 }
             }
         }
-        currentNeighbours = SortList(currentNeighbours);
+        currentNeighbours = SortListByHeight(currentNeighbours);
         for(int n=0; n<currentNeighbours.Count; n++)
         {
             for(int q=0; q<list.Count; q++)
@@ -1025,7 +1081,7 @@ public class TiledmapGeneration : MonoBehaviour {
             if (!list.Contains(currentNeighbours[n])) list.Add(currentNeighbours[n]);
         }
     }
-    
+
     //Function for coloring vertices of tiles and updates triangles if needed
     void ColorTiles(int k, int l, Color color)
     {
@@ -1144,10 +1200,6 @@ public class TiledmapGeneration : MonoBehaviour {
                 _triangles[_countersMatrix[k][l] * 18 + 11] = _leftTile3;
                 //_additionalTriangles.Add(temp);
             }
-            /*for (int t = 6; t < 12; t++)
-            {
-                _triangles[_countersMatrix[k][l] * 18 + t] = 0;
-            }*/
         }
 
         //paint down wall if down tile is clustered
@@ -1217,11 +1269,6 @@ public class TiledmapGeneration : MonoBehaviour {
                 _triangles[_countersMatrix[k][l] * 18 + 17] = _downTile2;
                 //_additionalTriangles.Add(temp);
             }
-
-            /*for (int t = 12; t < 18; t++)
-            {
-                _triangles[_countersMatrix[k][l] * 18 + t] = 0;
-            }*/
         }
 
         //paint right wall if right tile is clustered
@@ -1291,11 +1338,6 @@ public class TiledmapGeneration : MonoBehaviour {
                 _triangles[_countersMatrix[k + 1][l] * 18 + 11] = _rightTile0;
                 //_additionalTriangles.Add(temp);
             }
-
-            /*for (int t = 6; t < 12; t++)
-            {
-                _triangles[_countersMatrix[k + 1][l] * 18 + t] = 0;
-            }*/
         }
         if(_clustered[k][l + 1] && _additionalVerticesColor[_upTile0] != color)
         {
@@ -1363,10 +1405,6 @@ public class TiledmapGeneration : MonoBehaviour {
                 _triangles[_countersMatrix[k][l + 1] * 18 + 17] = _upTile1;
                 //_additionalTriangles.Add(temp);
             }
-            /*for (int t = 12; t < 18; t++)
-            {
-                _triangles[_countersMatrix[k][l + 1] * 18 + t] = 0;
-            }*/
         }
 
         #endregion
@@ -1736,12 +1774,12 @@ public class TiledmapGeneration : MonoBehaviour {
         _additionalVerticesColor = new List<Color>();
         _extraVerticesCounter = new List<int>[150][];
         _extraVertices = new List<Vector3>[150][];
-        _colorIsChangedToOtherCluster = new bool[150][];
+        _pathFinderChecked = new bool[150][];
         for(int i = 0; i < 150; i++)
         {
             _extraVerticesCounter[i] = new List<int>[150];
             _extraVertices[i] = new List<Vector3>[150];
-            _colorIsChangedToOtherCluster[i] = new bool[150];
+            _pathFinderChecked[i] = new bool[150];
         }
         for (int t = 0; t < _originalTriangles.Length; t++)
         {
@@ -3123,7 +3161,6 @@ public class TiledmapGeneration : MonoBehaviour {
         Mesh mesh = new Mesh();
         Vector3[] tempVertices = new Vector3[_additionalVertices.Count];
         Color[] tempColors = new Color[_additionalVerticesColor.Count];
-        //int[] tempTriangles = new int[_additionalTriangles.Count * 3];
         int[] tempTriangles = new int[_additionalTriangles.Count * 3 + _triangles.Length];
         for(int i=0; i<_additionalVertices.Count; i++)
         {
