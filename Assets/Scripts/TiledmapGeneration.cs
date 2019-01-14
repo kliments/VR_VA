@@ -142,7 +142,7 @@ public class TiledmapGeneration : MonoBehaviour {
             multiCentered = false;
             _singleCenteredSquaredWave = false;
             _additionalTriangles = new List<List<int>>();
-            SingleCenteredSquaredWave();
+            SingleCenteredSquaredWaveClusters();
             CreateAdditionalMesh();
         }
 
@@ -836,7 +836,7 @@ public class TiledmapGeneration : MonoBehaviour {
         return false;
     }
 
-    private void SingleCenteredSquaredWave()
+    private void SingleCenteredSquaredWaveClusters()
     {
         Vector3 peakPos = new Vector3();
         colorCounter = 0;
@@ -929,8 +929,6 @@ public class TiledmapGeneration : MonoBehaviour {
                             int m = _counterIndexes[tile][0];
                             int n = _counterIndexes[tile][1];
                             bool toBreak = false;
-                            //Debug.Log(m + "  " + n);
-                            //Debug.Log((_verticesMaximumMatrix[m][n].x - 0.581f).ToString() + " " + (_verticesMaximumMatrix[m][n].y + 0.002f).ToString() + " " + (_verticesMaximumMatrix[m][n].z - 0.63f).ToString());
                             for(int m1 = m-1; m1<= m+1; m1++)
                             {
                                 for(int n1 = n-1; n1 <= n+1; n1++)
@@ -1634,6 +1632,125 @@ public class TiledmapGeneration : MonoBehaviour {
         _additionalVerticesColor[_tile2] = color;
         _additionalVerticesColor[_tile3] = color;
         _clustered[k][l] = true;
+    }
+
+    private void SingleCenteredGaussianClusters()
+    {
+        Vector3 peakPos = new Vector3();
+        _peaksPosition = new List<Vector3>();
+        colorCounter = 0;
+        if (clusterColors.Count > 20)
+        {
+            for (int c = clusterColors.Count - 1; c >= 20; c--)
+            {
+                clusterColors.Remove(clusterColors[c]);
+            }
+        }
+        ResetMesh();
+        List<int> mainList = new List<int>();
+
+        for (int a = 0; a < 150; a++)
+        {
+            for (int b = 0; b < 150; b++)
+            {
+                _clustered[a][b] = false;
+            }
+        }
+        for(int i=0; i<150; i++)
+        {
+            for(int j=0; j<150; j++)
+            {
+                if(_isPeak[i][j] && !Is12Tilted(_tiledMapVertices[i][j]) && (_verticesMaximumMatrix[i][j].y + 0.002f)>threshold)
+                {
+                    peakPos = _verticesMaximumMatrix[i][j];
+                    _peaksPosition.Add(peakPos);
+                    a = 1;
+                    b = 1;
+                    c = 1;
+                    d = 1;
+
+                    if (colorCounter < 20) _clusterColor = clusterColors[colorCounter];
+                    else
+                    {
+                        _clusterColor = new Color(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f));
+                        if (!clusterColors.Contains(_clusterColor)) clusterColors.Add(_clusterColor);
+                        while (!clusterColors.Contains(_clusterColor))
+                        {
+                            _clusterColor = new Color(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f));
+                            clusterColors.Add(_clusterColor);
+                        }
+                    }
+                    mainList.Add(_countersMatrix[i][j]);
+                    for(int x=i-1; x<=i+1; x++)
+                    {
+                        for(int y=j-1; y<=j+1; y++)
+                        {
+                            if (!_clustered[x][y] && _verticesMaximumMatrix[x][y].y + 0.002f > threshold)
+                            {
+                                if (x == i && y == j) continue;
+                                else if (Is12Tilted(_tiledMapVertices[x][y])) continue;
+                                mainList.Add(_countersMatrix[x][y]);
+                            }
+                        }
+                    }
+                    for(int l=0; l<mainList.Count; l++)
+                    {
+                        int x = _counterIndexes[mainList[l]][0];
+                        int y = _counterIndexes[mainList[l]][1];
+                        IterateSingleCenteredGaussian(mainList, x, y, a, b, c, d);
+                        /////////////////////////////////////////////////////// continue here for coloring maybe.. or maybe color in iteratesinglecenteredgaussian
+                    }
+                    colorCounter++;
+                }
+            }
+        }
+    }
+
+    private void IterateSingleCenteredGaussian(List<int> list, int i, int j, int a1, int b1, int c1, int d1)
+    {
+        for(int k=i-1; k<=i+1; k++)
+        {
+            for(int l=j-1; l<=j+1; l++)
+            {
+                //if the tile is not tilted in half
+                if(!Is12Tilted(_tiledMapVertices[k][l]))
+                {
+                    //if they are not connected with the previous tile, skip
+                    if (NotNeighbors(_tiledMapVertices[i][j], _tiledMapVertices[k][l])) continue;
+                    //if below the threshold or already clustered, continue
+                    else if ((_verticesMaximumMatrix[k][l].y + 0.002f) < threshold || _clustered[k][l]) continue;
+                    //add to the list if it is not end of cluster or it is not already in the list
+                    else if(!EndOfCluster(_tiledMapVertices[i][j], _tiledMapVertices[k][l]))
+                    {
+                        ////dodaj obojuvanje tukaaaaaaaaaaaaa!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                        if(!list.Contains(_countersMatrix[k][l])) list.Add(_countersMatrix[k][l]);
+                    }
+                }
+            }
+        }
+    }
+
+    //Stop searching if second tile goes up from first (end of cluster)
+    private bool EndOfCluster(Vector3[] currentTile, Vector3[] neighbourTile)
+    {
+        //left tile
+        if(currentTile[0] == neighbourTile[1] && currentTile[2] == neighbourTile[3])if (neighbourTile[0].y > currentTile[0].y) return true;
+        //right tile
+        else if (currentTile[1] == neighbourTile[0] && currentTile[3] == neighbourTile[2]) if (neighbourTile[3].y > currentTile[3].y) return true;
+        //down tile
+        else if(currentTile[0] == neighbourTile[2] && currentTile[1] == neighbourTile[3]) if (neighbourTile[0].y > currentTile[0].y) return true;
+        //up tile
+        else if (currentTile[2] == neighbourTile[0] && currentTile[3] == neighbourTile[1]) if (neighbourTile[3].y > currentTile[3].y) return true;
+        //up-left tile
+        else if (currentTile[2] == neighbourTile[1]) if (neighbourTile[0].y > currentTile[2].y && neighbourTile[3].y > currentTile[2].y) return true;
+        //up-right tile
+        else if (currentTile[3] == neighbourTile[0]) if (neighbourTile[1].y > currentTile[3].y && neighbourTile[2].y > currentTile[3].y) return true;
+        //down-left tile
+        else if (currentTile[0] == neighbourTile[3]) if (neighbourTile[1].y > currentTile[0].y && neighbourTile[2].y > currentTile[0].y) return true;
+        //down-right tile
+        else if (currentTile[1] == neighbourTile[2]) if (neighbourTile[0].y > currentTile[1].y && neighbourTile[3].y > currentTile[1].y) return true;
+
+        return false;
     }
 
     //Recursive function that detects plateau regions
