@@ -338,16 +338,17 @@ public class DataSpaceHandler : MonoBehaviour
                 Color[] colors = new Color[vertices.Length];
                 for (int t = 0; t < vertices.Length; t++)
                 {
-                    colors[t] = new Color(float.Parse(attributes[4], System.Globalization.CultureInfo.InvariantCulture),
+                    /*colors[t] = new Color(float.Parse(attributes[4], System.Globalization.CultureInfo.InvariantCulture),
                         float.Parse(attributes[5], System.Globalization.CultureInfo.InvariantCulture),
-                        float.Parse(attributes[6], System.Globalization.CultureInfo.InvariantCulture));
-                    //colors[t] = new Color(0.2f, 0.6f, 0.4f);
+                        float.Parse(attributes[6], System.Globalization.CultureInfo.InvariantCulture));*/
+                    colors[t] = new Color(0.2f, 0.6f, 0.4f);
                 }
                 mesh.colors = colors;
                 childCat1.Add(dataPoint);
                 listOfColors.Add(colors[0]);
                 dataPoint.AddComponent<PreviousStepProperties>();
                 dataPoint.AddComponent<DBScanProperties>();
+                dataPoint.GetComponent<TiledCubeVariables>().trackObj = trackObj;
                 count++;
             }
         }
