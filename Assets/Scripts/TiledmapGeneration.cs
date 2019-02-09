@@ -516,7 +516,7 @@ public class TiledmapGeneration : MonoBehaviour {
                     if (mapTilesInfluence[i][j] > 0)
                     {
 
-                        _verticesMatrix[currentTile] = ChangeVertices(_verticesMatrix[currentTile], _tiledMapVertices[i][j + 1][0].y, _tiledMapVertices[i][j - 1][3].y, _tiledMapVertices[i + 1][j + 1][0].y,
+                        _verticesMatrix[currentTile] = ChangeVertices(_verticesMatrix[currentTile], i, j, _tiledMapVertices[i][j + 1][0].y, _tiledMapVertices[i][j - 1][3].y, _tiledMapVertices[i + 1][j + 1][0].y,
                                                                      _tiledMapVertices[i + 1][j][0].y, _tiledMapVertices[i - 1][j - 1][3].y, _tiledMapVertices[i - 1][j][3].y);
                         _tiledMapVertices[i][j] = _verticesMatrix[currentTile];
                         _verticesMaximumMatrix[i][j] = returnMax(_verticesMatrix[currentTile][0], _verticesMatrix[currentTile][1], _verticesMatrix[currentTile][2], _verticesMatrix[currentTile][3]);
@@ -612,15 +612,17 @@ public class TiledmapGeneration : MonoBehaviour {
     }    
     
     //change vertices of tiles to look like single mesh
-    private Vector3[] ChangeVertices(Vector3[] actualVertex, float top, float down, float topRight, float right, float downLeft, float left)
+    private Vector3[] ChangeVertices(Vector3[] actualVertex, int x, int z, float top, float down, float topRight, float right, float downLeft, float left)
     {
         Vector3[] vertex = new Vector3[4];
         if (actualVertex[0].y > 0)
         {
             actualVertex[0].y = downLeft;
-            actualVertex[1].y = down;
+            if (HasNeighbourOnTheRight(x, z)) actualVertex[1].y = down;
+            else actualVertex[1].y = 0;
             actualVertex[2].y = left;
-            actualVertex[3].y = (top + topRight + right) / 3;
+            if (HasNeighbourUp(x, z) && HasNeighbourOnTheRight(x,z) && HasNeighbourUpAndRight(x,z)) actualVertex[3].y = (top + topRight + right) / 3;
+            else actualVertex[3].y = 0;
             vertex = actualVertex;
         }
         return vertex;
@@ -723,6 +725,39 @@ public class TiledmapGeneration : MonoBehaviour {
         if(z>0)
         {
             if(mapTilesInfluence[x][z-1]>0)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    bool HasNeighbourOnTheRight(int x, int z)
+    {
+        if (x < 149)
+        {
+            if (mapTilesInfluence[x + 1][z] > 0)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    bool HasNeighbourUp(int x, int z)
+    {
+        if (z < 149)
+        {
+            if (mapTilesInfluence[x][z + 1] > 0)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    bool HasNeighbourUpAndRight(int x, int z)
+    {
+        if (x < 149 && z < 149)
+        {
+            if (mapTilesInfluence[x + 1][z + 1] > 0)
             {
                 return true;
             }
