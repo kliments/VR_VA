@@ -47,7 +47,8 @@ public class FixXandZPosition : MonoBehaviour {
             denclue.threshold = transform.position.y;
             if (denclue.gaussianCalculation)
             {
-                if(denclue.multiCentered) denclue._multiCenteredGaussian = true;
+                if (denclue.multiCentered) denclue._multiCenteredGaussian = true;
+                else denclue._singleCenteredGaussian = true;
             }
             else
             {
