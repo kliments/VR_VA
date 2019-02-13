@@ -110,27 +110,15 @@ public class TiledmapGeneration : MonoBehaviour {
 
         if(_multiCenteredGaussian)
         {
-            multiCentered = true;
-            _multiCenteredGaussian = false;
-            MultiCenteredGaussianClusters();
-            int nextVertex = 0;
-            for (int i = 0; i < 150; i++)
+            if(multiCentered == false)
             {
-                for (int j = 0; j < 150; j++)
-                {
-                    if (_tiledMapColors[i][j][0].r > 0 || _tiledMapColors[i][j][0].b > 0)
-                    {
-                        for (int k = 0; k < 4; k++)
-                        {
-                            _colors[nextVertex] = _tiledMapColors[i][j][k];
-                            nextVertex++;
-                        }
-                    }
-                }
+                multiCentered = true;
+                MultiCenteredGaussianClusters();
             }
-            _mesh.colors = _colors;
-
+            MultiCenteredGaussianClusters();
+            ColorMultiCenteredGaussian();
             CreateAdditionalMesh();
+            _multiCenteredGaussian = false;
         }
         if(_multiCenteredSquareWave)
         {
@@ -1695,17 +1683,21 @@ public class TiledmapGeneration : MonoBehaviour {
                     {
                         for(int y=j-1; y<=j+1; y++)
                         {
-                            if(x==i || y==j)
+                            //if(x==i || y==j)
+                            //{
+                            if (!_clustered[x][y] && _verticesMaximumMatrix[x][y].y + 0.002f > threshold)
                             {
-                                if (!_clustered[x][y] && _verticesMaximumMatrix[x][y].y + 0.002f > threshold)
-                                {
-                                    if (x == i && y == j) continue;
-                                    else if (Is12Tilted(_tiledMapVertices[x][y])) continue;
-                                    else if (EndOfCluster(_tiledMapVertices[i][j], _tiledMapVertices[x][y])) continue;
-                                    _clustered[x][y] = true;
-                                    mainList.Add(_countersMatrix[x][y]);
-                                }
+                                if (x == i && y == j) continue;
+                                else if (Is12Tilted(_tiledMapVertices[x][y])) continue;
+                                else if (_tiledMapVertices[x][y][0].y > _verticesMaximumMatrix[i][j].y ||
+                                        _tiledMapVertices[x][y][1].y > _verticesMaximumMatrix[i][j].y ||
+                                        _tiledMapVertices[x][y][2].y > _verticesMaximumMatrix[i][j].y ||
+                                        _tiledMapVertices[x][y][3].y > _verticesMaximumMatrix[i][j].y) continue;
+                                else if (EndOfCluster(_tiledMapVertices[i][j], _tiledMapVertices[x][y])) continue;
+                                _clustered[x][y] = true;
+                                mainList.Add(_countersMatrix[x][y]);
                             }
+                            //}
                         }
                     }
                     for(int l=0; l<mainList.Count; l++)
@@ -1905,6 +1897,13 @@ public class TiledmapGeneration : MonoBehaviour {
     private void MultiCenteredGaussianClusters()
     {
         colorCounter = 0;
+        if (clusterColors.Count > 20)
+        {
+            for (int c = clusterColors.Count - 1; c >= 20; c--)
+            {
+                clusterColors.Remove(clusterColors[c]);
+            }
+        }
         ResetMesh();
         for (int a = 0; a < 150; a++)
         {
@@ -1996,6 +1995,25 @@ public class TiledmapGeneration : MonoBehaviour {
         }
     }
 
+    private void ColorMultiCenteredGaussian()
+    {
+        int nextVertex = 0;
+        for (int i = 0; i < 150; i++)
+        {
+            for (int j = 0; j < 150; j++)
+            {
+                if (_tiledMapColors[i][j][0].r > 0 || _tiledMapColors[i][j][0].b > 0)
+                {
+                    for (int k = 0; k < 4; k++)
+                    {
+                        _colors[nextVertex] = _tiledMapColors[i][j][k];
+                        nextVertex++;
+                    }
+                }
+            }
+        }
+        _mesh.colors = _colors;
+    }
     //Resets original mesh back to its original vertices, triangles and color
     private void ResetMesh()
     {
