@@ -302,6 +302,10 @@ public class UniversalButtonScript : MonoBehaviour {
             {
                 denclue.StartDenclue();
             }
+            else if (this.name == "SingleMultiCentered")
+            {
+                GetComponent<ToggleSingleMultiCentered>().Toggle();
+            }
         }
         
 

@@ -87,16 +87,18 @@ public class IncreaseDecrease : MonoBehaviour {
         if(denclue.GetComponent<TiledmapGeneration>().halfLengthOfNeighbourhood < 10)
         {
             denclue.GetComponent<TiledmapGeneration>().halfLengthOfNeighbourhood++;
+            denclue.GetComponent<TiledmapGeneration>().StartDenclue();
         }
         text.text = "ε: " + denclue.GetComponent<TiledmapGeneration>().halfLengthOfNeighbourhood.ToString();
     }
 
     public void DecreaseInfluence()
     {
-        denclue.GetComponent<TiledmapGeneration>().ResetMe();
         if (denclue.GetComponent<TiledmapGeneration>().halfLengthOfNeighbourhood > 4)
         {
+            denclue.GetComponent<TiledmapGeneration>().ResetMe();
             denclue.GetComponent<TiledmapGeneration>().halfLengthOfNeighbourhood--;
+            denclue.GetComponent<TiledmapGeneration>().StartDenclue();
         }
         text.text = "ε: " + denclue.GetComponent<TiledmapGeneration>().halfLengthOfNeighbourhood.ToString();
     }

@@ -38,8 +38,8 @@ public class TiledmapGeneration : MonoBehaviour {
     private bool _skip;
     private int[][] _trianglesMatrix, _countersMatrix;
     private int[] _triangles, _originalTriangles;
-    private int _counter, _tile0, _tile1, _tile2, _tile3, a, b, c, d;
-    private float _x, _y, _z, _dist, _crossP1, _crossP2;
+    private int _counter, _tile0, _tile1, _tile2, _tile3, a, b, c, d, _layerMask;
+    private float _x, _y, _z, _dist, _crossP1, _crossP2, _maxHeight,_minHeight;
     private RaycastHit _hit;
     // Use this for initialization
     void Start () {
@@ -99,6 +99,7 @@ public class TiledmapGeneration : MonoBehaviour {
         _indexIterationBuffer = new List<List<int>>();
         _multiCenteredGaussian = false;
         _multiCenteredSquareWave = false;
+        _layerMask = LayerMask.GetMask("TiledMap");
     }
 	
 	// Update is called once per frame
@@ -248,6 +249,8 @@ public class TiledmapGeneration : MonoBehaviour {
     //counts the total number of "tiles"
     public void CountTiles()
     {
+        _minHeight = 1;
+        _maxHeight = 0;
         for (int x = 0; x < mapTilesInfluence.Length; x++)
         {
             for (int z = 0; z < mapTilesInfluence[x].Length; z++)
@@ -259,6 +262,18 @@ public class TiledmapGeneration : MonoBehaviour {
                 else if(mapTilesInfluence[x][z]>0 && gaussianCalculation)
                 {
                     _counter++;
+                }
+                //find highest and lowest point
+                if (mapTilesInfluence[x][z] > 0)
+                {
+                    if (_maxHeight < mapTilesInfluence[x][z] / 100)
+                    {
+                        _maxHeight = mapTilesInfluence[x][z] / 100;
+                    }
+                    if (_minHeight > mapTilesInfluence[x][z] / 100)
+                    {
+                        _minHeight = mapTilesInfluence[x][z] / 100;
+                    }
                 }
             }
         }
@@ -297,6 +312,7 @@ public class TiledmapGeneration : MonoBehaviour {
             _isPeak[x] = new bool[150];
             _pathFinderChecked[x] = new bool[150];
             _clustered[x] = new bool[150];
+
             for (int z = 0; z < mapTilesInfluence[x].Length; z++)
             {
                 _tiledMapVertices[x][z] = new Vector3[4];
@@ -363,8 +379,8 @@ public class TiledmapGeneration : MonoBehaviour {
                         //set the current tile to blue, since it is a "wall tile" on the ground
                         for (int c = 0; c < 4; c++)
 						{
-							_matrixColors[currentTile][c] = new Color(0, 0, Math.Abs(1-_verticesMatrix[currentTile][c].y));
-                            _tiledMapColors[x][z][c] = new Color(0, 0, Math.Abs(1 - _verticesMatrix[currentTile][c].y));
+							_matrixColors[currentTile][c] = new Color(0, 0, Math.Abs(1-NormalizeColor(_verticesMatrix[currentTile][c].y)));
+                            _tiledMapColors[x][z][c] = new Color(0, 0, Math.Abs(1 - NormalizeColor(_verticesMatrix[currentTile][c].y)));
                         }
                         _verticesMaximumMatrix[x][z] = _tiledMapVertices[x][z][0];
                         currentTile++;
@@ -428,7 +444,7 @@ public class TiledmapGeneration : MonoBehaviour {
 						for (int c = 0; c < 4; c++)
 						{
 							_matrixColors[currentTile][c] = new Color(_verticesMatrix[currentTile][c].y, 0, Math.Abs(1 - _verticesMatrix[currentTile][c].y));
-                            _tiledMapColors[x][z][c] = new Color(_verticesMatrix[currentTile][c].y, 0, Math.Abs(1 - _verticesMatrix[currentTile][c].y));
+                            _tiledMapColors[x][z][c] = new Color(NormalizeColor(_verticesMatrix[currentTile][c].y), 0, Math.Abs(1 - NormalizeColor(_verticesMatrix[currentTile][c].y)));
                         }
                         _verticesMaximumMatrix[x][z] = _tiledMapVertices[x][z][0];
                         currentTile++;
@@ -483,6 +499,8 @@ public class TiledmapGeneration : MonoBehaviour {
                 if(_indexesList.Count != 0) _counterIndexes.Add(_indexesList);
             }
         }
+        Debug.Log("max height " + _maxHeight.ToString());
+        Debug.Log("min height "+ _minHeight.ToString());
         //need to start from begining, to reposition vertices in Gaussian mesh
         currentTile = 0;
         if(gaussianCalculation)
@@ -1408,7 +1426,7 @@ public class TiledmapGeneration : MonoBehaviour {
         //if current tile is higher than left tile that is lower than threshold
         if (_pos0.y > _leftPos1.y && _leftPos1.y <= threshold)
         {
-            if (Physics.Raycast(_pos0, _leftPos1 - _pos0, out _hit, 5f))
+            if (Physics.Raycast(_pos0, _leftPos1 - _pos0, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
@@ -1419,7 +1437,7 @@ public class TiledmapGeneration : MonoBehaviour {
                 _additionalVerticesColor.Add(color);
                 _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
             }
-            if (Physics.Raycast(_pos2, _leftPos3 - _pos2, out _hit, 5f))
+            if (Physics.Raycast(_pos2, _leftPos3 - _pos2, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
@@ -1463,7 +1481,7 @@ public class TiledmapGeneration : MonoBehaviour {
         //if current tile is higher than down tile
         if (_pos0.y > _downPos2.y && _downPos2.y <= threshold)
         {
-            if (Physics.Raycast(_pos0, _downPos2 - _pos0, out _hit, 5f))
+            if (Physics.Raycast(_pos0, _downPos2 - _pos0, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
@@ -1474,7 +1492,7 @@ public class TiledmapGeneration : MonoBehaviour {
                 _additionalVerticesColor.Add(color);
                 _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
             }
-            if (Physics.Raycast(_pos1, _downPos3 - _pos1, out _hit, 5f))
+            if (Physics.Raycast(_pos1, _downPos3 - _pos1, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
@@ -1517,7 +1535,7 @@ public class TiledmapGeneration : MonoBehaviour {
         //if current tile is higher than right tile
         if (_pos1.y > _rightPos0.y && _rightPos0.y <= threshold)
         {
-            if (Physics.Raycast(_pos1, _rightPos0 - _pos1, out _hit, 5f))
+            if (Physics.Raycast(_pos1, _rightPos0 - _pos1, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
@@ -1528,7 +1546,7 @@ public class TiledmapGeneration : MonoBehaviour {
                 _additionalVerticesColor.Add(color);
                 _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
             }
-            if (Physics.Raycast(_pos3, _rightPos2 - _pos3, out _hit, 5f))
+            if (Physics.Raycast(_pos3, _rightPos2 - _pos3, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
@@ -1572,7 +1590,7 @@ public class TiledmapGeneration : MonoBehaviour {
         //if current tile is higher than up tile
         if (_pos2.y > _upPos0.y && _upPos0.y <= threshold)
         {
-            if (Physics.Raycast(_pos2, _upPos0 - _pos2, out _hit, 5f))
+            if (Physics.Raycast(_pos2, _upPos0 - _pos2, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
@@ -1583,7 +1601,7 @@ public class TiledmapGeneration : MonoBehaviour {
                 _additionalVerticesColor.Add(color);
                 _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
             }
-            if (Physics.Raycast(_pos3, _upPos1 - _pos3, out _hit, 5f))
+            if (Physics.Raycast(_pos3, _upPos1 - _pos3, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
@@ -2127,7 +2145,7 @@ public class TiledmapGeneration : MonoBehaviour {
         //if 1,2,3 vertices are above the threshold, find points where it cuts the thresholdPlane
         else if (ThreeVerticesAbove(_tiledMapVertices[k][l][1], _tiledMapVertices[k][l][2], _tiledMapVertices[k][l][3], threshold))
         {
-            if (Physics.Raycast(_pos1, _pos0 - _pos1, out _hit, 5f))
+            if (Physics.Raycast(_pos1, _pos0 - _pos1, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
@@ -2138,7 +2156,7 @@ public class TiledmapGeneration : MonoBehaviour {
                 _additionalVerticesColor.Add(_clusterColor);
                 _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
             }
-            if (Physics.Raycast(_pos2, _pos0 - _pos2, out _hit, 5f))
+            if (Physics.Raycast(_pos2, _pos0 - _pos2, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
@@ -2200,7 +2218,7 @@ public class TiledmapGeneration : MonoBehaviour {
         {
             if(multiCentered || !Is12Tilted(_tiledMapVertices[k][l]))
             {
-                if (Physics.Raycast(_pos0, _pos1 - _pos0, out _hit, 5f))
+                if (Physics.Raycast(_pos0, _pos1 - _pos0, out _hit, 5f, _layerMask))
                 {
                     vertex = _hit.point;
                     vertex.x += 0.581f;
@@ -2211,7 +2229,7 @@ public class TiledmapGeneration : MonoBehaviour {
                     _additionalVerticesColor.Add(_clusterColor);
                     _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
                 }
-                if (Physics.Raycast(_pos3, _pos1 - _pos3, out _hit, 5f))
+                if (Physics.Raycast(_pos3, _pos1 - _pos3, out _hit, 5f, _layerMask))
                 {
                     vertex = _hit.point;
                     vertex.x += 0.581f;
@@ -2268,7 +2286,7 @@ public class TiledmapGeneration : MonoBehaviour {
             }
             else
             {
-                if (Physics.Raycast(_pos0, _pos1 - _pos0, out _hit, 5f))
+                if (Physics.Raycast(_pos0, _pos1 - _pos0, out _hit, 5f, _layerMask))
                 {
                     vertex = _hit.point;
                     vertex.x += 0.581f;
@@ -2279,7 +2297,7 @@ public class TiledmapGeneration : MonoBehaviour {
                     _additionalVerticesColor.Add(_clusterColor);
                     _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
                 }
-                if (Physics.Raycast(_pos2, _pos1 - _pos2, out _hit, 5f))
+                if (Physics.Raycast(_pos2, _pos1 - _pos2, out _hit, 5f, _layerMask))
                 {
                     vertex = _hit.point;
                     vertex.x += 0.581f;
@@ -2294,7 +2312,7 @@ public class TiledmapGeneration : MonoBehaviour {
                     _additionalVerticesColor.Add(_color);
                     _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
                 }
-                if (Physics.Raycast(_pos3, _pos1 - _pos3, out _hit, 5f))
+                if (Physics.Raycast(_pos3, _pos1 - _pos3, out _hit, 5f, _layerMask))
                 {
                     vertex = _hit.point;
                     vertex.x += 0.581f;
@@ -2359,7 +2377,7 @@ public class TiledmapGeneration : MonoBehaviour {
         {
             if(multiCentered || !Is12Tilted(_tiledMapVertices[k][l]))
             {
-                if (Physics.Raycast(_pos0, _pos2 - _pos0, out _hit, 5f))
+                if (Physics.Raycast(_pos0, _pos2 - _pos0, out _hit, 5f, _layerMask))
                 {
                     vertex = _hit.point;
                     vertex.x += 0.581f;
@@ -2370,7 +2388,7 @@ public class TiledmapGeneration : MonoBehaviour {
                     _additionalVerticesColor.Add(_clusterColor);
                     _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
                 }
-                if (Physics.Raycast(_pos3, _pos2 - _pos3, out _hit, 5f))
+                if (Physics.Raycast(_pos3, _pos2 - _pos3, out _hit, 5f, _layerMask))
                 {
                     vertex = _hit.point;
                     vertex.x += 0.581f;
@@ -2420,7 +2438,7 @@ public class TiledmapGeneration : MonoBehaviour {
             }
             else
             {
-                if (Physics.Raycast(_pos0, _pos2 - _pos0, out _hit, 5f))
+                if (Physics.Raycast(_pos0, _pos2 - _pos0, out _hit, 5f, _layerMask))
                 {
                     vertex = _hit.point;
                     vertex.x += 0.581f;
@@ -2431,7 +2449,7 @@ public class TiledmapGeneration : MonoBehaviour {
                     _additionalVerticesColor.Add(_clusterColor);
                     _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
                 }
-                if (Physics.Raycast(_pos1, _pos2 - _pos1, out _hit, 5f))
+                if (Physics.Raycast(_pos1, _pos2 - _pos1, out _hit, 5f, _layerMask))
                 {
                     vertex = _hit.point;
                     vertex.x += 0.581f;
@@ -2446,7 +2464,7 @@ public class TiledmapGeneration : MonoBehaviour {
                     _additionalVerticesColor.Add(_color);
                     _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
                 }
-                if (Physics.Raycast(_pos3, _pos2 - _pos3, out _hit, 5f))
+                if (Physics.Raycast(_pos3, _pos2 - _pos3, out _hit, 5f, _layerMask))
                 {
                     vertex = _hit.point;
                     vertex.x += 0.581f;
@@ -2509,7 +2527,7 @@ public class TiledmapGeneration : MonoBehaviour {
         //if 0,1,2 vertices are above the threshold..
         else if (ThreeVerticesAbove(_tiledMapVertices[k][l][0], _tiledMapVertices[k][l][1], _tiledMapVertices[k][l][2], threshold))
         {
-            if (Physics.Raycast(_pos2, _pos3 - _pos2, out _hit, 5f))
+            if (Physics.Raycast(_pos2, _pos3 - _pos2, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
@@ -2520,7 +2538,7 @@ public class TiledmapGeneration : MonoBehaviour {
                 _additionalVerticesColor.Add(_clusterColor);
                 _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
             }
-            if (Physics.Raycast(_pos1, _pos3 - _pos1, out _hit, 5f))
+            if (Physics.Raycast(_pos1, _pos3 - _pos1, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
@@ -2583,7 +2601,7 @@ public class TiledmapGeneration : MonoBehaviour {
         #region 2VerticesAbove
         else if (TwoVerticesAbove(_tiledMapVertices[k][l][2], _tiledMapVertices[k][l][3], threshold))
         {
-            if (Physics.Raycast(_pos2, _pos0 - _pos2, out _hit, 5f))
+            if (Physics.Raycast(_pos2, _pos0 - _pos2, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
@@ -2594,7 +2612,7 @@ public class TiledmapGeneration : MonoBehaviour {
                 _additionalVerticesColor.Add(_clusterColor);
                 _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
             }
-            if (Physics.Raycast(_pos3, _pos1 - _pos3, out _hit, 5f))
+            if (Physics.Raycast(_pos3, _pos1 - _pos3, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
@@ -2654,7 +2672,7 @@ public class TiledmapGeneration : MonoBehaviour {
 
         else if (TwoVerticesAbove(_tiledMapVertices[k][l][0], _tiledMapVertices[k][l][1], threshold))
         {
-            if (Physics.Raycast(_pos0, _pos2 - _pos0, out _hit, 5f))
+            if (Physics.Raycast(_pos0, _pos2 - _pos0, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
@@ -2665,7 +2683,7 @@ public class TiledmapGeneration : MonoBehaviour {
                 _additionalVerticesColor.Add(_clusterColor);
                 _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
             }
-            if (Physics.Raycast(_pos1, _pos3 - _pos1, out _hit, 5f))
+            if (Physics.Raycast(_pos1, _pos3 - _pos1, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
@@ -2725,7 +2743,7 @@ public class TiledmapGeneration : MonoBehaviour {
 
         else if (TwoVerticesAbove(_tiledMapVertices[k][l][0], _tiledMapVertices[k][l][2], threshold))
         {
-            if (Physics.Raycast(_pos0, _pos1 - _pos0, out _hit, 5f))
+            if (Physics.Raycast(_pos0, _pos1 - _pos0, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
@@ -2736,7 +2754,7 @@ public class TiledmapGeneration : MonoBehaviour {
                 _additionalVerticesColor.Add(_clusterColor);
                 _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
             }
-            if (Physics.Raycast(_pos2, _pos3 - _pos2, out _hit, 5f))
+            if (Physics.Raycast(_pos2, _pos3 - _pos2, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
@@ -2795,7 +2813,7 @@ public class TiledmapGeneration : MonoBehaviour {
 
         else if (TwoVerticesAbove(_tiledMapVertices[k][l][1], _tiledMapVertices[k][l][3], threshold))
         {
-            if (Physics.Raycast(_pos1, _pos0 - _pos1, out _hit, 5f))
+            if (Physics.Raycast(_pos1, _pos0 - _pos1, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
@@ -2806,7 +2824,7 @@ public class TiledmapGeneration : MonoBehaviour {
                 _additionalVerticesColor.Add(_clusterColor);
                 _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
             }
-            if (Physics.Raycast(_pos3, _pos2 - _pos3, out _hit, 5f))
+            if (Physics.Raycast(_pos3, _pos2 - _pos3, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
@@ -2866,7 +2884,7 @@ public class TiledmapGeneration : MonoBehaviour {
         
         else if (TwoVerticesAbove(_tiledMapVertices[k][l][1], _tiledMapVertices[k][l][2], threshold))
         {
-            if (Physics.Raycast(_pos1, _pos0 - _pos1, out _hit, 5f))
+            if (Physics.Raycast(_pos1, _pos0 - _pos1, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
@@ -2877,7 +2895,7 @@ public class TiledmapGeneration : MonoBehaviour {
                 _additionalVerticesColor.Add(_clusterColor);
                 _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
             }
-            if (Physics.Raycast(_pos2, _pos0 - _pos2, out _hit, 5f))
+            if (Physics.Raycast(_pos2, _pos0 - _pos2, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
@@ -2888,7 +2906,7 @@ public class TiledmapGeneration : MonoBehaviour {
                 _additionalVerticesColor.Add(_clusterColor);
                 _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
             }
-            if (Physics.Raycast(_pos1, _pos3 - _pos1, out _hit, 5f))
+            if (Physics.Raycast(_pos1, _pos3 - _pos1, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
@@ -2899,7 +2917,7 @@ public class TiledmapGeneration : MonoBehaviour {
                 _additionalVerticesColor.Add(_clusterColor);
                 _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
             }
-            if (Physics.Raycast(_pos2, _pos3 - _pos2, out _hit, 5f))
+            if (Physics.Raycast(_pos2, _pos3 - _pos2, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
@@ -2957,7 +2975,7 @@ public class TiledmapGeneration : MonoBehaviour {
         //tilted tile
         else if (TwoVerticesAbove(_tiledMapVertices[k][l][0], _tiledMapVertices[k][l][3], threshold))
         {
-            if (Physics.Raycast(_pos0, _pos1 - _pos0, out _hit, 5f))
+            if (Physics.Raycast(_pos0, _pos1 - _pos0, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
@@ -2968,7 +2986,7 @@ public class TiledmapGeneration : MonoBehaviour {
                 _additionalVerticesColor.Add(_clusterColor);
                 _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
             }
-            if (Physics.Raycast(_pos3, _pos1 - _pos3, out _hit, 5f))
+            if (Physics.Raycast(_pos3, _pos1 - _pos3, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
@@ -2979,7 +2997,7 @@ public class TiledmapGeneration : MonoBehaviour {
                 _additionalVerticesColor.Add(_color);
                 _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
             }
-            if (Physics.Raycast(_pos0, _pos2 - _pos0, out _hit, 5f))
+            if (Physics.Raycast(_pos0, _pos2 - _pos0, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
@@ -2990,7 +3008,7 @@ public class TiledmapGeneration : MonoBehaviour {
                 _additionalVerticesColor.Add(_clusterColor);
                 _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
             }
-            if (Physics.Raycast(_pos3, _pos2 - _pos3, out _hit, 5f))
+            if (Physics.Raycast(_pos3, _pos2 - _pos3, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
@@ -3064,7 +3082,7 @@ public class TiledmapGeneration : MonoBehaviour {
 
         else if ((_tiledMapVertices[k][l][0].y + 0.002f) > threshold)
         {
-            if (Physics.Raycast(_pos0, _pos1 - _pos0, out _hit, 5f))
+            if (Physics.Raycast(_pos0, _pos1 - _pos0, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
@@ -3075,7 +3093,7 @@ public class TiledmapGeneration : MonoBehaviour {
                 _additionalVerticesColor.Add(_clusterColor);
                 _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
             }
-            if (Physics.Raycast(_pos0, _pos2 - _pos0, out _hit, 5f))
+            if (Physics.Raycast(_pos0, _pos2 - _pos0, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
@@ -3133,7 +3151,7 @@ public class TiledmapGeneration : MonoBehaviour {
         }
         else if (_tiledMapVertices[k][l][2].y + 0.002f > threshold)
         {
-            if (Physics.Raycast(_pos2, _pos0 - _pos2, out _hit, 5f))
+            if (Physics.Raycast(_pos2, _pos0 - _pos2, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
@@ -3144,7 +3162,7 @@ public class TiledmapGeneration : MonoBehaviour {
                 _additionalVerticesColor.Add(_clusterColor);
                 _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
             }
-            if (Physics.Raycast(_pos2, _pos3 - _pos2, out _hit, 5f))
+            if (Physics.Raycast(_pos2, _pos3 - _pos2, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
@@ -3202,7 +3220,7 @@ public class TiledmapGeneration : MonoBehaviour {
         }
         else if ((_tiledMapVertices[k][l][1].y + 0.002f) > threshold)
         {
-            if (Physics.Raycast(_pos1, _pos0 - _pos1, out _hit, 5f))
+            if (Physics.Raycast(_pos1, _pos0 - _pos1, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
@@ -3213,7 +3231,7 @@ public class TiledmapGeneration : MonoBehaviour {
                 _additionalVerticesColor.Add(_clusterColor);
                 _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
             }
-            if (Physics.Raycast(_pos1, _pos3 - _pos1, out _hit, 5f))
+            if (Physics.Raycast(_pos1, _pos3 - _pos1, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
@@ -3272,7 +3290,7 @@ public class TiledmapGeneration : MonoBehaviour {
         else if (_tiledMapVertices[k][l][3].y + 0.002f > threshold)
         {
             if (Is12Tilted(_tiledMapVertices[k][l]) && !multiCentered) _clusterColor = _color;
-            if (Physics.Raycast(_pos3, _pos2 - _pos3, out _hit, 5f))
+            if (Physics.Raycast(_pos3, _pos2 - _pos3, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
@@ -3283,7 +3301,7 @@ public class TiledmapGeneration : MonoBehaviour {
                 _additionalVerticesColor.Add(_clusterColor);
                 _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
             }
-            if (Physics.Raycast(_pos3, _pos1 - _pos3, out _hit, 5f))
+            if (Physics.Raycast(_pos3, _pos1 - _pos3, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
@@ -3438,7 +3456,7 @@ public class TiledmapGeneration : MonoBehaviour {
                 //if current tile is higher than down tile
                 if (_pos0.y > _downPos2.y && _downPos2.y <= threshold)
                 {
-                    if(Physics.Raycast(_pos0, _downPos2 - _pos0, out _hit, 5f))
+                    if(Physics.Raycast(_pos0, _downPos2 - _pos0, out _hit, 5f, _layerMask))
                     {
                         vertex = _hit.point;
                         vertex.x += 0.581f;
@@ -3449,7 +3467,7 @@ public class TiledmapGeneration : MonoBehaviour {
                         _additionalVerticesColor.Add(_clusterColor);
                         _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
                     }
-                    if (Physics.Raycast(_pos1, _downPos3 - _pos1, out _hit, 5f))
+                    if (Physics.Raycast(_pos1, _downPos3 - _pos1, out _hit, 5f, _layerMask))
                     {
                         vertex = _hit.point;
                         vertex.x += 0.581f;
@@ -3491,7 +3509,7 @@ public class TiledmapGeneration : MonoBehaviour {
                 //if current tile is higher than left tile that is lower than threshold
                 if (_pos0.y > _leftPos1.y && _leftPos1.y <= threshold)
                 {
-                    if(Physics.Raycast(_pos0, _leftPos1 - _pos0, out _hit, 5f))
+                    if(Physics.Raycast(_pos0, _leftPos1 - _pos0, out _hit, 5f, _layerMask))
                     {
                         vertex = _hit.point;
                         vertex.x += 0.581f;
@@ -3502,7 +3520,7 @@ public class TiledmapGeneration : MonoBehaviour {
                         _additionalVerticesColor.Add(_clusterColor);
                         _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
                     }
-                    if (Physics.Raycast(_pos2, _leftPos3 - _pos2, out _hit, 5f))
+                    if (Physics.Raycast(_pos2, _leftPos3 - _pos2, out _hit, 5f, _layerMask))
                     {
                         vertex = _hit.point;
                         vertex.x += 0.581f;
@@ -3545,7 +3563,7 @@ public class TiledmapGeneration : MonoBehaviour {
                 //if current tile is higher than right tile
                 if (_pos1.y > _rightPos0.y && _rightPos0.y <= threshold)
                 {
-                    if (Physics.Raycast(_pos1, _rightPos0 - _pos1, out _hit, 5f))
+                    if (Physics.Raycast(_pos1, _rightPos0 - _pos1, out _hit, 5f, _layerMask))
                     {
                         vertex = _hit.point;
                         vertex.x += 0.581f;
@@ -3556,7 +3574,7 @@ public class TiledmapGeneration : MonoBehaviour {
                         _additionalVerticesColor.Add(_clusterColor);
                         _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
                     }
-                    if (Physics.Raycast(_pos3, _rightPos2 - _pos3, out _hit, 5f))
+                    if (Physics.Raycast(_pos3, _rightPos2 - _pos3, out _hit, 5f, _layerMask))
                     {
                         vertex = _hit.point;
                         vertex.x += 0.581f;
@@ -3599,7 +3617,7 @@ public class TiledmapGeneration : MonoBehaviour {
                 //if current tile is higher than up tile
                 if(_pos2.y > _upPos0.y && _upPos0.y <= threshold)
                 {
-                    if (Physics.Raycast(_pos2, _upPos0 - _pos2, out _hit, 5f))
+                    if (Physics.Raycast(_pos2, _upPos0 - _pos2, out _hit, 5f, _layerMask))
                     {
                         vertex = _hit.point;
                         vertex.x += 0.581f;
@@ -3610,7 +3628,7 @@ public class TiledmapGeneration : MonoBehaviour {
                         _additionalVerticesColor.Add(_clusterColor);
                         _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
                     }
-                    if (Physics.Raycast(_pos3, _upPos1 - _pos3, out _hit, 5f))
+                    if (Physics.Raycast(_pos3, _upPos1 - _pos3, out _hit, 5f, _layerMask))
                     {
                         vertex = _hit.point;
                         vertex.x += 0.581f;
@@ -3738,5 +3756,10 @@ public class TiledmapGeneration : MonoBehaviour {
                  center[3].y == current[1].y && (center[3].y + 0.002f) > threshold ||
                  center[3].y == current[2].y && (center[3].y + 0.002f) > threshold) return false;
         return true;
+    }
+
+    private float NormalizeColor(float y)
+    {
+        return ((y - _minHeight) / (_maxHeight - _minHeight));
     }
 }
