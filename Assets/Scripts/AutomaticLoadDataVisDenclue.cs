@@ -28,7 +28,7 @@ public class AutomaticLoadDataVisDenclue : MonoBehaviour {
     }
     void LoadDenclue()
     {
-        denclue.GetComponent<UniversalButtonScript>().denclue.StartDenclue();
+        denclue.GetComponent<UniversalButtonScript>().denclue.StartAlgorithm();
     }
 
     private void OnEnable()

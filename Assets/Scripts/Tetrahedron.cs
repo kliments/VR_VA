@@ -13,7 +13,7 @@ public class Tetrahedron : MonoBehaviour
     List<TetrahedronMesh> listObjects;
     public Vector3 Positions;
     public List<Vector3> dataPositions;
-    public TiledmapGeneration tiledMap;
+    public DenclueAlgorithm tiledMap;
     public GameObject dummy;
     private Vector3 dummyPos;
 

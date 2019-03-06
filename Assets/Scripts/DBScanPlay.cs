@@ -55,7 +55,7 @@ public class DBScanPlay : MonoBehaviour {
 
         while (!allClustersFound)
         {
-            dbScanButton.GetComponent<DBScanAlgorithm>().StartDBSCAN();
+            dbScanButton.GetComponent<DBScanAlgorithm>().StartAlgorithm();
             yield return new WaitForSeconds(1f);
         }
 

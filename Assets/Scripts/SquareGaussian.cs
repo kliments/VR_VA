@@ -19,16 +19,16 @@ public class SquareGaussian : MonoBehaviour {
 
     public void ToggleSquareGaussian()
     {
-        if (denclue.GetComponent<TiledmapGeneration>().gaussianCalculation == true)
+        if (denclue.GetComponent<DenclueAlgorithm>().gaussianCalculation == true)
         {
-            denclue.GetComponent<TiledmapGeneration>().gaussianCalculation = false;
+            denclue.GetComponent<DenclueAlgorithm>().gaussianCalculation = false;
             sprite.sprite = square;
         }
         else
         {
-            denclue.GetComponent<TiledmapGeneration>().gaussianCalculation = true;
+            denclue.GetComponent<DenclueAlgorithm>().gaussianCalculation = true;
             sprite.sprite = gaussian;
         }
-        denclue.GetComponent<TiledmapGeneration>().ResetMe();
+        denclue.GetComponent<DenclueAlgorithm>().ResetMe();
     }
 }
