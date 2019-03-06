@@ -11,7 +11,7 @@ public class ToggleSingleMultiCentered : MonoBehaviour {
     void Start()
     {
         tiledmap = (TiledmapGeneration)FindObjectOfType(typeof(TiledmapGeneration));
-        multiCentered = false;
+        multiCentered = true;
     }
 
     // Update is called once per frame
