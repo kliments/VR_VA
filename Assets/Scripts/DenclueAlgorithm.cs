@@ -159,6 +159,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
             current.algorithm = this;
         }
         ResetMe();
+        thresholdPlane.SetActive(true);
         IncreaseInfluence();
         _obj.transform.localScale = _finishSize;
     }
@@ -611,7 +612,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
         if(_obj.GetComponent<MeshRenderer>() == null) _obj.AddComponent<MeshRenderer>();
         _obj.GetComponent<MeshFilter>().mesh = _mesh;
         _obj.GetComponent<MeshRenderer>().material = mat;
-        _obj.transform.localPosition = new Vector3(-0.581f, 0.002f, -0.63f);
+        _obj.transform.localPosition = new Vector3(-0.581f, 0.752f, -0.63f);
     }    
     
     //change vertices of tiles to look like single mesh
@@ -675,6 +676,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
         {
             clusterColors.RemoveAt(i);
         }
+        thresholdPlane.SetActive(false);
     }
 
     //checks whether a tile has any neighbours around that are part of the mesh
@@ -883,7 +885,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
         {
             for(int j=0; j< 150; j++)
             {
-                if(_isPeak[i][j] && !_clustered[i][j] && (_verticesMaximumMatrix[i][j].y + 0.002f) > threshold )
+                if(_isPeak[i][j] && !_clustered[i][j] && (_verticesMaximumMatrix[i][j].y + 0.752f) > threshold )
                 {
                     //list for peaks' position
                     peakPos = (_tiledMapVertices[i][j][0] + _tiledMapVertices[i][j][1] + _tiledMapVertices[i][j][2] + _tiledMapVertices[i][j][3]) / 4;
@@ -910,7 +912,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
                     {
                         for(int y=j-1; y<= j+1; y++)
                         {
-                            if (!_clustered[x][y] && _verticesMaximumMatrix[x][y].y + 0.002f > threshold)
+                            if (!_clustered[x][y] && _verticesMaximumMatrix[x][y].y + 0.752f > threshold)
                             {
                                 if (x == i && y == j) continue;
                                 mainList.Add(_countersMatrix[x][y]);
@@ -933,7 +935,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
         {
             for(int j=0; j<150; j++)
             {
-                if ((_verticesMaximumMatrix[i][j].y + 0.002f) > threshold && !_pathFinderChecked[i][j])
+                if ((_verticesMaximumMatrix[i][j].y + 0.752f) > threshold && !_pathFinderChecked[i][j])
                 {
                     List<int> list = new List<int>();
                     _pathFinderChecked[i][j] = true;
@@ -988,7 +990,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
                     peakReached = true;
                     return true;
                 }
-                else if (_verticesMaximumMatrix[k][l].y + 0.002f < threshold) continue;
+                else if (_verticesMaximumMatrix[k][l].y + 0.752f <= threshold) continue;
                 else if (k == i && l == j) continue;
                 else if (list.Contains(countKL)) continue;
                 else if (_additionalVerticesColor[countKL * 4] != _additionalVerticesColor[countIJ * 4]) continue;
@@ -1049,7 +1051,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
                 _tile1 = _countersMatrix[k][l] * 4 + 1;
                 _tile2 = _countersMatrix[k][l] * 4 + 2;
                 _tile3 = _countersMatrix[k][l] * 4 + 3;
-                if ((_tiledMapVertices[k][l][0].y + 0.002f) < threshold) continue;
+                if ((_tiledMapVertices[k][l][0].y + 0.752f) <= threshold) continue;
                 else if(_verticesMaximumMatrix[i][j].y >= _verticesMaximumMatrix[k][l].y)
                 {
                     if (!list.Contains(_countersMatrix[k][l]))
@@ -1157,11 +1159,11 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
         {
             if(_pos0.y > _leftPos1.y)
             {
-                Vector3 tempVector = new Vector3(_leftPos1.x + 0.581f, _leftPos1.y - 0.002f, _leftPos1.z + 0.63f);
+                Vector3 tempVector = new Vector3(_leftPos1.x + 0.581f, _leftPos1.y - 0.752f, _leftPos1.z + 0.63f);
                 _additionalVertices.Add(tempVector);
                 //save vertex position
                 _extraVertices[k][l].Add(tempVector);
-                tempVector = new Vector3(_leftPos3.x + 0.581f, _leftPos3.y - 0.002f, _leftPos3.z + 0.63f);
+                tempVector = new Vector3(_leftPos3.x + 0.581f, _leftPos3.y - 0.752f, _leftPos3.z + 0.63f);
                 _additionalVertices.Add(tempVector);
                 //save vertex position
                 _extraVertices[k][l].Add(tempVector);
@@ -1190,11 +1192,11 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
             }
             else
             {
-                Vector3 tempVector = new Vector3(_pos0.x + 0.581f, _pos0.y - 0.002f, _pos0.z + 0.63f);
+                Vector3 tempVector = new Vector3(_pos0.x + 0.581f, _pos0.y - 0.752f, _pos0.z + 0.63f);
                 _additionalVertices.Add(tempVector);
                 //save vertex position
                 _extraVertices[k][l].Add(tempVector);
-                tempVector = new Vector3(_pos2.x + 0.581f, _pos2.y - 0.002f, _pos2.z + 0.63f);
+                tempVector = new Vector3(_pos2.x + 0.581f, _pos2.y - 0.752f, _pos2.z + 0.63f);
                 _additionalVertices.Add(tempVector);
                 //save vertex position
                 _extraVertices[k][l].Add(tempVector);
@@ -1227,11 +1229,11 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
         {
             if(_pos0.y > _downPos2.y)
             {
-                Vector3 tempVector = new Vector3(_downPos2.x + 0.581f, _downPos2.y - 0.002f, _downPos2.z + 0.63f);
+                Vector3 tempVector = new Vector3(_downPos2.x + 0.581f, _downPos2.y - 0.752f, _downPos2.z + 0.63f);
                 _additionalVertices.Add(tempVector);
                 //save vertex position
                 _extraVertices[k][l].Add(tempVector);
-                tempVector = new Vector3(_downPos3.x + 0.581f, _downPos3.y - 0.002f, _downPos3.z + 0.63f);
+                tempVector = new Vector3(_downPos3.x + 0.581f, _downPos3.y - 0.752f, _downPos3.z + 0.63f);
                 _additionalVertices.Add(tempVector);
                 //save vertex position
                 _extraVertices[k][l].Add(tempVector);
@@ -1259,11 +1261,11 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
             }
             else
             {
-                Vector3 tempVector = new Vector3(_pos0.x + 0.581f, _pos0.y - 0.002f, _pos0.z + 0.63f);
+                Vector3 tempVector = new Vector3(_pos0.x + 0.581f, _pos0.y - 0.752f, _pos0.z + 0.63f);
                 _additionalVertices.Add(tempVector);
                 //save vertex position
                 _extraVertices[k][l].Add(tempVector);
-                tempVector = new Vector3(_pos1.x + 0.581f, _pos1.y - 0.002f, _pos1.z + 0.63f);
+                tempVector = new Vector3(_pos1.x + 0.581f, _pos1.y - 0.752f, _pos1.z + 0.63f);
                 _additionalVertices.Add(tempVector);
                 //save vertex position
                 _extraVertices[k][l].Add(tempVector);
@@ -1296,11 +1298,11 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
         {
             if(_pos1.y > _rightPos0.y)
             {
-                Vector3 tempVector = new Vector3(_rightPos0.x + 0.581f, _rightPos0.y - 0.002f, _rightPos0.z + 0.63f);
+                Vector3 tempVector = new Vector3(_rightPos0.x + 0.581f, _rightPos0.y - 0.752f, _rightPos0.z + 0.63f);
                 _additionalVertices.Add(tempVector);
                 //save vertex position
                 _extraVertices[k][l].Add(tempVector);
-                tempVector = new Vector3(_rightPos2.x + 0.581f, _rightPos2.y - 0.002f, _rightPos2.z + 0.63f);
+                tempVector = new Vector3(_rightPos2.x + 0.581f, _rightPos2.y - 0.752f, _rightPos2.z + 0.63f);
                 _additionalVertices.Add(tempVector);
                 //save vertex position
                 _extraVertices[k][l].Add(tempVector);
@@ -1328,11 +1330,11 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
             }
             else
             {
-                Vector3 tempVector = new Vector3(_pos1.x + 0.581f, _pos1.y - 0.002f, _pos1.z + 0.63f);
+                Vector3 tempVector = new Vector3(_pos1.x + 0.581f, _pos1.y - 0.752f, _pos1.z + 0.63f);
                 _additionalVertices.Add(tempVector);
                 //save vertex position
                 _extraVertices[k][l].Add(tempVector);
-                tempVector = new Vector3(_pos3.x + 0.581f, _pos3.y - 0.002f, _pos3.z + 0.63f);
+                tempVector = new Vector3(_pos3.x + 0.581f, _pos3.y - 0.752f, _pos3.z + 0.63f);
                 _additionalVertices.Add(tempVector);
                 //save vertex position
                 _extraVertices[k][l].Add(tempVector);
@@ -1363,11 +1365,11 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
         {
             if (_pos2.y > _upPos0.y)
             {
-                Vector3 tempVector = new Vector3(_upPos0.x + 0.581f, _upPos0.y - 0.002f, _upPos0.z + 0.63f);
+                Vector3 tempVector = new Vector3(_upPos0.x + 0.581f, _upPos0.y - 0.752f, _upPos0.z + 0.63f);
                 _additionalVertices.Add(tempVector);
                 //save vertex position
                 _extraVertices[k][l].Add(tempVector);
-                tempVector = new Vector3(_upPos1.x + 0.581f, _upPos1.y - 0.002f, _upPos1.z + 0.63f);
+                tempVector = new Vector3(_upPos1.x + 0.581f, _upPos1.y - 0.752f, _upPos1.z + 0.63f);
                 _additionalVertices.Add(tempVector);
                 //save vertex position
                 _extraVertices[k][l].Add(tempVector);
@@ -1395,11 +1397,11 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
             }
             else
             {
-                Vector3 tempVector = new Vector3(_pos2.x + 0.581f, _pos2.y - 0.002f, _pos2.z + 0.63f);
+                Vector3 tempVector = new Vector3(_pos2.x + 0.581f, _pos2.y - 0.752f, _pos2.z + 0.63f);
                 _additionalVertices.Add(tempVector);
                 //save vertex position
                 _extraVertices[k][l].Add(tempVector);
-                tempVector = new Vector3(_pos3.x + 0.581f, _pos3.y - 0.002f, _pos3.z + 0.63f);
+                tempVector = new Vector3(_pos3.x + 0.581f, _pos3.y - 0.752f, _pos3.z + 0.63f);
                 _additionalVertices.Add(tempVector);
                 //save vertex position
                 _extraVertices[k][l].Add(tempVector);
@@ -1437,7 +1439,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
-                vertex.y -= 0.002f;
+                vertex.y -= 0.752f;
                 vertex.z += 0.63f;
                 _additionalVertices.Add(vertex); // -4
                 _additionalVertices.Add(vertex); // -3
@@ -1448,7 +1450,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
-                vertex.y -= 0.002f;
+                vertex.y -= 0.752f;
                 vertex.z += 0.63f;
                 _additionalVertices.Add(vertex); // -2
                 _additionalVertices.Add(vertex); // -1
@@ -1492,7 +1494,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
-                vertex.y -= 0.002f;
+                vertex.y -= 0.752f;
                 vertex.z += 0.63f;
                 _additionalVertices.Add(vertex); // -4
                 _additionalVertices.Add(vertex); // -3
@@ -1503,7 +1505,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
-                vertex.y -= 0.002f;
+                vertex.y -= 0.752f;
                 vertex.z += 0.63f;
                 _additionalVertices.Add(vertex); // -2
                 _additionalVertices.Add(vertex); // -1
@@ -1546,7 +1548,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
-                vertex.y -= 0.002f;
+                vertex.y -= 0.752f;
                 vertex.z += 0.63f;
                 _additionalVertices.Add(vertex); // -4
                 _additionalVertices.Add(vertex); // -3
@@ -1557,7 +1559,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
-                vertex.y -= 0.002f;
+                vertex.y -= 0.752f;
                 vertex.z += 0.63f;
                 _additionalVertices.Add(vertex); // -2
                 _additionalVertices.Add(vertex); // -1
@@ -1601,7 +1603,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
-                vertex.y -= 0.002f;
+                vertex.y -= 0.752f;
                 vertex.z += 0.63f;
                 _additionalVertices.Add(vertex); // -4
                 _additionalVertices.Add(vertex); // -3
@@ -1612,7 +1614,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
-                vertex.y -= 0.002f;
+                vertex.y -= 0.752f;
                 vertex.z += 0.63f;
                 _additionalVertices.Add(vertex); // -2
                 _additionalVertices.Add(vertex); // -1
@@ -1682,7 +1684,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
         {
             for(int j=0; j<150; j++)
             {
-                if(_isPeak[i][j] && !_clustered[i][j] && !Is12Tilted(_tiledMapVertices[i][j]) && (_verticesMaximumMatrix[i][j].y + 0.002f)>threshold)
+                if(_isPeak[i][j] && !_clustered[i][j] && !Is12Tilted(_tiledMapVertices[i][j]) && (_verticesMaximumMatrix[i][j].y + 0.752f) >threshold)
                 {
                     mainList = new List<int>();
                     peakPos = _verticesMaximumMatrix[i][j];
@@ -1710,7 +1712,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
                         {
                             //if(x==i || y==j)
                             //{
-                            if (!_clustered[x][y] && _verticesMaximumMatrix[x][y].y + 0.002f > threshold)
+                            if (!_clustered[x][y] && _verticesMaximumMatrix[x][y].y + 0.752f > threshold)
                             {
                                 if (x == i && y == j) continue;
                                 else if (Is12Tilted(_tiledMapVertices[x][y])) continue;
@@ -1754,7 +1756,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
         {
             for(int j=0; j<150; j++)
             {
-                if((_verticesMaximumMatrix[i][j].y + 0.002f) > threshold && Is12Tilted(_tiledMapVertices[i][j]))
+                if((_verticesMaximumMatrix[i][j].y + 0.752f) > threshold && Is12Tilted(_tiledMapVertices[i][j]))
                 {
                     _tile0 = _countersMatrix[i][j] * 4;
                     _pos0 = _obj.transform.TransformPoint(_vertices[_tile0]);
@@ -1785,7 +1787,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
                         //if they are not connected with the previous tile, skip
                         if (NotNeighbors(_tiledMapVertices[i][j], _tiledMapVertices[k][l])) continue;
                         //if below the threshold or already clustered, continue
-                        else if ((_verticesMaximumMatrix[k][l].y + 0.002f) < threshold) continue;
+                        else if ((_verticesMaximumMatrix[k][l].y + 0.752f) <= threshold) continue;
                         else if (list.Contains(_countersMatrix[k][l])) continue;
                         //add to the list if it is not end of cluster or it is not already in the list
                         else if (!EndOfCluster(_tiledMapVertices[i][j], _tiledMapVertices[k][l]))
@@ -1948,7 +1950,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
                 _tile3 = _countersMatrix[i][j] * 4 + 3;
 
                 //if already belongs to cluster or if the maximum point is below the threshold, continue
-                if (_clustered[i][j] || (_verticesMaximumMatrix[i][j].y + 0.002f < threshold)) continue;
+                if (_clustered[i][j] || (_verticesMaximumMatrix[i][j].y + 0.752f <= threshold)) continue;
 
                 if (AllVerticesAbove(_tiledMapVertices[i][j], threshold))
                 {
@@ -1995,8 +1997,8 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
                     IterateMultiCenterGaussianClusterAround(i, j);
                     colorCounter++;
                 }
-                else if(_tiledMapVertices[i][j][0].y + 0.002f > threshold || _tiledMapVertices[i][j][1].y + 0.002f > threshold ||
-                        _tiledMapVertices[i][j][2].y + 0.002f > threshold || _tiledMapVertices[i][j][3].y + 0.002f > threshold)
+                else if(_tiledMapVertices[i][j][0].y + 0.752f > threshold || _tiledMapVertices[i][j][1].y + 0.752f > threshold ||
+                        _tiledMapVertices[i][j][2].y + 0.752f > threshold || _tiledMapVertices[i][j][3].y + 0.752f > threshold)
                 {
                     if (colorCounter < 20) _clusterColor = clusterColors[colorCounter];
                     else
@@ -2077,7 +2079,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
                 //if they are not connected with the previous tile, skip
                 if (NotNeighbors(_tiledMapVertices[i][j], _tiledMapVertices[k][l])) continue;
                 //if already belongs to cluster or if the maximum point is below the threshold, continue
-                if (_clustered[k][l] || (_verticesMaximumMatrix[k][l].y + 0.002f < threshold)) continue;
+                if (_clustered[k][l] || (_verticesMaximumMatrix[k][l].y + 0.752f <= threshold)) continue;
                 
                 _tile0 = _countersMatrix[k][l] * 4;
                 _pos0 = _obj.transform.TransformPoint(_vertices[_tile0]);
@@ -2156,7 +2158,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
-                vertex.y -= 0.002f;
+                vertex.y -= 0.752f;
                 vertex.z += 0.63f;
                 _additionalVertices.Add(vertex); // -4
                 _additionalVertices.Add(vertex); // -3
@@ -2167,7 +2169,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
-                vertex.y -= 0.002f;
+                vertex.y -= 0.752f;
                 vertex.z += 0.63f;
                 _additionalVertices.Add(vertex); // -2
                 _additionalVertices.Add(vertex); // -1
@@ -2229,7 +2231,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
                 {
                     vertex = _hit.point;
                     vertex.x += 0.581f;
-                    vertex.y -= 0.002f;
+                    vertex.y -= 0.752f;
                     vertex.z += 0.63f;
                     _additionalVertices.Add(vertex); // -4
                     _additionalVertices.Add(vertex); // -3
@@ -2240,7 +2242,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
                 {
                     vertex = _hit.point;
                     vertex.x += 0.581f;
-                    vertex.y -= 0.002f;
+                    vertex.y -= 0.752f;
                     vertex.z += 0.63f;
                     _additionalVertices.Add(vertex); // -2
                     _additionalVertices.Add(vertex); // -1
@@ -2297,7 +2299,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
                 {
                     vertex = _hit.point;
                     vertex.x += 0.581f;
-                    vertex.y -= 0.002f;
+                    vertex.y -= 0.752f;
                     vertex.z += 0.63f;
                     _additionalVertices.Add(vertex); // -8
                     _additionalVertices.Add(vertex); // -7
@@ -2308,9 +2310,9 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
                 {
                     vertex = _hit.point;
                     vertex.x += 0.581f;
-                    vertex.y -= 0.002f;
+                    vertex.y -= 0.752f;
                     vertex.z += 0.63f;
-                    _additionalVertices.Add(new Vector3(_pos2.x + 0.581f, _pos2.y - 0.002f, _pos2.z + 0.63f));  // -6
+                    _additionalVertices.Add(new Vector3(_pos2.x + 0.581f, _pos2.y - 0.752f, _pos2.z + 0.63f));  // -6
                     _additionalVertices.Add(vertex); // -5
                     _additionalVertices.Add(vertex); // -4
                     _additionalVertices.Add(vertex); // -3
@@ -2323,7 +2325,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
                 {
                     vertex = _hit.point;
                     vertex.x += 0.581f;
-                    vertex.y -= 0.002f;
+                    vertex.y -= 0.752f;
                     vertex.z += 0.63f;
                     _additionalVertices.Add(vertex); // -2
                     _additionalVertices.Add(vertex); // -1
@@ -2388,7 +2390,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
                 {
                     vertex = _hit.point;
                     vertex.x += 0.581f;
-                    vertex.y -= 0.002f;
+                    vertex.y -= 0.752f;
                     vertex.z += 0.63f;
                     _additionalVertices.Add(vertex); // -4
                     _additionalVertices.Add(vertex); // -3
@@ -2399,7 +2401,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
                 {
                     vertex = _hit.point;
                     vertex.x += 0.581f;
-                    vertex.y -= 0.002f;
+                    vertex.y -= 0.752f;
                     vertex.z += 0.63f;
                     _additionalVertices.Add(vertex); // -2
                     _additionalVertices.Add(vertex); // -1
@@ -2449,7 +2451,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
                 {
                     vertex = _hit.point;
                     vertex.x += 0.581f;
-                    vertex.y -= 0.002f;
+                    vertex.y -= 0.752f;
                     vertex.z += 0.63f;
                     _additionalVertices.Add(vertex); // -8
                     _additionalVertices.Add(vertex); // -7
@@ -2460,9 +2462,9 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
                 {
                     vertex = _hit.point;
                     vertex.x += 0.581f;
-                    vertex.y -= 0.002f;
+                    vertex.y -= 0.752f;
                     vertex.z += 0.63f;
-                    _additionalVertices.Add(new Vector3(_pos1.x + 0.581f, _pos1.y - 0.002f, _pos1.z + 0.63f));  // -6
+                    _additionalVertices.Add(new Vector3(_pos1.x + 0.581f, _pos1.y - 0.752f, _pos1.z + 0.63f));  // -6
                     _additionalVertices.Add(vertex); // -5
                     _additionalVertices.Add(vertex); // -4
                     _additionalVertices.Add(vertex); // -3
@@ -2475,7 +2477,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
                 {
                     vertex = _hit.point;
                     vertex.x += 0.581f;
-                    vertex.y -= 0.002f;
+                    vertex.y -= 0.752f;
                     vertex.z += 0.63f;
                     _additionalVertices.Add(vertex); // -2
                     _additionalVertices.Add(vertex); // -1
@@ -2538,7 +2540,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
-                vertex.y -= 0.002f;
+                vertex.y -= 0.752f;
                 vertex.z += 0.63f;
                 _additionalVertices.Add(vertex); // -4
                 _additionalVertices.Add(vertex); // -3
@@ -2549,7 +2551,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
-                vertex.y -= 0.002f;
+                vertex.y -= 0.752f;
                 vertex.z += 0.63f;
                 _additionalVertices.Add(vertex); // -2
                 _additionalVertices.Add(vertex); // -1
@@ -2612,7 +2614,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
-                vertex.y -= 0.002f;
+                vertex.y -= 0.752f;
                 vertex.z += 0.63f;
                 _additionalVertices.Add(vertex); // -4
                 _additionalVertices.Add(vertex); // -3
@@ -2623,7 +2625,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
-                vertex.y -= 0.002f;
+                vertex.y -= 0.752f;
                 vertex.z += 0.63f;
                 _additionalVertices.Add(vertex); // -2
                 _additionalVertices.Add(vertex); // -1
@@ -2683,7 +2685,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
-                vertex.y -= 0.002f;
+                vertex.y -= 0.752f;
                 vertex.z += 0.63f;
                 _additionalVertices.Add(vertex); // -4
                 _additionalVertices.Add(vertex); // -3
@@ -2694,7 +2696,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
-                vertex.y -= 0.002f;
+                vertex.y -= 0.752f;
                 vertex.z += 0.63f;
                 _additionalVertices.Add(vertex); // -2
                 _additionalVertices.Add(vertex); // -1
@@ -2754,7 +2756,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
-                vertex.y -= 0.002f;
+                vertex.y -= 0.752f;
                 vertex.z += 0.63f;
                 _additionalVertices.Add(vertex); // -4
                 _additionalVertices.Add(vertex); // -3
@@ -2765,7 +2767,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
-                vertex.y -= 0.002f;
+                vertex.y -= 0.752f;
                 vertex.z += 0.63f;
                 _additionalVertices.Add(vertex); // -2
                 _additionalVertices.Add(vertex); // -1
@@ -2824,7 +2826,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
-                vertex.y -= 0.002f;
+                vertex.y -= 0.752f;
                 vertex.z += 0.63f;
                 _additionalVertices.Add(vertex); // -4
                 _additionalVertices.Add(vertex); // -3
@@ -2835,7 +2837,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
-                vertex.y -= 0.002f;
+                vertex.y -= 0.752f;
                 vertex.z += 0.63f;
                 _additionalVertices.Add(vertex); // -2
                 _additionalVertices.Add(vertex); // -1
@@ -2895,7 +2897,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
-                vertex.y -= 0.002f;
+                vertex.y -= 0.752f;
                 vertex.z += 0.63f;
                 _additionalVertices.Add(vertex); // -8
                 _additionalVertices.Add(vertex); // -7
@@ -2906,7 +2908,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
-                vertex.y -= 0.002f;
+                vertex.y -= 0.752f;
                 vertex.z += 0.63f;
                 _additionalVertices.Add(vertex); // -6
                 _additionalVertices.Add(vertex); // -5
@@ -2917,7 +2919,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
-                vertex.y -= 0.002f;
+                vertex.y -= 0.752f;
                 vertex.z += 0.63f;
                 _additionalVertices.Add(vertex); // -4
                 _additionalVertices.Add(vertex); // -3
@@ -2928,7 +2930,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
-                vertex.y -= 0.002f;
+                vertex.y -= 0.752f;
                 vertex.z += 0.63f;
                 _additionalVertices.Add(vertex); // -2
                 _additionalVertices.Add(vertex); // -1
@@ -2986,7 +2988,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
-                vertex.y -= 0.002f;
+                vertex.y -= 0.752f;
                 vertex.z += 0.63f;
                 _additionalVertices.Add(vertex); // -8
                 _additionalVertices.Add(vertex); // -7
@@ -2997,7 +2999,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
-                vertex.y -= 0.002f;
+                vertex.y -= 0.752f;
                 vertex.z += 0.63f;
                 _additionalVertices.Add(vertex); // -6
                 _additionalVertices.Add(vertex); // -5
@@ -3008,7 +3010,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
-                vertex.y -= 0.002f;
+                vertex.y -= 0.752f;
                 vertex.z += 0.63f;
                 _additionalVertices.Add(vertex); // -4
                 _additionalVertices.Add(vertex); // -3
@@ -3019,7 +3021,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
-                vertex.y -= 0.002f;
+                vertex.y -= 0.752f;
                 vertex.z += 0.63f;
                 _additionalVertices.Add(vertex); // -2
                 _additionalVertices.Add(vertex); // -1
@@ -3087,13 +3089,13 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
         //one vertex is above the threshold, find two points where it cuts with threshold plane and add to mesh
         #region 1VertexAbove
 
-        else if ((_tiledMapVertices[k][l][0].y + 0.002f) > threshold)
+        else if ((_tiledMapVertices[k][l][0].y + 0.752f) > threshold)
         {
             if (Physics.Raycast(_pos0, _pos1 - _pos0, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
-                vertex.y -= 0.002f;
+                vertex.y -= 0.752f;
                 vertex.z += 0.63f;
                 _additionalVertices.Add(vertex); // -4
                 _additionalVertices.Add(vertex); // -3
@@ -3104,7 +3106,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
-                vertex.y -= 0.002f;
+                vertex.y -= 0.752f;
                 vertex.z += 0.63f;
                 _additionalVertices.Add(vertex); // -2
                 _additionalVertices.Add(vertex); // -1
@@ -3156,13 +3158,13 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
                 _indexIterationBuffer.Add(temp);
             }
         }
-        else if (_tiledMapVertices[k][l][2].y + 0.002f > threshold)
+        else if (_tiledMapVertices[k][l][2].y + 0.752f > threshold)
         {
             if (Physics.Raycast(_pos2, _pos0 - _pos2, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
-                vertex.y -= 0.002f;
+                vertex.y -= 0.752f;
                 vertex.z += 0.63f;
                 _additionalVertices.Add(vertex); // -4
                 _additionalVertices.Add(vertex); // -3
@@ -3173,7 +3175,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
-                vertex.y -= 0.002f;
+                vertex.y -= 0.752f;
                 vertex.z += 0.63f;
                 _additionalVertices.Add(vertex); // -2
                 _additionalVertices.Add(vertex); // -1
@@ -3225,13 +3227,13 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
                 _indexIterationBuffer.Add(temp);
             }
         }
-        else if ((_tiledMapVertices[k][l][1].y + 0.002f) > threshold)
+        else if ((_tiledMapVertices[k][l][1].y + 0.752f) > threshold)
         {
             if (Physics.Raycast(_pos1, _pos0 - _pos1, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
-                vertex.y -= 0.002f;
+                vertex.y -= 0.752f;
                 vertex.z += 0.63f;
                 _additionalVertices.Add(vertex); // -4
                 _additionalVertices.Add(vertex); // -3
@@ -3242,7 +3244,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
-                vertex.y -= 0.002f;
+                vertex.y -= 0.752f;
                 vertex.z += 0.63f;
                 _additionalVertices.Add(vertex); // -2
                 _additionalVertices.Add(vertex); // -1
@@ -3294,14 +3296,14 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
                 _indexIterationBuffer.Add(temp);
             }
         }
-        else if (_tiledMapVertices[k][l][3].y + 0.002f > threshold)
+        else if (_tiledMapVertices[k][l][3].y + 0.752f > threshold)
         {
             if (Is12Tilted(_tiledMapVertices[k][l]) && !multiCentered) _clusterColor = _color;
             if (Physics.Raycast(_pos3, _pos2 - _pos3, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
-                vertex.y -= 0.002f;
+                vertex.y -= 0.752f;
                 vertex.z += 0.63f;
                 _additionalVertices.Add(vertex); // -4
                 _additionalVertices.Add(vertex); // -3
@@ -3312,7 +3314,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
             {
                 vertex = _hit.point;
                 vertex.x += 0.581f;
-                vertex.y -= 0.002f;
+                vertex.y -= 0.752f;
                 vertex.z += 0.63f;
                 _additionalVertices.Add(vertex); // -2
                 _additionalVertices.Add(vertex); // -1
@@ -3388,7 +3390,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
                 _tile3 = _countersMatrix[i][j] * 4 + 3;
 
                 //if tile already belongs to cluster or if it is below the threshold continue
-                if (_clustered[i][j] || (_tiledMapVertices[i][j][0].y + 0.002f) < threshold) continue;
+                if (_clustered[i][j] || (_tiledMapVertices[i][j][0].y + 0.752f) <= threshold) continue;
                 else
                 {
                     if (colorCounter < 20) _clusterColor = clusterColors[colorCounter];
@@ -3423,7 +3425,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
         {
             for(int l = j-1; l<j+2; l++)
             {
-                if (_clustered[k][l] || (_tiledMapVertices[k][l][0].y + 0.002f) < threshold) continue;
+                if (_clustered[k][l] || (_tiledMapVertices[k][l][0].y + 0.752f) <= threshold) continue;
                 _clustered[k][l] = true;
                 Vector3 vertex;
                 List<int> temp = new List<int>();
@@ -3467,7 +3469,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
                     {
                         vertex = _hit.point;
                         vertex.x += 0.581f;
-                        vertex.y -= 0.002f;
+                        vertex.y -= 0.752f;
                         vertex.z += 0.63f;
                         _additionalVertices.Add(vertex); // -4
                         _additionalVertices.Add(vertex); // -3
@@ -3478,7 +3480,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
                     {
                         vertex = _hit.point;
                         vertex.x += 0.581f;
-                        vertex.y -= 0.002f;
+                        vertex.y -= 0.752f;
                         vertex.z += 0.63f;
                         _additionalVertices.Add(vertex); // -2
                         _additionalVertices.Add(vertex); // -1
@@ -3520,7 +3522,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
                     {
                         vertex = _hit.point;
                         vertex.x += 0.581f;
-                        vertex.y -= 0.002f;
+                        vertex.y -= 0.752f;
                         vertex.z += 0.63f;
                         _additionalVertices.Add(vertex); // -4
                         _additionalVertices.Add(vertex); // -3
@@ -3531,7 +3533,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
                     {
                         vertex = _hit.point;
                         vertex.x += 0.581f;
-                        vertex.y -= 0.002f;
+                        vertex.y -= 0.752f;
                         vertex.z += 0.63f;
                         _additionalVertices.Add(vertex); // -2
                         _additionalVertices.Add(vertex); // -1
@@ -3574,7 +3576,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
                     {
                         vertex = _hit.point;
                         vertex.x += 0.581f;
-                        vertex.y -= 0.002f;
+                        vertex.y -= 0.752f;
                         vertex.z += 0.63f;
                         _additionalVertices.Add(vertex); // -4
                         _additionalVertices.Add(vertex); // -3
@@ -3585,7 +3587,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
                     {
                         vertex = _hit.point;
                         vertex.x += 0.581f;
-                        vertex.y -= 0.002f;
+                        vertex.y -= 0.752f;
                         vertex.z += 0.63f;
                         _additionalVertices.Add(vertex); // -2
                         _additionalVertices.Add(vertex); // -1
@@ -3628,7 +3630,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
                     {
                         vertex = _hit.point;
                         vertex.x += 0.581f;
-                        vertex.y -= 0.002f;
+                        vertex.y -= 0.752f;
                         vertex.z += 0.63f;
                         _additionalVertices.Add(vertex); // -4
                         _additionalVertices.Add(vertex); // -3
@@ -3639,7 +3641,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
                     {
                         vertex = _hit.point;
                         vertex.x += 0.581f;
-                        vertex.y -= 0.002f;
+                        vertex.y -= 0.752f;
                         vertex.z += 0.63f;
                         _additionalVertices.Add(vertex); // -2
                         _additionalVertices.Add(vertex); // -1
@@ -3703,8 +3705,6 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
             tempColors[i] = _additionalVerticesColor[i];
         }
         int x = 0;
-        int y = 0;
-        int z = 0;
         for(int i=0; i<_triangles.Length; i++)
         {
             tempTriangles[i] = _triangles[i];
@@ -3730,7 +3730,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
     {
         foreach (Vector3 vertex in tile)
         {
-            if ((vertex.y + 0.002f) < threshold)
+            if ((vertex.y + 0.752f) <= threshold)
                 return false;
         }
         return true;
@@ -3738,30 +3738,30 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
     
     private bool ThreeVerticesAbove(Vector3 a, Vector3 b, Vector3 c, float threshold)
     {
-        if ((a.y + 0.002f) >= threshold && (b.y + 0.002f) >= threshold && (c.y + 0.002f) >= threshold) return true;
+        if ((a.y + 0.752f) > threshold && (b.y + 0.752f) > threshold && (c.y + 0.752f) > threshold) return true;
         return false;
     }
 
     private bool TwoVerticesAbove(Vector3 a, Vector3 b, float threshold)
     {
-        if ((a.y + 0.002f) > threshold && (b.y + 0.002f) > threshold) return true;
+        if ((a.y + 0.752f) > threshold && (b.y + 0.752f) > threshold) return true;
         return false;
     }
 
     private bool NotNeighbors(Vector3[] center, Vector3[] current)
     {
-        if (center[0].y == current[3].y && (center[0].y + 0.002f) > threshold ||
-            center[0].y == current[2].y && (center[0].y + 0.002f) > threshold ||
-            center[0].y == current[1].y && (center[0].y + 0.002f) > threshold) return false;
-        else if (center[1].y == current[3].y && (center[1].y + 0.002f) > threshold ||
-                 center[1].y == current[2].y && (center[1].y + 0.002f) > threshold ||
-                 center[1].y == current[0].y && (center[1].y + 0.002f) > threshold) return false;
-        else if (center[2].y == current[0].y && (center[2].y + 0.002f) > threshold ||
-                 center[2].y == current[1].y && (center[2].y + 0.002f) > threshold ||
-                 center[2].y == current[3].y && (center[2].y + 0.002f) > threshold) return false;
-        else if (center[3].y == current[0].y && (center[3].y + 0.002f) > threshold ||
-                 center[3].y == current[1].y && (center[3].y + 0.002f) > threshold ||
-                 center[3].y == current[2].y && (center[3].y + 0.002f) > threshold) return false;
+        if (center[0].y == current[3].y && (center[0].y + 0.752f) > threshold ||
+            center[0].y == current[2].y && (center[0].y + 0.752f) > threshold ||
+            center[0].y == current[1].y && (center[0].y + 0.752f) > threshold) return false;
+        else if (center[1].y == current[3].y && (center[1].y + 0.752f) > threshold ||
+                 center[1].y == current[2].y && (center[1].y + 0.752f) > threshold ||
+                 center[1].y == current[0].y && (center[1].y + 0.752f) > threshold) return false;
+        else if (center[2].y == current[0].y && (center[2].y + 0.752f) > threshold ||
+                 center[2].y == current[1].y && (center[2].y + 0.752f) > threshold ||
+                 center[2].y == current[3].y && (center[2].y + 0.752f) > threshold) return false;
+        else if (center[3].y == current[0].y && (center[3].y + 0.752f) > threshold ||
+                 center[3].y == current[1].y && (center[3].y + 0.752f) > threshold ||
+                 center[3].y == current[2].y && (center[3].y + 0.752f) > threshold) return false;
         return true;
     }
 

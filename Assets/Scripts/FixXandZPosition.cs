@@ -35,10 +35,10 @@ public class FixXandZPosition : MonoBehaviour {
         {
             transform.parent = null;
         }
-        if(transform.position.y < 0.0022f)
+        if(transform.position.y < 0.7522f)
         {
             newPos = transform.position;
-            newPos.y = 0.0022f;
+            newPos.y = 0.7522f;
             transform.position = newPos;
         }
         oldPos = newPos;
