@@ -152,7 +152,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
 
     public override void StartAlgorithm()
     {
-        if (current.algorithm != this)
+        if (current != null && current.algorithm != this)
         {
             resetDBscan.ResetMe();
             resetKmeans.ResetMe();
