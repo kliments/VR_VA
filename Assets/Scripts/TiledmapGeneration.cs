@@ -520,7 +520,7 @@ public class TiledmapGeneration : MonoBehaviour {
                         for (int c = 0; c < 4; c++)
                         {
                             _matrixColors[currentTile][c] = new Color(_verticesMatrix[currentTile][c].y, 0, Math.Abs(1 - _verticesMatrix[currentTile][c].y));
-                            _tiledMapColors[i][j][c] = new Color(NormalizeColor(_verticesMatrix[currentTile][c].y), 0, Math.Abs(1 - NormalizeColor(_verticesMatrix[currentTile][c].y)));
+                            _tiledMapColors[i][j][c] = new Color(_verticesMatrix[currentTile][c].y, 0, Math.Abs(1 - _verticesMatrix[currentTile][c].y));
                         }
                         currentTile++;
                     }
