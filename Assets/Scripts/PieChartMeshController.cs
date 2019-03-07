@@ -14,7 +14,7 @@ public class PieChartMeshController : MonoBehaviour
 	private int timer = 0;
 	PieChartMesh[] listObjects;
     public Camera myCamera;
-    public DenclueAlgorithm tiledMap;
+    public TiledmapGeneration tiledMap;
     private Vector3 target;
 
     private GameObject[] rotateObjects;

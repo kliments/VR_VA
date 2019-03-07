@@ -154,7 +154,7 @@ public LayerMask layersToIgnoreAdd = Physics.IgnoreRaycastLayer;
         if(pressDBscan)
         {
             pressDBscan = false;
-            dbscanButton.GetComponent<DBScanAlgorithm>().StartAlgorithm();
+            dbscanButton.GetComponent<DBScanAlgorithm>().StartDBSCAN();
         }
 
     }
@@ -355,7 +355,7 @@ public LayerMask layersToIgnoreAdd = Physics.IgnoreRaycastLayer;
         //Start DBSCAN algorithm
         else if (selectedObject.name == "DBNextStep")
         {
-            selectedObject.GetComponent<DBScanAlgorithm>().StartAlgorithm();
+            selectedObject.GetComponent<DBScanAlgorithm>().StartDBSCAN();
         }
         //Go back one step in DBSCAN algorithm
         else if (selectedObject.name == "DBPreviousStep")
@@ -474,14 +474,14 @@ public LayerMask layersToIgnoreAdd = Physics.IgnoreRaycastLayer;
             if (selectedObject.name == "ThresholdPlane")
             {
                 selectedObject.GetComponent<FixXandZPosition>().isTaken = false;
-                selectedObject.GetComponent<FixXandZPosition>().denclue.GetComponent<DenclueAlgorithm>().threshold = selectedObject.transform.position.y;
-                if (selectedObject.GetComponent<FixXandZPosition>().denclue.GetComponent<DenclueAlgorithm>().gaussianCalculation)
+                selectedObject.GetComponent<FixXandZPosition>().denclue.GetComponent<TiledmapGeneration>().threshold = selectedObject.transform.position.y;
+                if (selectedObject.GetComponent<FixXandZPosition>().denclue.GetComponent<TiledmapGeneration>().gaussianCalculation)
                 {
-                    selectedObject.GetComponent<FixXandZPosition>().denclue.GetComponent<DenclueAlgorithm>()._multiCenteredGaussian = true;
+                    selectedObject.GetComponent<FixXandZPosition>().denclue.GetComponent<TiledmapGeneration>()._multiCenteredGaussian = true;
                 }
                 else
                 {
-                    selectedObject.GetComponent<FixXandZPosition>().denclue.GetComponent<DenclueAlgorithm>()._multiCenteredSquareWave = true;
+                    selectedObject.GetComponent<FixXandZPosition>().denclue.GetComponent<TiledmapGeneration>()._multiCenteredSquareWave = true;
                 }
             }
             ////TODO remove for release? (restore parent if it changed)

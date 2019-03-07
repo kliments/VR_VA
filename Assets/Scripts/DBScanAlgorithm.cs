@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DBScanAlgorithm : ClusteringAlgorithm {
+public class DBScanAlgorithm : MonoBehaviour {
     public float epsilon;
     public int minPts;
 
     public Transform scatterplot;
-    public ClusteringAlgorithm resetKMeans, resetDenclue;
+    public GameObject resetKMeans;
 
     //current data points visualisation
     private GameObject dataVisuals;
@@ -58,25 +58,19 @@ public class DBScanAlgorithm : ClusteringAlgorithm {
 	void Update () {
     }
 
-    public override void StartAlgorithm()
-    {   
+    public void StartDBSCAN()
+    {
         //happens only once, in the beginning
-        if (current.algorithm != this)
+        if(counter == 0)
         {
-            resetKMeans.ResetMe();
-            resetDenclue.ResetMe();
-            current.algorithm = this;
-        }
-        if (counter == 0)
-        {
-            resetKMeans.ResetMe();
+            resetKMeans.GetComponent<KMeansAlgorithm>().ResetMe();
             AssignDataPoints();
             PaintAllWhite();
             ShuffleDataPoints();
             counter++;
             steps.Add("firstStep");
         }
-        else if (dataPoints.Count == 0 && neighbours.Count == 0)
+        else if(dataPoints.Count == 0 && neighbours.Count == 0)
         {
             Debug.Log("DBScan finished in " + NrOfClusters(dataVisuals.transform).ToString() + " steps!");
             dbscanFinishedPlane.transform.GetChild(0).gameObject.GetComponent<TextMesh>().text = NrOfClusters(dataVisuals.transform).ToString() + " clusters found!";
@@ -164,7 +158,7 @@ public class DBScanAlgorithm : ClusteringAlgorithm {
                                 temp.Add(obj);
                                 dataPoints.Remove(obj);
                                 //only for cubes
-                                if (obj.name.Contains("cube"))
+                                if(obj.name.Contains("cube"))
                                 {
                                     AddWireFrame(obj);
                                 }
@@ -335,7 +329,7 @@ public class DBScanAlgorithm : ClusteringAlgorithm {
         return (Mathf.Abs(a.x - b.x) + Mathf.Abs(a.y - b.y) + Mathf.Abs(a.z - b.z));
     }
 
-    public override void ResetMe()
+    public void ResetMe()
     {
         if(dataVisuals !=null)
         {

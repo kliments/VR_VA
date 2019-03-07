@@ -83,47 +83,47 @@ public class IncreaseDecrease : MonoBehaviour {
 
     public void IncreaseInfluence()
     {
-        denclue.GetComponent<DenclueAlgorithm>().ResetMe();
-        if(denclue.GetComponent<DenclueAlgorithm>().halfLengthOfNeighbourhood < 10)
+        denclue.GetComponent<TiledmapGeneration>().ResetMe();
+        if(denclue.GetComponent<TiledmapGeneration>().halfLengthOfNeighbourhood < 10)
         {
-            denclue.GetComponent<DenclueAlgorithm>().halfLengthOfNeighbourhood++;
-            denclue.GetComponent<DenclueAlgorithm>().StartAlgorithm();
+            denclue.GetComponent<TiledmapGeneration>().halfLengthOfNeighbourhood++;
+            denclue.GetComponent<TiledmapGeneration>().StartDenclue();
         }
-        text.text = "ε: " + denclue.GetComponent<DenclueAlgorithm>().halfLengthOfNeighbourhood.ToString();
+        text.text = "ε: " + denclue.GetComponent<TiledmapGeneration>().halfLengthOfNeighbourhood.ToString();
     }
 
     public void DecreaseInfluence()
     {
-        if (denclue.GetComponent<DenclueAlgorithm>().halfLengthOfNeighbourhood > 4)
+        if (denclue.GetComponent<TiledmapGeneration>().halfLengthOfNeighbourhood > 4)
         {
-            denclue.GetComponent<DenclueAlgorithm>().ResetMe();
-            denclue.GetComponent<DenclueAlgorithm>().halfLengthOfNeighbourhood--;
-            denclue.GetComponent<DenclueAlgorithm>().StartAlgorithm();
+            denclue.GetComponent<TiledmapGeneration>().ResetMe();
+            denclue.GetComponent<TiledmapGeneration>().halfLengthOfNeighbourhood--;
+            denclue.GetComponent<TiledmapGeneration>().StartDenclue();
         }
-        text.text = "ε: " + denclue.GetComponent<DenclueAlgorithm>().halfLengthOfNeighbourhood.ToString();
+        text.text = "ε: " + denclue.GetComponent<TiledmapGeneration>().halfLengthOfNeighbourhood.ToString();
     }
 
     public void IncreaseThreshold()
     {
-        if (denclue.GetComponent<DenclueAlgorithm>().threshold < 1.1f)
+        if (denclue.GetComponent<TiledmapGeneration>().threshold < 1.1f)
         {
-            denclue.GetComponent<DenclueAlgorithm>().threshold+=0.01f;
-            Vector3 tempPos = denclue.GetComponent<DenclueAlgorithm>().thresholdPlane.transform.position;
+            denclue.GetComponent<TiledmapGeneration>().threshold+=0.01f;
+            Vector3 tempPos = denclue.GetComponent<TiledmapGeneration>().thresholdPlane.transform.position;
             tempPos.y += 0.01f;
-            denclue.GetComponent<DenclueAlgorithm>().thresholdPlane.transform.position = tempPos;
+            denclue.GetComponent<TiledmapGeneration>().thresholdPlane.transform.position = tempPos;
         }
-        text.text = "ξ: " + decimal.Round((decimal)denclue.GetComponent<DenclueAlgorithm>().threshold,2).ToString();
+        text.text = "ξ: " + decimal.Round((decimal)denclue.GetComponent<TiledmapGeneration>().threshold,2).ToString();
     }
 
     public void DecreaseThreshold()
     {
-        if (denclue.GetComponent<DenclueAlgorithm>().threshold > 0.02f)
+        if (denclue.GetComponent<TiledmapGeneration>().threshold > 0.02f)
         {
-            denclue.GetComponent<DenclueAlgorithm>().threshold-= 0.01f;
-            Vector3 tempPos = denclue.GetComponent<DenclueAlgorithm>().thresholdPlane.transform.position;
+            denclue.GetComponent<TiledmapGeneration>().threshold-= 0.01f;
+            Vector3 tempPos = denclue.GetComponent<TiledmapGeneration>().thresholdPlane.transform.position;
             tempPos.y -= 0.01f;
-            denclue.GetComponent<DenclueAlgorithm>().thresholdPlane.transform.position = tempPos;
+            denclue.GetComponent<TiledmapGeneration>().thresholdPlane.transform.position = tempPos;
         }
-        text.text = "ξ: " + decimal.Round((decimal)denclue.GetComponent<DenclueAlgorithm>().threshold,2).ToString();
+        text.text = "ξ: " + decimal.Round((decimal)denclue.GetComponent<TiledmapGeneration>().threshold,2).ToString();
     }
 }

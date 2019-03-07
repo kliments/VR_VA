@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class KMeansAlgorithm : ClusteringAlgorithm {
+public class KMeansAlgorithm : MonoBehaviour {
 
     public Transform scatterplot;
-    public ClusteringAlgorithm resetDBScan, resetDenclue;
+    public GameObject resetDBScan;
     public GameObject sphere;
     private GameObject dataVisuals;
     public GameObject kMeansFinishedPlane;
@@ -143,14 +143,8 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
         }
 	}
 
-    public override void StartAlgorithm()
+    public void StartAlgorithm()
     {
-        if (current.algorithm != this)
-        {
-            resetDBScan.ResetMe();
-            resetDenclue.ResetMe();
-            current.algorithm = this;
-        }
         AssignDataToGameObjects();
 
         //only generate spheres the first time;
@@ -439,7 +433,7 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
         }
     }
 
-    public override void ResetMe()
+    public void ResetMe()
     {
         ground.GetComponent<SetToGround>().rigPosReset = true;
         ground.GetComponent<SetToGround>().RemoveParenthoodFromRig();

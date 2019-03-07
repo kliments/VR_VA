@@ -14,7 +14,7 @@ public class UniversalButtonScript : MonoBehaviour {
     private PointerEventListener ptEvtLsnr;
     private BackButtonMenu menusParent;
     private SwapBetweenMenus swapScript;
-    public DenclueAlgorithm denclue;
+    public TiledmapGeneration denclue;
 
     //for debugging
     public bool loadDataset, loadVis, startDenclue;
@@ -31,7 +31,7 @@ public class UniversalButtonScript : MonoBehaviour {
         menusParent = (BackButtonMenu)FindObjectOfType(typeof(BackButtonMenu));
         swapScript = (SwapBetweenMenus)FindObjectOfType(typeof(SwapBetweenMenus));
         ground = GameObject.Find("Ground");
-        denclue = (DenclueAlgorithm)FindObjectOfType(typeof(DenclueAlgorithm));
+        denclue = (TiledmapGeneration)FindObjectOfType(typeof(TiledmapGeneration));
 
         loadDataset = loadVis = startDenclue = false;
     }
@@ -60,7 +60,7 @@ public class UniversalButtonScript : MonoBehaviour {
         if (startDenclue)
         {
             startDenclue = false;
-            denclue.StartAlgorithm();
+            denclue.StartDenclue();
         }
     }
     
@@ -248,7 +248,7 @@ public class UniversalButtonScript : MonoBehaviour {
             }
             else if(this.name == "DBScan Step Forward")
             {
-                GetComponent<DBScanAlgorithm>().StartAlgorithm();
+                GetComponent<DBScanAlgorithm>().StartDBSCAN();
             }
             else if(this.name == "Play")
             {
@@ -300,7 +300,7 @@ public class UniversalButtonScript : MonoBehaviour {
             }
             else if(this.name == "DencluePlay")
             {
-                denclue.StartAlgorithm();
+                denclue.StartDenclue();
             }
             else if (this.name == "SingleMultiCentered")
             {

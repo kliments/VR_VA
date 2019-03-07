@@ -30,7 +30,7 @@ public class DataSpaceHandler : MonoBehaviour
     public List<Vector3> dataPositions;
     public List<string> classes;
 
-    public DenclueAlgorithm tiledMap;
+    public TiledmapGeneration tiledMap;
 
     [SerializeField]
     public TextAsset data;

@@ -17,7 +17,7 @@ public class Triangle : MonoBehaviour {
     public Material material;
     public Color[] colorArray;
     public List<Vector3> dataPositions;
-    public DenclueAlgorithm tiledMap;
+    public TiledmapGeneration tiledMap;
 
     public List<Color> listOfColors = new List<Color>();
     private Vector3 dummyPos;

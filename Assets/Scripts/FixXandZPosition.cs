@@ -7,7 +7,7 @@ public class FixXandZPosition : MonoBehaviour {
     Vector3 oldPos, newPos;
     Quaternion rot;
     public bool isTaken;
-    public DenclueAlgorithm denclue;
+    public TiledmapGeneration denclue;
     public Text buttonText;
     // Use this for initialization
     void Start () {
@@ -15,13 +15,12 @@ public class FixXandZPosition : MonoBehaviour {
         newPos = transform.position;
         rot = transform.localRotation;
         isTaken = false;
-        denclue = (DenclueAlgorithm)FindObjectOfType(typeof(DenclueAlgorithm));
+        denclue = (TiledmapGeneration)FindObjectOfType(typeof(TiledmapGeneration));
     }
 	
 	// Update is called once per frame
 	void Update () {
-        if(denclue == null) denclue = (DenclueAlgorithm)FindObjectOfType(typeof(DenclueAlgorithm));
-        if (isTaken && (decimal.Round((decimal)transform.position.y, 5) != (decimal)denclue.GetComponent<DenclueAlgorithm>().threshold))
+        if(isTaken && (decimal.Round((decimal)transform.position.y, 5) != (decimal)denclue.GetComponent<TiledmapGeneration>().threshold))
         {
             newPos = transform.position;
             newPos.x = oldPos.x;
