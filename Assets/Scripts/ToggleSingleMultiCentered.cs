@@ -10,8 +10,13 @@ public class ToggleSingleMultiCentered : MonoBehaviour {
     // Use this for initialization
     void Start()
     {
+<<<<<<< Updated upstream
+        tiledmap = (TiledmapGeneration)FindObjectOfType(typeof(TiledmapGeneration));
+        multiCentered = true;
+=======
         tiledmap = (DenclueAlgorithm)FindObjectOfType(typeof(DenclueAlgorithm));
         multiCentered = false;
+>>>>>>> Stashed changes
     }
 
     // Update is called once per frame

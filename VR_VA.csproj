@@ -145,7 +145,6 @@
     <Compile Include="Assets\Scripts\SwapBetweenMenus.cs" />
     <Compile Include="Assets\Scripts\Tetrahedron.cs" />
     <Compile Include="Assets\Scripts\TetrahedronMesh.cs" />
-    <Compile Include="Assets\Scripts\TiledmapGeneration.cs" />
     <Compile Include="Assets\Scripts\ToggleEucledianManhattan.cs" />
     <Compile Include="Assets\Scripts\ToggleSingleMultiCentered.cs" />
     <Compile Include="Assets\Scripts\ToggleSprite.cs" />
