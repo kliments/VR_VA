@@ -11,7 +11,7 @@ public class DenclueAlgorithm : MonoBehaviour {
     public bool gaussianCalculation, resizeMesh, _multiCenteredGaussian, _multiCenteredSquareWave, returnPeaks, _singleCenteredSquaredWave, _singleCenteredGaussian, multiCentered;
     //plus/minus neighbourhood cubes around the center cube in the matrix
     public int halfLengthOfNeighbourhood;
-    public GameObject thresholdPlane;
+    public GameObject thresholdPlane, label;
     public GaussianCoefficients gaussCoef;
     public KMeansAlgorithm kMeans;
     public DBScanAlgorithm dbscan;
@@ -676,6 +676,7 @@ public class DenclueAlgorithm : MonoBehaviour {
             clusterColors.RemoveAt(i);
         }
         thresholdPlane.SetActive(false);
+        label.SetActive(false);
     }
 
     //checks whether a tile has any neighbours around that are part of the mesh
@@ -3725,6 +3726,9 @@ public class DenclueAlgorithm : MonoBehaviour {
         mesh.RecalculateBounds();
         _obj.GetComponent<MeshFilter>().mesh = null;
         _obj.GetComponent<MeshFilter>().mesh = mesh;
+
+        label.GetComponentInChildren<TextMesh>().text = colorCounter.ToString() + " clusters found.";
+        label.SetActive(true);
     }
 
     private bool AllVerticesAbove(Vector3[] tile, float threshold)
