@@ -29,6 +29,7 @@ public class VisualizationChangerScript : MonoBehaviour {
     private int cubesCounter, piesCounter, trnglCounter, ttrhdrnCounter = 0;
     public GameObject resetKmeans;
     public GameObject resetDBScan;
+    public GameObject resetDenclue;
 
     private int vizLength;
     public void startSelectedAction()
@@ -38,6 +39,7 @@ public class VisualizationChangerScript : MonoBehaviour {
 
         resetKmeans.GetComponent<KMeansAlgorithm>().ResetMe();
         resetDBScan.GetComponent<DBScanAlgorithm>().ResetMe();
+        resetDenclue.GetComponent<DenclueAlgorithm>().ResetMe();
         
         vizLength = typeOfVisualization.Length;
         cubes = FindObject(Scatterplot, "DataSpace");

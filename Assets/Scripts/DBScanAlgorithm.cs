@@ -8,6 +8,7 @@ public class DBScanAlgorithm : MonoBehaviour {
 
     public Transform scatterplot;
     public GameObject resetKMeans;
+    public GameObject resetDenclue;
 
     //current data points visualisation
     private GameObject dataVisuals;
@@ -64,6 +65,7 @@ public class DBScanAlgorithm : MonoBehaviour {
         if(counter == 0)
         {
             resetKMeans.GetComponent<KMeansAlgorithm>().ResetMe();
+            resetDenclue.GetComponent<DenclueAlgorithm>().ResetMe();
             AssignDataPoints();
             PaintAllWhite();
             ShuffleDataPoints();
@@ -336,10 +338,7 @@ public class DBScanAlgorithm : MonoBehaviour {
             foreach (Transform obj in dataVisuals.transform)
             {
                 obj.GetComponent<DBScanProperties>().ResetPoint();
-                if (obj.name.Contains("cube"))
-                {
-                    RemoveWireFrame(obj.gameObject);
-                }
+                RemoveWireFrame(obj.gameObject);
                 obj.GetComponent<MeshRenderer>().material.color = obj.GetComponent<PreviousStepProperties>().originalColor;
                 obj.GetComponent<PreviousStepProperties>().colorList = new List<Color>();
             }

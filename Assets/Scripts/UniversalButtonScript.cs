@@ -14,7 +14,7 @@ public class UniversalButtonScript : MonoBehaviour {
     private PointerEventListener ptEvtLsnr;
     private BackButtonMenu menusParent;
     private SwapBetweenMenus swapScript;
-    public TiledmapGeneration denclue;
+    public DenclueAlgorithm denclue;
 
     //for debugging
     public bool loadDataset, loadVis, startDenclue;
@@ -31,7 +31,7 @@ public class UniversalButtonScript : MonoBehaviour {
         menusParent = (BackButtonMenu)FindObjectOfType(typeof(BackButtonMenu));
         swapScript = (SwapBetweenMenus)FindObjectOfType(typeof(SwapBetweenMenus));
         ground = GameObject.Find("Ground");
-        denclue = (TiledmapGeneration)FindObjectOfType(typeof(TiledmapGeneration));
+        denclue = (DenclueAlgorithm)FindObjectOfType(typeof(DenclueAlgorithm));
 
         loadDataset = loadVis = startDenclue = false;
     }

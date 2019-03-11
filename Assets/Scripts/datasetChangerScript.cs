@@ -25,6 +25,7 @@ public class datasetChangerScript : MonoBehaviour
 
     public GameObject resetKmeans;
     public GameObject resetDBScan;
+    public GameObject resetDenclue;
     public GameObject ground;
     public Sprite datasetSelected;
 
@@ -37,6 +38,8 @@ public class datasetChangerScript : MonoBehaviour
 
         //Reset the DBScan algorithm in case the dataset is changed
         resetDBScan.GetComponent<DBScanAlgorithm>().ResetMe();
+
+        resetDenclue.GetComponent<DenclueAlgorithm>().ResetMe();
 
         scatterplot = GameObject.Find("ScatterplotElements");
         cubes = FindObject(scatterplot, "DataSpace");
@@ -99,6 +102,16 @@ public class datasetChangerScript : MonoBehaviour
                     if (childOfChild.name == "DBScan Step Forward")
                     {
                         resetDBScan = childOfChild.gameObject;
+                    }
+                }
+            }
+            else if (child.name == "DENCLUEParent")
+            {
+                foreach (Transform childOfChild in child)
+                {
+                    if (childOfChild.name == "DencluePlay")
+                    {
+                        resetDenclue = childOfChild.gameObject;
                     }
                 }
             }

@@ -5,7 +5,7 @@ using UnityEngine;
 public class KMeansAlgorithm : MonoBehaviour {
 
     public Transform scatterplot;
-    public GameObject resetDBScan;
+    public GameObject resetDBScan, resetDenclue;
     public GameObject sphere;
     private GameObject dataVisuals;
     public GameObject kMeansFinishedPlane;
@@ -151,6 +151,7 @@ public class KMeansAlgorithm : MonoBehaviour {
         if (counter == 0)
         {
             resetDBScan.GetComponent<DBScanAlgorithm>().ResetMe();
+            resetDenclue.GetComponent<DenclueAlgorithm>().ResetMe();
             SetSizeOfArrays(nrOfSpheres);
             GenerateRandomSpheres();
             //spheres.AddRange(GameObject.FindGameObjectsWithTag("sphere"));

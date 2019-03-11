@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class SquareGaussian : MonoBehaviour {
-    public GameObject denclue;
+    public DenclueAlgorithm denclue;
     public SpriteRenderer sprite;
     public Sprite gaussian, square;
 	// Use this for initialization
@@ -19,16 +19,17 @@ public class SquareGaussian : MonoBehaviour {
 
     public void ToggleSquareGaussian()
     {
-        if (denclue.GetComponent<TiledmapGeneration>().gaussianCalculation == true)
+        if (denclue.gaussianCalculation == true)
         {
-            denclue.GetComponent<TiledmapGeneration>().gaussianCalculation = false;
+            denclue.gaussianCalculation = false;
             sprite.sprite = square;
         }
         else
         {
-            denclue.GetComponent<TiledmapGeneration>().gaussianCalculation = true;
+            denclue.gaussianCalculation = true;
             sprite.sprite = gaussian;
         }
-        denclue.GetComponent<TiledmapGeneration>().ResetMe();
+        denclue.ResetMe();
+        denclue.StartDenclue();
     }
 }

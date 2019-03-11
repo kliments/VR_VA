@@ -5,12 +5,12 @@ using UnityEngine;
 public class ToggleSingleMultiCentered : MonoBehaviour {
     public SpriteRenderer sprite;
     public Sprite singleCenSpr, multiCenSpr;
-    private TiledmapGeneration tiledmap;
+    private DenclueAlgorithm denclue;
     private bool multiCentered;
     // Use this for initialization
     void Start()
     {
-        tiledmap = (TiledmapGeneration)FindObjectOfType(typeof(TiledmapGeneration));
+        denclue = (DenclueAlgorithm)FindObjectOfType(typeof(DenclueAlgorithm));
         multiCentered = false;
     }
 
@@ -22,19 +22,18 @@ public class ToggleSingleMultiCentered : MonoBehaviour {
 
     public void Toggle()
     {
-        //reset DBSCAN algorithm
-        tiledmap.ResetMe();
         if (multiCentered)
         {
             multiCentered = false;
-            tiledmap.multiCentered = true;
+            denclue.multiCentered = true;
             sprite.sprite = multiCenSpr;
         }
         else
         {
             multiCentered = true;
-            tiledmap.multiCentered = false;
+            denclue.multiCentered = false;
             sprite.sprite = singleCenSpr;
         }
+        denclue.StartDenclue();
     }
 }

@@ -115,6 +115,7 @@
     <Compile Include="Assets\Scripts\DatasetButtonTextChanger.cs" />
     <Compile Include="Assets\Scripts\DatasetSelectedSpriteToggle.cs" />
     <Compile Include="Assets\Scripts\DatasetSpriteChanger.cs" />
+    <Compile Include="Assets\Scripts\DenclueAlgorithm.cs" />
     <Compile Include="Assets\Scripts\DrawWiredCube.cs" />
     <Compile Include="Assets\Scripts\FixXandZPosition.cs" />
     <Compile Include="Assets\Scripts\GaussianCoefficients.cs" />
@@ -127,6 +128,7 @@
     <Compile Include="Assets\Scripts\ResponsiveMenuDatasetsGenerator.cs" />
     <Compile Include="Assets\Scripts\ResponsiveMenuScript.cs" />
     <Compile Include="Assets\Scripts\RotateDatasetButtonProperties.cs" />
+    <Compile Include="Assets\Scripts\RotateLabelTowardsCamera.cs" />
     <Compile Include="Assets\Scripts\SetToGround.cs" />
     <Compile Include="Assets\Scripts\ShowHideAlgorithms.cs" />
     <Compile Include="Assets\Scripts\ShowHideDBSCANAlgorithm.cs" />
@@ -141,7 +143,6 @@
     <Compile Include="Assets\Scripts\SwapBetweenMenus.cs" />
     <Compile Include="Assets\Scripts\Tetrahedron.cs" />
     <Compile Include="Assets\Scripts\TetrahedronMesh.cs" />
-    <Compile Include="Assets\Scripts\TiledmapGeneration.cs" />
     <Compile Include="Assets\Scripts\ToggleEucledianManhattan.cs" />
     <Compile Include="Assets\Scripts\ToggleSingleMultiCentered.cs" />
     <Compile Include="Assets\Scripts\ToggleSprite.cs" />

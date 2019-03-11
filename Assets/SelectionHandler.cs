@@ -45,8 +45,8 @@ public class SelectionHandler : MonoBehaviour
         //selector.transform.parent = oldSelectorParent;
 
         selector = null;
-        handler.setSelectionSphere(new Vector3(0.5f, 0.5f, 0.5f), 25);
-        handler.setSelection(0, 0, 0, 1, 1, 1);
+        //handler.setSelectionSphere(new Vector3(0.5f, 0.5f, 0.5f), 25);
+        //handler.setSelection(0, 0, 0, 1, 1, 1);
 
         //FIXME set rendering mode opaque for now since the transparent one is not working correctly when there are 
         //handler.dataMappedMaterial.SetFloat("_Mode", 0);
@@ -81,7 +81,7 @@ public class SelectionHandler : MonoBehaviour
         //Debug.Log(minTransformed +" "+ maxTransformed);
 
         //set selection
-        handler.setSelectionSphere(centerTransformed, selectorSize/2.0f);
+        //handler.setSelectionSphere(centerTransformed, selectorSize/2.0f);
     }
 
 }
