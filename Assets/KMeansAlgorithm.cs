@@ -370,7 +370,8 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
 
     void SetSizeOfArrays(int i)
     {
-        clusters = new List<List<GameObject>>(i);
+        //clusters = new List<List<GameObject>>(i);
+        clusters = new List<List<GameObject>>(new List<GameObject>[i]);
         for(int a=0; a<clusters.Count; a++)
         {
             clusters[a] = new List<GameObject>();
@@ -456,6 +457,7 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
         movedSteps = 0;
         bestClusterFound = false;
         counter = 0;
+        clusterID = 0;
         kMeansFinishedPlane.SetActive(false);
         for(int s = 0; s < nrOfSpheres; s++)
         {

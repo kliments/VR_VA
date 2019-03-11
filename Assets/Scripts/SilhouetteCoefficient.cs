@@ -27,15 +27,15 @@ public class SilhouetteCoefficient : MonoBehaviour {
         int clusterID = 0;
         float count = 0;
         float coef = 0;
-        float minAverage = 0;
-        foreach(Transform point in dataContainer)
+        float minAverage = 10;
+        foreach(GameObject point in dataPoints)
         {
             clusterID = point.GetComponent<ClusterQualityValues>().clusterID;
-            point.GetComponent<ClusterQualityValues>().Ai = AverageDistance(point.gameObject, currentAlgorithm.clusters[clusterID]);
+            point.GetComponent<ClusterQualityValues>().Ai = AverageDistance(point, currentAlgorithm.clusters[clusterID]);
             for(int i=0; i<currentAlgorithm.clusters.Count; i++)
             {
                 if (i == clusterID) continue;
-                if (minAverage > AverageDistance(point.gameObject, currentAlgorithm.clusters[i])) minAverage = AverageDistance(point.gameObject, currentAlgorithm.clusters[i]);
+                if (minAverage > AverageDistance(point, currentAlgorithm.clusters[i])) minAverage = AverageDistance(point, currentAlgorithm.clusters[i]);
             }
             point.GetComponent<ClusterQualityValues>().Bi = minAverage;
             point.GetComponent<ClusterQualityValues>().Si = (point.GetComponent<ClusterQualityValues>().Bi - point.GetComponent<ClusterQualityValues>().Ai) / Mathf.Max(point.GetComponent<ClusterQualityValues>().Ai, point.GetComponent<ClusterQualityValues>().Bi);
