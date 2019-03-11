@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DBScanAlgorithm : MonoBehaviour {
+public class DBScanAlgorithm : ClusteringAlgorithm {
     public float epsilon;
     public int minPts;
 
+    public SilhouetteCoefficient silhouetteCoef;
     public Transform scatterplot;
     public GameObject resetKMeans;
     public GameObject resetDenclue;
@@ -26,7 +27,7 @@ public class DBScanAlgorithm : MonoBehaviour {
     public int counter;
     
     private List<List<GameObject>> neighbours;
-    private List<GameObject> corePoints;
+    private List<GameObject> corePoints, currentCluster;
 
     public int clusterID, UNCLASSIFIED, NOISE, tempClusterID;
 
@@ -53,6 +54,9 @@ public class DBScanAlgorithm : MonoBehaviour {
         allClustersFound = false;
         steps = new List<string>();
         processedPoints = new List<List<GameObject>>();
+        clusters = new List<List<GameObject>>();
+        currentCluster = new List<GameObject>();
+        silhouetteCoef = (SilhouetteCoefficient)FindObjectOfType(typeof(SilhouetteCoefficient));
     }
 	
 	// Update is called once per frame
@@ -66,6 +70,8 @@ public class DBScanAlgorithm : MonoBehaviour {
         {
             resetKMeans.GetComponent<KMeansAlgorithm>().ResetMe();
             resetDenclue.GetComponent<DenclueAlgorithm>().ResetMe();
+            silhouetteCoef.currentAlgorithm = this;
+
             AssignDataPoints();
             PaintAllWhite();
             ShuffleDataPoints();
@@ -122,6 +128,8 @@ public class DBScanAlgorithm : MonoBehaviour {
                             corePoints[i].GetComponent<DBScanProperties>().clusterID = clusterID;
                             corePoints[i].GetComponent<MeshRenderer>().material.color = pointsColor[clusterID - 1];
                             temp.Add(corePoints[i]);
+
+                            currentCluster.Add(corePoints[i]);
                             dataPoints.Remove(corePoints[i]);
                         }
                         corePoints.Remove(dataPoint);
@@ -158,9 +166,10 @@ public class DBScanAlgorithm : MonoBehaviour {
                                 obj.GetComponent<DBScanProperties>().clusterID = clusterID;
                                 obj.GetComponent<MeshRenderer>().material.color = pointsColor[clusterID - 1];
                                 temp.Add(obj);
+                                currentCluster.Add(obj);
                                 dataPoints.Remove(obj);
                                 //only for cubes
-                                if(obj.name.Contains("cube"))
+                                if(obj.name.Contains("Cube"))
                                 {
                                     AddWireFrame(obj);
                                 }
@@ -181,6 +190,8 @@ public class DBScanAlgorithm : MonoBehaviour {
 
                 if (neighbours.Count == 0)
                 {
+                    clusters.Add(currentCluster);
+                    currentCluster = new List<GameObject>();
                     clusterID++;
                     if (clusterID > 20)
                     {
@@ -353,6 +364,8 @@ public class DBScanAlgorithm : MonoBehaviour {
         dbscanFinishedPlane.SetActive(false);
         steps = new List<string>();
         processedPoints = new List<List<GameObject>>();
+        clusters = new List<List<GameObject>>();
+        currentCluster = new List<GameObject>();
     }
 
     private void ShuffleDataPoints()

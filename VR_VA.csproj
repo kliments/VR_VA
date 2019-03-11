@@ -104,6 +104,8 @@
     <Compile Include="Assets\Scripts\AutomaticLoadDataVisDenclue.cs" />
     <Compile Include="Assets\Scripts\BackButtonMenu.cs" />
     <Compile Include="Assets\Scripts\ChangeNrOfEpsilonAndMinPts.cs" />
+    <Compile Include="Assets\Scripts\ClusterQualityValues.cs" />
+    <Compile Include="Assets\Scripts\ClusteringAlgorithm.cs" />
     <Compile Include="Assets\Scripts\CoverflowScript.cs" />
     <Compile Include="Assets\Scripts\CubeSorter.cs" />
     <Compile Include="Assets\Scripts\CubesVertices.cs" />
@@ -139,6 +141,7 @@
     <Compile Include="Assets\Scripts\ShowOrHideDatasets.cs" />
     <Compile Include="Assets\Scripts\ShowOrHideVisualizations.cs" />
     <Compile Include="Assets\Scripts\ShowProperAlgorithmButtons.cs" />
+    <Compile Include="Assets\Scripts\SilhouetteCoefficient.cs" />
     <Compile Include="Assets\Scripts\SquareGaussian.cs" />
     <Compile Include="Assets\Scripts\SwapBetweenMenus.cs" />
     <Compile Include="Assets\Scripts\Tetrahedron.cs" />

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class KMeansAlgorithm : MonoBehaviour {
+public class KMeansAlgorithm : ClusteringAlgorithm {
 
     public Transform scatterplot;
     public GameObject resetDBScan, resetDenclue;
@@ -11,13 +11,12 @@ public class KMeansAlgorithm : MonoBehaviour {
     public GameObject kMeansFinishedPlane;
     public List<Color> spheresColor;
     private List<GameObject> spheres;
+    public SilhouetteCoefficient silhouetteCoef;
 
     //offset for X and Z values, because the 0 coordinates of the local position from each data point is shifted from their parent to x=-0,581 and z=-0,63
     private float xOffset = 0.581f;
     private float zOffset = 0.63f;
-
-    //array of lists for data points with different collors
-    private List<GameObject>[] dataPoints;
+    
 
     //average center position
     private Vector3[] avgCenter;
@@ -76,10 +75,14 @@ public class KMeansAlgorithm : MonoBehaviour {
 
     //Used for reset, in case the Play button was pressed
     public GameObject play;
-    // Use this for initialization
-    void Start () {
 
-	}
+    //current cluster ID
+    private int clusterID = 0;
+    // Use this for initialization
+    void Start ()
+    {
+        silhouetteCoef = (SilhouetteCoefficient)FindObjectOfType(typeof(SilhouetteCoefficient));
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -139,6 +142,15 @@ public class KMeansAlgorithm : MonoBehaviour {
                 kMeansFinishedPlane.SetActive(true);
                 kMeansFinishedPlane.transform.GetChild(0).gameObject.GetComponent<TextMesh>().text = "Best clustering found in " + counter.ToString() + " steps!";
                 bestClusterFound = true;
+
+                foreach(var cluster in clusters)
+                {
+                    foreach(var point in cluster)
+                    {
+                        point.GetComponent<ClusterQualityValues>().clusterID = clusterID;
+                    }
+                    clusterID++;
+                }
             }
         }
 	}
@@ -152,6 +164,8 @@ public class KMeansAlgorithm : MonoBehaviour {
         {
             resetDBScan.GetComponent<DBScanAlgorithm>().ResetMe();
             resetDenclue.GetComponent<DenclueAlgorithm>().ResetMe();
+            silhouetteCoef.currentAlgorithm = this;
+
             SetSizeOfArrays(nrOfSpheres);
             GenerateRandomSpheres();
             //spheres.AddRange(GameObject.FindGameObjectsWithTag("sphere"));
@@ -251,9 +265,9 @@ public class KMeansAlgorithm : MonoBehaviour {
 
         for (int dP = 0; dP < nrOfSpheres; dP++)
         {
-            if (dataPoints[dP].Count > 0)
+            if (clusters[dP].Count > 0)
             {
-                dataPoints[dP].Clear();
+                clusters[dP].Clear();
             }
         }
         foreach (Transform child in dataVisuals.transform)
@@ -278,7 +292,7 @@ public class KMeansAlgorithm : MonoBehaviour {
             {
                 child.gameObject.GetComponent<MeshRenderer>().material.SetColor("_Color", spheres[smallestDistanceIndex].GetComponent<Renderer>().material.color);
                 child.gameObject.GetComponent<PreviousStepProperties>().colorList.Add(spheres[smallestDistanceIndex].GetComponent<Renderer>().material.color);
-                dataPoints[smallestDistanceIndex].Add(child.gameObject);
+                clusters[smallestDistanceIndex].Add(child.gameObject);
                 newTotal[smallestDistanceIndex]++;
             }
 
@@ -293,7 +307,7 @@ public class KMeansAlgorithm : MonoBehaviour {
                     {
                         if (child.gameObject.GetComponent<MeshRenderer>().material.color == spheres[pC].GetComponent<MeshRenderer>().material.color)
                             {
-                                dataPoints[pC].Add(child.gameObject);
+                                clusters[pC].Add(child.gameObject);
                                 newTotal[pC]++;
                                 break;
                             }
@@ -312,20 +326,20 @@ public class KMeansAlgorithm : MonoBehaviour {
         //calculate center of each color data points
         for (int c = 0; c < nrOfSpheres; c++)
         {
-            if (dataPoints[c].Count > 0)
+            if (clusters[c].Count > 0)
             {
-                for (int r = 0; r < dataPoints[c].Count; r++)
+                for (int r = 0; r < clusters[c].Count; r++)
                 {
-                    xPos[c] += dataPoints[c][r].transform.localPosition.x;
-                    yPos[c] += dataPoints[c][r].transform.localPosition.y;
-                    zPos[c] += dataPoints[c][r].transform.localPosition.z;
+                    xPos[c] += clusters[c][r].transform.localPosition.x;
+                    yPos[c] += clusters[c][r].transform.localPosition.y;
+                    zPos[c] += clusters[c][r].transform.localPosition.z;
                 }
-                xPos[c] = xPos[c] / dataPoints[c].Count;
+                xPos[c] = xPos[c] / clusters[c].Count;
                 xPos[c] = xPos[c] - xOffset;
 
-                yPos[c] = yPos[c] / dataPoints[c].Count;
+                yPos[c] = yPos[c] / clusters[c].Count;
 
-                zPos[c] = zPos[c] / dataPoints[c].Count;
+                zPos[c] = zPos[c] / clusters[c].Count;
                 zPos[c] = zPos[c] - zOffset;
             }
             else
@@ -356,10 +370,10 @@ public class KMeansAlgorithm : MonoBehaviour {
 
     void SetSizeOfArrays(int i)
     {
-        dataPoints = new List<GameObject>[i];
-        for(int a=0; a<dataPoints.Length; a++)
+        clusters = new List<List<GameObject>>(i);
+        for(int a=0; a<clusters.Count; a++)
         {
-            dataPoints[a] = new List<GameObject>();
+            clusters[a] = new List<GameObject>();
         }
         spheres = new List<GameObject>();
         distance = new float[i];
