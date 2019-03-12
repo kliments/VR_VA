@@ -7,10 +7,11 @@ public class SilhouetteCoefficient : MonoBehaviour {
     public Transform dataContainer;
     public ClusteringAlgorithm currentAlgorithm;
     private List<GameObject> dataPoints;
-	// Use this for initialization
-	void Start () {
+    private Transform[] list;
+    // Use this for initialization
+    void Start () {
 
-	}
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -30,6 +31,7 @@ public class SilhouetteCoefficient : MonoBehaviour {
         float minAverage = 10;
         foreach(GameObject point in dataPoints)
         {
+            minAverage = 10;
             clusterID = point.GetComponent<ClusterQualityValues>().clusterID;
             point.GetComponent<ClusterQualityValues>().Ai = AverageDistance(point, currentAlgorithm.clusters[clusterID]);
             for(int i=0; i<currentAlgorithm.clusters.Count; i++)
@@ -48,7 +50,8 @@ public class SilhouetteCoefficient : MonoBehaviour {
     void AssignData()
     {
         dataPoints = new List<GameObject>();
-        foreach(Transform child in dataContainer)
+        list = dataContainer.GetComponentsInChildren<Transform>(false);
+        foreach (Transform child in list)
         {
             if(child.gameObject.GetComponent<ClusterQualityValues>() != null)
             {

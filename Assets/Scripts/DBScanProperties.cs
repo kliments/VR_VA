@@ -22,7 +22,7 @@ public class DBScanProperties : MonoBehaviour {
     private float sizeDiamond;
     private Color color;
     private MaterialPropertyBlock blockColor;
-
+    private GameObject obj;
     // Use this for initialization
     void Start () {
         //starting radius to increase till epsilon
@@ -35,6 +35,12 @@ public class DBScanProperties : MonoBehaviour {
         diamondMesh = new Mesh();
         blockColor = new MaterialPropertyBlock();
         refMat = new Material(Shader.Find("Transparent/Bumped Diffuse"));
+
+        obj = new GameObject();
+        obj.AddComponent<MeshFilter>();
+        obj.AddComponent<MeshRenderer>();
+        obj.GetComponent<MeshRenderer>().material = refMat;
+        obj.transform.parent = transform;
     }
 	
 	// Update is called once per frame
@@ -56,14 +62,14 @@ public class DBScanProperties : MonoBehaviour {
                 GenerateManhattanDiamond();
                 SetColor();
             }
-            if(drawSphere)
+            /*if(drawSphere)
             {
                 Graphics.DrawMesh(sphereMesh, pos, Quaternion.identity, refMat, layerMask);
             }
             else
             {
                 Graphics.DrawMesh(diamondMesh, pos, Quaternion.identity, refMat, layerMask);
-            }
+            }*/
         }
         else if(clusterID == NOISE)
         {
@@ -170,6 +176,7 @@ public class DBScanProperties : MonoBehaviour {
         sphereMesh.RecalculateBounds();
 
         drawSphere = true;
+        obj.GetComponent<MeshFilter>().mesh = sphereMesh;
     }
 
     private void GenerateManhattanDiamond()
@@ -201,6 +208,7 @@ public class DBScanProperties : MonoBehaviour {
         diamondMesh.triangles = triangles;
         diamondMesh.RecalculateBounds();
         drawSphere = false;
+        obj.GetComponent<MeshFilter>().mesh = diamondMesh;
     }
 
     private void SetColor()
