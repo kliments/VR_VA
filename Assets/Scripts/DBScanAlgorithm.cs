@@ -38,7 +38,7 @@ public class DBScanAlgorithm : ClusteringAlgorithm {
     private List<string> steps;
     private List<List<GameObject>> processedPoints;
 
-    public bool allClustersFound;
+    public bool allClustersFound, nextStep;
     public GameObject playRoutine;
     // Use this for initialization
     void Start () {
@@ -61,6 +61,11 @@ public class DBScanAlgorithm : ClusteringAlgorithm {
 	
 	// Update is called once per frame
 	void Update () {
+        if(nextStep)
+        {
+            nextStep = false;
+            StartDBSCAN();
+        }
     }
 
     public void StartDBSCAN()

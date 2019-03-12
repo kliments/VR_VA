@@ -32,7 +32,6 @@ public class UniversalButtonScript : MonoBehaviour {
         swapScript = (SwapBetweenMenus)FindObjectOfType(typeof(SwapBetweenMenus));
         ground = GameObject.Find("Ground");
         denclue = (DenclueAlgorithm)FindObjectOfType(typeof(DenclueAlgorithm));
-
         loadDataset = loadVis = startDenclue = false;
     }
 	

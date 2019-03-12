@@ -41,6 +41,7 @@ public class DBScanProperties : MonoBehaviour {
         obj.AddComponent<MeshRenderer>();
         obj.GetComponent<MeshRenderer>().material = refMat;
         obj.transform.parent = transform;
+        obj.transform.position = transform.position;
     }
 	
 	// Update is called once per frame

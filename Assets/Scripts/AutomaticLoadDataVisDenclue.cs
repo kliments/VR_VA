@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class AutomaticLoadDataVisDenclue : MonoBehaviour {
-    public GameObject data, viz, denclue;
+    public GameObject data, viz, denclue, dbscan;
     public int i;
 	// Use this for initialization
 	void Start () {
@@ -35,6 +35,5 @@ public class AutomaticLoadDataVisDenclue : MonoBehaviour {
     {
         Invoke("LoadData", 1f);
         Invoke("LoadVis", 1.1f);
-        Invoke("LoadDenclue", 1.2f);
     }
 }
