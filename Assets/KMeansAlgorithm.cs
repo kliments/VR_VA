@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class KMeansAlgorithm : ClusteringAlgorithm {
 
@@ -76,6 +77,8 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
     //Used for reset, in case the Play button was pressed
     public GameObject play;
 
+    public bool nextStep;
+
     //current cluster ID
     private int clusterID = 0;
     // Use this for initialization
@@ -142,7 +145,6 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
                 kMeansFinishedPlane.SetActive(true);
                 kMeansFinishedPlane.transform.GetChild(0).gameObject.GetComponent<TextMesh>().text = "Best clustering found in " + counter.ToString() + " steps!";
                 bestClusterFound = true;
-
                 foreach(var cluster in clusters)
                 {
                     foreach(var point in cluster)
@@ -151,12 +153,23 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
                     }
                     clusterID++;
                 }
+
+                //paint pseudo code text red
+                pseudoCodeText.transform.GetChild(4).GetComponent<Text>().color = Color.red;
+                prevText.color = Color.black;
+                prevText = pseudoCodeText.transform.GetChild(4).GetComponent<Text>();
             }
+        }
+        if(nextStep)
+        {
+            nextStep = false;
+            StartAlgorithm();
         }
 	}
 
     public void StartAlgorithm()
     {
+        pseudoCodeText.SetActive(true);
         AssignDataToGameObjects();
 
         //only generate spheres the first time;
@@ -168,6 +181,10 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
 
             SetSizeOfArrays(nrOfSpheres);
             GenerateRandomSpheres();
+
+            //paint pseudo code text red
+            pseudoCodeText.transform.GetChild(1).GetComponent<Text>().color = Color.red;
+            prevText = pseudoCodeText.transform.GetChild(1).GetComponent<Text>();
             //spheres.AddRange(GameObject.FindGameObjectsWithTag("sphere"));
             Vector3[] copy1 = new Vector3[nrOfSpheres];
 
@@ -192,6 +209,7 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
             foreach(Transform dataPoint in dataVisuals.transform)
             {
                 dataPoint.gameObject.GetComponent<MeshRenderer>().material.color = Color.white;
+                clusteredPoints++;
             }
 
         }
@@ -205,6 +223,11 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
             repositionSpheres = true;
             prevReposSpheres = false;
             counter++;
+
+            //paint pseudo code text red
+            pseudoCodeText.transform.GetChild(2).GetComponent<Text>().color = Color.red;
+            prevText.color = Color.black;
+            prevText = pseudoCodeText.transform.GetChild(2).GetComponent<Text>();
         }
 
         //if the next step is to reposition the spheres in the center of the data points
@@ -218,6 +241,11 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
             prevReposSpheres = true;
             allInPlace = false;
             counter++;
+
+            //paint pseudo code text red
+            pseudoCodeText.transform.GetChild(3).GetComponent<Text>().color = Color.red;
+            prevText.color = Color.black;
+            prevText = pseudoCodeText.transform.GetChild(3).GetComponent<Text>();
         }
     }
 
@@ -235,6 +263,11 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
             repositionSpheres = false;
             prevReposSpheres = true;
             counter--;
+
+            //paint pseudo code text red
+            pseudoCodeText.transform.GetChild(2).GetComponent<Text>().color = Color.red;
+            prevText.color = Color.black;
+            prevText = pseudoCodeText.transform.GetChild(2).GetComponent<Text>();
         }
 
         else if(prevReposSpheres)
@@ -248,6 +281,11 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
             prevReposSpheres = false;
             allInPlace = false;
             counter--;
+
+            //paint pseudo code text red
+            pseudoCodeText.transform.GetChild(3).GetComponent<Text>().color = Color.red;
+            prevText.color = Color.black;
+            prevText = pseudoCodeText.transform.GetChild(3).GetComponent<Text>();
         }
     }
 
@@ -458,6 +496,7 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
         bestClusterFound = false;
         counter = 0;
         clusterID = 0;
+        clusteredPoints = 0;
         kMeansFinishedPlane.SetActive(false);
         for(int s = 0; s < nrOfSpheres; s++)
         {
@@ -484,6 +523,9 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
         repositionSpheres = false;
         prevChangeColors = false;
         prevReposSpheres = false;
+
+        if (prevText != null) prevText.color = Color.black;
+        pseudoCodeText.SetActive(false);
     }
 
     public bool AllAreTrue(bool[] array)

@@ -7,7 +7,7 @@ public class DBScanProperties : MonoBehaviour {
     
     public int UNCLASSIFIED = 0;
     public int NOISE = -1;
-    public bool drawMeshAround, drawSphere;
+    public bool drawMeshAround, drawSphere, clustered;
     public int clusterID;
     public float epsilon;
     //mesh to be drawn
@@ -17,7 +17,6 @@ public class DBScanProperties : MonoBehaviour {
     public DBScanAlgorithm dbScanButton;
     private int layerMask;
     private Vector3[] baseVertices;
-    private Vector3 pos;
     private float radiusSphere;
     private float sizeDiamond;
     private Color color;
@@ -48,20 +47,46 @@ public class DBScanProperties : MonoBehaviour {
 	void Update () {
 		if(drawMeshAround)
         {
-            pos = transform.position;
-            if(dbScanButton == null)
+            if (clusterID == NOISE)
             {
-                dbScanButton = (DBScanAlgorithm)FindObjectOfType(typeof(DBScanAlgorithm));
+                gameObject.GetComponent<MeshRenderer>().material.color = Color.black;
+
+                if (dbScanButton == null)
+                {
+                    dbScanButton = (DBScanAlgorithm)FindObjectOfType(typeof(DBScanAlgorithm));
+                }
+                if (radiusSphere < epsilon && dbScanButton.GetComponent<DBScanAlgorithm>().euclDist)
+                {
+                    GenerateSphere();
+                }
+                else if (sizeDiamond < epsilon && !dbScanButton.GetComponent<DBScanAlgorithm>().euclDist)
+                {
+                    GenerateManhattanDiamond();
+                }
+                else
+                {
+                    obj.GetComponent<MeshFilter>().mesh = new Mesh();
+                }
+                color = Color.black;
+                color.a = 0.2f;
+                refMat.color = color;
             }
-            if (radiusSphere < epsilon && dbScanButton.GetComponent<DBScanAlgorithm>().euclDist)
+            else
             {
-                GenerateSphere();
-                SetColor();
-            }
-            else if (sizeDiamond < epsilon && !dbScanButton.GetComponent<DBScanAlgorithm>().euclDist)
-            {
-                GenerateManhattanDiamond();
-                SetColor();
+                if (dbScanButton == null)
+                {
+                    dbScanButton = (DBScanAlgorithm)FindObjectOfType(typeof(DBScanAlgorithm));
+                }
+                if (radiusSphere < epsilon && dbScanButton.GetComponent<DBScanAlgorithm>().euclDist)
+                {
+                    GenerateSphere();
+                    SetColor();
+                }
+                else if (sizeDiamond < epsilon && !dbScanButton.GetComponent<DBScanAlgorithm>().euclDist)
+                {
+                    GenerateManhattanDiamond();
+                    SetColor();
+                }
             }
             /*if(drawSphere)
             {
@@ -71,10 +96,6 @@ public class DBScanProperties : MonoBehaviour {
             {
                 Graphics.DrawMesh(diamondMesh, pos, Quaternion.identity, refMat, layerMask);
             }*/
-        }
-        else if(clusterID == NOISE)
-        {
-            gameObject.GetComponent<MeshRenderer>().material.color = Color.black;
         }
 	}
 
@@ -175,8 +196,8 @@ public class DBScanProperties : MonoBehaviour {
         sphereMesh.triangles = triangles;
 
         sphereMesh.RecalculateBounds();
-
         drawSphere = true;
+        if (radiusSphere == epsilon) drawSphere = false;
         obj.GetComponent<MeshFilter>().mesh = sphereMesh;
     }
 

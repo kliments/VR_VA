@@ -43,21 +43,25 @@ public class SilhouetteCoefficient : MonoBehaviour {
     private float Coef()
     {
         int clusterID = 0;
-        float count = 0;
+        float count = 1;
         float coef = 0;
         float minAverage = 10;
+        float ai, si;
         foreach(GameObject point in _dataPoints)
         {
+            if (point.GetComponent<ClusterQualityValues>().clusterID == currentAlgorithm.NOISE) continue;
             minAverage = 10;
             clusterID = point.GetComponent<ClusterQualityValues>().clusterID;
-            point.GetComponent<ClusterQualityValues>().Ai = AverageDistance(point, currentAlgorithm.clusters[clusterID]);
+            ai = AverageDistance(point, currentAlgorithm.clusters[clusterID]);
+            point.GetComponent<ClusterQualityValues>().Ai = ai;
             for(int i=0; i<currentAlgorithm.clusters.Count; i++)
             {
                 if (i == clusterID) continue;
                 if (minAverage > AverageDistance(point, currentAlgorithm.clusters[i])) minAverage = AverageDistance(point, currentAlgorithm.clusters[i]);
             }
             point.GetComponent<ClusterQualityValues>().Bi = minAverage;
-            point.GetComponent<ClusterQualityValues>().Si = (point.GetComponent<ClusterQualityValues>().Bi - point.GetComponent<ClusterQualityValues>().Ai) / Mathf.Max(point.GetComponent<ClusterQualityValues>().Ai, point.GetComponent<ClusterQualityValues>().Bi);
+            si = (point.GetComponent<ClusterQualityValues>().Bi - point.GetComponent<ClusterQualityValues>().Ai) / Mathf.Max(point.GetComponent<ClusterQualityValues>().Ai, point.GetComponent<ClusterQualityValues>().Bi);
+            point.GetComponent<ClusterQualityValues>().Si = si;
             coef += point.GetComponent<ClusterQualityValues>().Si;
             count++;
         }
@@ -94,11 +98,11 @@ public class SilhouetteCoefficient : MonoBehaviour {
         int currentPoint = 0;
         Color _currentColor = new Color();
         Vector3 tempVertex = new Vector3();
-        _yScale = (0.5f - (clustersValues.Length - 1) * 0.01f) / _dataPoints.Count;
+        _yScale = (0.5f - (clustersValues.Length - 1) * 0.01f) / currentAlgorithm.clusteredPoints;
         _yShift = 1.7f;
-        _vertices = new Vector3[_dataPoints.Count * 4];
-        _triangles = new int[_dataPoints.Count * 6];
-        _colors = new Color[_dataPoints.Count * 4];
+        _vertices = new Vector3[currentAlgorithm.clusteredPoints * 4];
+        _triangles = new int[currentAlgorithm.clusteredPoints * 6];
+        _colors = new Color[currentAlgorithm.clusteredPoints * 4];
         //calculate vertices
         for(int i=0; i<clustersValues.Length; i++)
         {
@@ -106,7 +110,7 @@ public class SilhouetteCoefficient : MonoBehaviour {
             for(int j=clustersValues[i].Length -1; j>=0; j--)
             {
                 #region Vertex0
-                tempVertex.x = -0.15f;
+                tempVertex.x = -0.7f;
                 tempVertex.y = _yShift;
                 tempVertex.z = 2.996f;
                 _vertices[currentPoint * 4] = tempVertex;
@@ -114,7 +118,7 @@ public class SilhouetteCoefficient : MonoBehaviour {
                 #endregion
 
                 #region Vertex1
-                tempVertex.x = -0.15f + clustersValues[i][j] * 0.4f;
+                tempVertex.x = -0.7f + clustersValues[i][j] * 0.4f;
                 tempVertex.y = _yShift;
                 tempVertex.z = 2.996f;
                 _vertices[currentPoint * 4 + 1] = tempVertex;
@@ -122,7 +126,7 @@ public class SilhouetteCoefficient : MonoBehaviour {
                 #endregion
                 _yShift -= _yScale;
                 #region Vertex2
-                tempVertex.x = -0.15f;
+                tempVertex.x = -0.7f;
                 tempVertex.y = _yShift;
                 tempVertex.z = 2.996f;
                 _vertices[currentPoint * 4 + 2] = tempVertex;
@@ -130,7 +134,7 @@ public class SilhouetteCoefficient : MonoBehaviour {
                 #endregion
 
                 #region Vertex3
-                tempVertex.x = -0.15f + clustersValues[i][j] * 0.4f;
+                tempVertex.x = -0.7f + clustersValues[i][j] * 0.4f;
                 tempVertex.y = _yShift;
                 tempVertex.z = 2.996f;
                 _vertices[currentPoint * 4 + 3] = tempVertex;
@@ -154,7 +158,7 @@ public class SilhouetteCoefficient : MonoBehaviour {
         }
         currentPoint = 0;
         //create triangles
-        for(int i=0; i<_dataPoints.Count; i++)
+        for(int i=0; i< currentAlgorithm.clusteredPoints; i++)
         {
             _triangles[currentPoint * 6] = currentPoint*4;
             _triangles[currentPoint * 6 + 1] = currentPoint * 4 + 1;
@@ -171,7 +175,7 @@ public class SilhouetteCoefficient : MonoBehaviour {
         _mesh.RecalculateBounds();
 
         _obj.GetComponent<MeshFilter>().mesh = _mesh;
-        tempVertex.x = -0.15f + Coef() * 0.4f;
+        tempVertex.x = -0.7f + Coef() * 0.4f;
         tempVertex.y = 1.45f;
         tempVertex.z = 2.996f;
         averageLine.position = tempVertex;

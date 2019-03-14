@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class DenclueAlgorithm : MonoBehaviour {
     public float[][] mapTilesInfluence;
@@ -17,6 +18,7 @@ public class DenclueAlgorithm : MonoBehaviour {
     public DBScanAlgorithm dbscan;
     public int colorCounter = 0;
     public List<Color> clusterColors;
+    public GameObject pseudoCode;
 
     private GameObject _obj;
     private Mesh _mesh;
@@ -39,8 +41,9 @@ public class DenclueAlgorithm : MonoBehaviour {
     private int[][] _trianglesMatrix, _countersMatrix;
     private int[] _triangles, _originalTriangles;
     private int _counter, _tile0, _tile1, _tile2, _tile3, a, b, c, d, _layerMask;
-    private float _x, _y, _z, _dist, _crossP1, _crossP2, _maxHeight,_minHeight;
+    private float _x, _y, _z, _dist, _crossP1, _crossP2, _maxHeight, _minHeight;
     private RaycastHit _hit;
+    private Text prevText;
     // Use this for initialization
     void Start () {
         _x = -0.25f;
@@ -159,6 +162,10 @@ public class DenclueAlgorithm : MonoBehaviour {
         thresholdPlane.SetActive(true);
         IncreaseInfluence();
         resizeMesh = true;
+
+        pseudoCode.SetActive(true);
+        prevText = pseudoCode.transform.GetChild(1).GetComponent<Text>();
+        prevText.color = Color.red;
     }
     
     //increasing influence if "tiles" belong in neighbourhood
@@ -677,6 +684,9 @@ public class DenclueAlgorithm : MonoBehaviour {
         }
         thresholdPlane.SetActive(false);
         label.SetActive(false);
+
+        pseudoCode.SetActive(false);
+        if (prevText != null) prevText.color = Color.black;
     }
 
     //checks whether a tile has any neighbours around that are part of the mesh

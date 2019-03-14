@@ -1,10 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public abstract class ClusteringAlgorithm : MonoBehaviour {
 
     public List<List<GameObject>> clusters;
+    public GameObject pseudoCodeText;
+    public Text prevText;
+    public int clusteredPoints;
+    public int NOISE = -1;
 	// Use this for initialization
 	void Start () {
 		

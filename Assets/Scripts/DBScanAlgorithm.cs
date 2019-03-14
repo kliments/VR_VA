@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class DBScanAlgorithm : ClusteringAlgorithm {
     public float epsilon;
@@ -21,7 +22,7 @@ public class DBScanAlgorithm : ClusteringAlgorithm {
     public List<Color> pointsColor;
 
     //the actual data points
-    public List<GameObject> dataPoints;
+    public List<GameObject> dataPoints, noisePoints;
     
     //counter for steps
     public int counter;
@@ -29,7 +30,7 @@ public class DBScanAlgorithm : ClusteringAlgorithm {
     private List<List<GameObject>> neighbours;
     private List<GameObject> corePoints, currentCluster;
 
-    public int clusterID, UNCLASSIFIED, NOISE, tempClusterID;
+    public int clusterID, UNCLASSIFIED, tempClusterID;
 
     //Eucledian distance if true, if not then Manhattan
     public bool euclDist;
@@ -40,6 +41,8 @@ public class DBScanAlgorithm : ClusteringAlgorithm {
 
     public bool allClustersFound, nextStep;
     public GameObject playRoutine;
+
+    private Text prevText1;
     // Use this for initialization
     void Start () {
         counter = 0;
@@ -77,6 +80,7 @@ public class DBScanAlgorithm : ClusteringAlgorithm {
             resetDenclue.GetComponent<DenclueAlgorithm>().ResetMe();
             silhouetteCoef.currentAlgorithm = this;
 
+            pseudoCodeText.SetActive(true);
             AssignDataPoints();
             PaintAllWhite();
             ShuffleDataPoints();
@@ -90,6 +94,25 @@ public class DBScanAlgorithm : ClusteringAlgorithm {
             dbscanFinishedPlane.SetActive(true);
             allClustersFound = true;
             steps.Add("finish");
+            clusterID = 0;
+            foreach (var cluster in clusters)
+            {
+                foreach (var point in cluster)
+                {
+                    point.GetComponent<ClusterQualityValues>().clusterID = clusterID;
+                }
+                clusterID++;
+            }
+            foreach(var point in noisePoints)
+            {
+                point.GetComponent<ClusterQualityValues>().clusterID = NOISE;
+            }
+
+            //paint pseudo code text red
+            prevText.color = Color.black;
+            prevText1.color = Color.black;
+            pseudoCodeText.transform.GetChild(5).GetComponent<Text>().color = Color.red;
+            prevText = pseudoCodeText.transform.GetChild(5).GetComponent<Text>();
         }
         else
         {//check if there are any neighbours to expand, before trying to find another cluster
@@ -106,9 +129,23 @@ public class DBScanAlgorithm : ClusteringAlgorithm {
                 {
                     List<GameObject> temp = new List<GameObject>();
                     corePoints = RegionQuery(dataPoint, epsilon, euclDist);
+
+                    //paint pseudo code text red
+                    if(prevText != null) prevText.color = Color.black;
+                    if(prevText1 != null) prevText1.color = Color.black;
+
+                    pseudoCodeText.transform.GetChild(1).GetComponent<Text>().color = Color.red;
+                    prevText = pseudoCodeText.transform.GetChild(1).GetComponent<Text>();
+
+                    pseudoCodeText.transform.GetChild(2).GetComponent<Text>().color = Color.red;
+                    prevText1 = pseudoCodeText.transform.GetChild(2).GetComponent<Text>();
+
                     if (corePoints.Count < minPts) //no core point
                     {
                         dataPoint.GetComponent<DBScanProperties>().clusterID = NOISE;
+                        dataPoint.GetComponent<DBScanProperties>().drawMeshAround = true;
+                        dataPoint.GetComponent<DBScanProperties>().epsilon = epsilon;
+                        noisePoints.Add(dataPoint);
                         corePoints = new List<GameObject>();
                         RemoveWireFrame(dataPoint);
                         //necessary for previous steps
@@ -120,6 +157,7 @@ public class DBScanAlgorithm : ClusteringAlgorithm {
                         dataPoint.GetComponent<DBScanProperties>().epsilon = epsilon;
                         dataPoint.GetComponent<DBScanProperties>().clusterID = clusterID;
                         dataPoint.GetComponent<DBScanProperties>().drawMeshAround = true;
+                        clusteredPoints++;
                         steps.Add("ptHaveNbrs");
 
                         temp = new List<GameObject>();
@@ -160,6 +198,7 @@ public class DBScanAlgorithm : ClusteringAlgorithm {
                     currentPoint.GetComponent<DBScanProperties>().epsilon = epsilon;
                     currentPoint.GetComponent<DBScanProperties>().clusterID = clusterID;
                     currentPoint.GetComponent<DBScanProperties>().drawMeshAround = true;
+                    clusteredPoints++;
                     List<GameObject> result = RegionQuery(currentPoint, epsilon, euclDist);
                     if (result.Count > 0)
                     {
@@ -190,11 +229,24 @@ public class DBScanAlgorithm : ClusteringAlgorithm {
                     neighbours.Add(temp);
                     processedPoints.Insert(processedPoints.Count, copyList(temp));
                     steps.Add("haveNbrs");
+
+                    //paint pseudo code text red
+                    prevText.color = Color.black;
+                    prevText1.color = Color.black;
+                    pseudoCodeText.transform.GetChild(3).GetComponent<Text>().color = Color.red;
+                    prevText = pseudoCodeText.transform.GetChild(3).GetComponent<Text>();
+
                 }
                 neighbours.RemoveAt(0);
 
                 if (neighbours.Count == 0)
                 {
+                    //paint pseudo code text red
+                    prevText.color = Color.black;
+                    prevText1.color = Color.black;
+                    pseudoCodeText.transform.GetChild(4).GetComponent<Text>().color = Color.red;
+                    prevText = pseudoCodeText.transform.GetChild(4).GetComponent<Text>();
+
                     clusters.Add(currentCluster);
                     currentCluster = new List<GameObject>();
                     clusterID++;
@@ -231,6 +283,16 @@ public class DBScanAlgorithm : ClusteringAlgorithm {
             dataPoints.Insert(0, current);
             processedPoints.RemoveAt(processedPoints.Count - 1);
             steps.RemoveAt(currentStep);
+
+            //paint pseudo code text red
+            prevText.color = Color.black;
+            prevText1.color = Color.black;
+
+            pseudoCodeText.transform.GetChild(1).GetComponent<Text>().color = Color.red;
+            prevText = pseudoCodeText.transform.GetChild(1).GetComponent<Text>();
+
+            pseudoCodeText.transform.GetChild(2).GetComponent<Text>().color = Color.red;
+            prevText1 = pseudoCodeText.transform.GetChild(2).GetComponent<Text>();
         }
         else if (steps[currentStep] == "ptHaveNbrs")
         {
@@ -249,6 +311,13 @@ public class DBScanAlgorithm : ClusteringAlgorithm {
             processedPoints.RemoveAt(processedPoints.Count - 1);
             steps.RemoveAt(currentStep);
             neighbours = new List<List<GameObject>>();
+
+            //paint pseudo code text red
+            pseudoCodeText.transform.GetChild(1).GetComponent<Text>().color = Color.red;
+            prevText = pseudoCodeText.transform.GetChild(1).GetComponent<Text>();
+
+            pseudoCodeText.transform.GetChild(2).GetComponent<Text>().color = Color.red;
+            prevText1 = pseudoCodeText.transform.GetChild(2).GetComponent<Text>();
         }
         else if(steps[currentStep] == "haveNbrs")
         {
@@ -269,6 +338,13 @@ public class DBScanAlgorithm : ClusteringAlgorithm {
             neighbours.Add(processedPoints[processedPoints.Count - 1]);
             processedPoints.RemoveAt(processedPoints.Count - 1);
             steps.RemoveAt(currentStep);
+
+            //paint pseudo code text red
+            prevText.color = Color.black;
+            prevText1.color = Color.black;
+            pseudoCodeText.transform.GetChild(3).GetComponent<Text>().color = Color.red;
+            prevText = pseudoCodeText.transform.GetChild(3).GetComponent<Text>();
+
         }
         else if (steps[currentStep] == "noNbrs")
         {
@@ -284,6 +360,13 @@ public class DBScanAlgorithm : ClusteringAlgorithm {
             processedPoints.RemoveAt(processedPoints.Count - 1);
             steps.RemoveAt(currentStep);
             clusterID--;
+
+            //paint pseudo code text red
+            prevText.color = Color.black;
+            prevText1.color = Color.black;
+            pseudoCodeText.transform.GetChild(4).GetComponent<Text>().color = Color.red;
+            prevText = pseudoCodeText.transform.GetChild(4).GetComponent<Text>();
+
         }
 
     }
@@ -314,7 +397,7 @@ public class DBScanAlgorithm : ClusteringAlgorithm {
         {
             if(euclDist)
             {
-                if (EucledianDistance(child.transform.position, obj.transform.position) <= epsilon && child.gameObject.GetComponent<DBScanProperties>().clusterID <= 0)
+                if (EucledianDistance(child.transform.position, obj.transform.position) <= epsilon && child.gameObject.GetComponent<DBScanProperties>().clusterID == UNCLASSIFIED)
                 {
                     if (child != obj)
                     {
@@ -324,7 +407,7 @@ public class DBScanAlgorithm : ClusteringAlgorithm {
             }
             else
             {
-                if (ManhattanDistance(child.transform.position, obj.transform.position) <= epsilon && child.gameObject.GetComponent<DBScanProperties>().clusterID <= 0)
+                if (ManhattanDistance(child.transform.position, obj.transform.position) <= epsilon && child.gameObject.GetComponent<DBScanProperties>().clusterID == UNCLASSIFIED)
                 {
                     if (child != obj)
                     {
@@ -359,6 +442,7 @@ public class DBScanAlgorithm : ClusteringAlgorithm {
                 obj.GetComponent<PreviousStepProperties>().colorList = new List<Color>();
             }
         }
+        clusteredPoints = 0;
         clusterID = 1;
         corePoints = new List<GameObject>();
         neighbours = new List<List<GameObject>>();
@@ -371,6 +455,11 @@ public class DBScanAlgorithm : ClusteringAlgorithm {
         processedPoints = new List<List<GameObject>>();
         clusters = new List<List<GameObject>>();
         currentCluster = new List<GameObject>();
+
+        pseudoCodeText.SetActive(false);
+        if (prevText != null) prevText.color = Color.black;
+        if (prevText1 != null) prevText1.color = Color.black;
+        noisePoints = new List<GameObject>();
     }
 
     private void ShuffleDataPoints()
