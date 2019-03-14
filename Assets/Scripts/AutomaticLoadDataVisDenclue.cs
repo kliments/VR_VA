@@ -35,6 +35,6 @@ public class AutomaticLoadDataVisDenclue : MonoBehaviour {
     {
         Invoke("LoadData", 1f);
         Invoke("LoadVis", 1.1f);
-        Invoke("LoadDenclue", 1.2f);
+        //Invoke("LoadDenclue", 1.2f);
     }
 }

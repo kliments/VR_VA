@@ -110,7 +110,7 @@ public class SilhouetteCoefficient : MonoBehaviour {
             for(int j=clustersValues[i].Length -1; j>=0; j--)
             {
                 #region Vertex0
-                tempVertex.x = -0.7f;
+                tempVertex.x = -1.5f;
                 tempVertex.y = _yShift;
                 tempVertex.z = 2.996f;
                 _vertices[currentPoint * 4] = tempVertex;
@@ -118,7 +118,7 @@ public class SilhouetteCoefficient : MonoBehaviour {
                 #endregion
 
                 #region Vertex1
-                tempVertex.x = -0.7f + clustersValues[i][j] * 0.4f;
+                tempVertex.x = -1.5f + clustersValues[i][j] * 0.4f;
                 tempVertex.y = _yShift;
                 tempVertex.z = 2.996f;
                 _vertices[currentPoint * 4 + 1] = tempVertex;
@@ -126,7 +126,7 @@ public class SilhouetteCoefficient : MonoBehaviour {
                 #endregion
                 _yShift -= _yScale;
                 #region Vertex2
-                tempVertex.x = -0.7f;
+                tempVertex.x = -1.5f;
                 tempVertex.y = _yShift;
                 tempVertex.z = 2.996f;
                 _vertices[currentPoint * 4 + 2] = tempVertex;
@@ -134,7 +134,7 @@ public class SilhouetteCoefficient : MonoBehaviour {
                 #endregion
 
                 #region Vertex3
-                tempVertex.x = -0.7f + clustersValues[i][j] * 0.4f;
+                tempVertex.x = -1.5f + clustersValues[i][j] * 0.4f;
                 tempVertex.y = _yShift;
                 tempVertex.z = 2.996f;
                 _vertices[currentPoint * 4 + 3] = tempVertex;
@@ -175,7 +175,7 @@ public class SilhouetteCoefficient : MonoBehaviour {
         _mesh.RecalculateBounds();
 
         _obj.GetComponent<MeshFilter>().mesh = _mesh;
-        tempVertex.x = -0.7f + Coef() * 0.4f;
+        tempVertex.x = -1.5f + Coef() * 0.4f;
         tempVertex.y = 1.45f;
         tempVertex.z = 2.996f;
         averageLine.position = tempVertex;

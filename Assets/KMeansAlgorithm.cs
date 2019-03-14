@@ -79,6 +79,10 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
 
     public bool nextStep;
 
+    public Text[] clusterCompactnessTexts;
+    private string tempText;
+    private int currentTextCounter;
+
     //current cluster ID
     private int clusterID = 0;
     // Use this for initialization
@@ -111,6 +115,15 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
             }
             //if all are true, the IF statement won't happen again
             allInPlace = AllAreTrue(hasArrived);
+            if (allInPlace)
+            {
+                Debug.Log(ClusteringCompactness());
+
+                tempText = clusterCompactnessTexts[currentTextCounter].text;
+                tempText = tempText + "Step " + (counter - 1).ToString() + ": " + ClusteringCompactness().ToString() + System.Environment.NewLine;
+                clusterCompactnessTexts[currentTextCounter].text = tempText;
+                if (counter != 0 && (counter - 1) % 20 == 0) currentTextCounter++;
+            }
         }
 
         //check whether best clustering is found and execute code inside if yes
@@ -211,7 +224,10 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
                 dataPoint.gameObject.GetComponent<MeshRenderer>().material.color = Color.white;
                 clusteredPoints++;
             }
-
+            foreach(var text in clusterCompactnessTexts)
+            {
+                text.text = "";
+            }
         }
 
         //if the next step is to change the colors of the data points related to the closest sphere
@@ -228,6 +244,12 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
             pseudoCodeText.transform.GetChild(2).GetComponent<Text>().color = Color.red;
             prevText.color = Color.black;
             prevText = pseudoCodeText.transform.GetChild(2).GetComponent<Text>();
+
+            //cluster compactness
+            tempText = clusterCompactnessTexts[currentTextCounter].text;
+            tempText = tempText + "Step " + (counter - 1).ToString() + ": " + ClusteringCompactness().ToString() + System.Environment.NewLine;
+            clusterCompactnessTexts[currentTextCounter].text = tempText;
+            if (counter != 0 && (counter - 1) % 20 == 0) currentTextCounter++;
         }
 
         //if the next step is to reposition the spheres in the center of the data points
@@ -332,6 +354,7 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
                 child.gameObject.GetComponent<PreviousStepProperties>().colorList.Add(spheres[smallestDistanceIndex].GetComponent<Renderer>().material.color);
                 clusters[smallestDistanceIndex].Add(child.gameObject);
                 newTotal[smallestDistanceIndex]++;
+                child.gameObject.GetComponent<ClusterQualityValues>().clusterID = smallestDistanceIndex;
             }
 
             else if(prevChangeColors)
@@ -353,6 +376,7 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
                     }
             }
         }
+        Debug.Log(ClusteringCompactness());
     }
     
     private void RepositionTheSpheres()
@@ -526,6 +550,9 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
 
         if (prevText != null) prevText.color = Color.black;
         pseudoCodeText.SetActive(false);
+
+        tempText = "";
+        currentTextCounter = 0;
     }
 
     public bool AllAreTrue(bool[] array)
@@ -538,5 +565,20 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
             }
         }
         return true;
+    }
+
+    private float ClusteringCompactness()
+    {
+        float compact = 0;
+        int cluster = 0;
+        int nrPoints = 0;
+        foreach(Transform point in dataVisuals.transform)
+        {
+            cluster = point.GetComponent<ClusterQualityValues>().clusterID;
+            compact += Mathf.Sqrt(Vector3.Distance(point.position, spheres[cluster].transform.position));
+            nrPoints++;
+        }
+        int roundedInt = (int)(compact * 10000 / nrPoints);
+        return (float) roundedInt/10000;
     }
 }
