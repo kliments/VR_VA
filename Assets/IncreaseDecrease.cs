@@ -26,6 +26,7 @@ public class IncreaseDecrease : MonoBehaviour {
             kMeans.GetComponent<KMeansAlgorithm>().nrOfSpheres++;
         }
         text.text = "K: " + kMeans.GetComponent<KMeansAlgorithm>().nrOfSpheres.ToString();
+        kMeans.GetComponent<KMeansAlgorithm>().pseudoCodeText.SetActive(true);
     }
 
     public void DecreaseNrSpheres()
@@ -36,6 +37,7 @@ public class IncreaseDecrease : MonoBehaviour {
             kMeans.GetComponent<KMeansAlgorithm>().nrOfSpheres--;
         }
         text.text = "K: " + kMeans.GetComponent<KMeansAlgorithm>().nrOfSpheres.ToString();
+        kMeans.GetComponent<KMeansAlgorithm>().pseudoCodeText.SetActive(true);
     }
 
     public void IncreaseEpsilon()
@@ -47,6 +49,7 @@ public class IncreaseDecrease : MonoBehaviour {
             dbScan.GetComponent<DBScanAlgorithm>().epsilon = (float)(System.Math.Round((double)dbScan.GetComponent<DBScanAlgorithm>().epsilon, 2));
         }
         text.text = "eps: " + dbScan.GetComponent<DBScanAlgorithm>().epsilon.ToString();
+        dbScan.GetComponent<DBScanAlgorithm>().pseudoCodeText.SetActive(true);
     }
 
     public void DecreaseEpsilon()
@@ -58,6 +61,7 @@ public class IncreaseDecrease : MonoBehaviour {
             dbScan.GetComponent<DBScanAlgorithm>().epsilon = (float)(System.Math.Round((double)dbScan.GetComponent<DBScanAlgorithm>().epsilon, 2));
         }
         text.text = "eps: " + dbScan.GetComponent<DBScanAlgorithm>().epsilon.ToString();
+        dbScan.GetComponent<DBScanAlgorithm>().pseudoCodeText.SetActive(true);
     }
 
 
@@ -69,6 +73,7 @@ public class IncreaseDecrease : MonoBehaviour {
             dbScan.GetComponent<DBScanAlgorithm>().minPts++;
         }
         text.text = "minPts: " + dbScan.GetComponent<DBScanAlgorithm>().minPts.ToString();
+        dbScan.GetComponent<DBScanAlgorithm>().pseudoCodeText.SetActive(true);
     }
 
     public void DecreaseMinPts()
@@ -79,6 +84,7 @@ public class IncreaseDecrease : MonoBehaviour {
             dbScan.GetComponent<DBScanAlgorithm>().minPts--;
         }
         text.text = "minPts: " + dbScan.GetComponent<DBScanAlgorithm>().minPts.ToString();
+        dbScan.GetComponent<DBScanAlgorithm>().pseudoCodeText.SetActive(true);
     }
 
     public void IncreaseInfluence()

@@ -21,10 +21,21 @@ public class DatasetSelectedSpriteToggle : MonoBehaviour {
     {
         if(spriteObj==null || datasetSelectedSprite==null)
         {
+            datasetSelectedSprite = gameObject;
             //checkmark that dataset has been selected
-            spriteObj = GameObject.Find("PrimaryMenuParent").transform.GetChild(0).transform.GetChild(0).gameObject;
-            //sprite notification that disappears after 3 seconds
-            datasetSelectedSprite = GameObject.Find("MenusParent").transform.GetChild(5).gameObject;
+            while(datasetSelectedSprite.name != "MenusParent")
+            {
+                datasetSelectedSprite = datasetSelectedSprite.transform.parent.gameObject;
+            }
+            foreach(Transform obj in datasetSelectedSprite.transform)
+            {
+                if(obj.name == "DatasetSelected")
+                {
+                    datasetSelectedSprite = obj.gameObject;
+                    break;
+                }
+            }
+            spriteObj = transform.parent.parent.GetChild(0).GetChild(0).GetChild(0).gameObject;
         }
         spriteObj.SetActive(true);
         datasetSelectedSprite.SetActive(true);

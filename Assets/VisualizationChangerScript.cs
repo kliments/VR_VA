@@ -42,161 +42,156 @@ public class VisualizationChangerScript : MonoBehaviour {
         resetDenclue.GetComponent<DenclueAlgorithm>().ResetMe();
         
         vizLength = typeOfVisualization.Length;
-        cubes = FindObject(Scatterplot, "DataSpace");
-        pies = FindObject(Scatterplot, "PieChartCtrl");
-        triangles = FindObject(Scatterplot, "Triangle");
-        tetrahedrons = FindObject(Scatterplot, "Tetrahedron");
+        if(cubes == null) cubes = FindObject(Scatterplot, "DataSpace");
+        if(pies == null) pies = FindObject(Scatterplot, "PieChartCtrl");
+        if(triangles == null) triangles = FindObject(Scatterplot, "Triangle");
+        if(tetrahedrons == null) tetrahedrons = FindObject(Scatterplot, "Tetrahedron");
 
         myDataset = data(ChooserElementsContainer);
-        if (Time.time - lastActivation > 2)
+        foreach(Transform obj in transform.parent)
         {
-            lastActivation = Time.time;
-            foreach (VisualizationChangerScript v in FindObjectsOfType<VisualizationChangerScript>())
+            obj.GetComponent<VisualizationChangerScript>().isSelected = false;
+        }
+        GetComponent<VisualizationChangerScript>().isSelected = true;
+        if (this.name == "CubesButton")
+        {
+            if (pies.activeSelf)
             {
-                v.GetComponent<VisualizationChangerScript>().isSelected = false;
+                PieChartMeshController dummy = pies.GetComponent<PieChartMeshController>();
+                dummy.resetMe();
+                pies.SetActive(false);
             }
-            this.GetComponent<VisualizationChangerScript>().isSelected = true;
-            if (this.name == "CubesButton")
+            else if (triangles.activeSelf)
             {
-                if (pies.activeSelf)
-                {
-                    PieChartMeshController dummy = pies.GetComponent<PieChartMeshController>();
-                    dummy.resetMe();
-                    pies.SetActive(false);
-                }
-                else if (triangles.activeSelf)
-                {
-                    Triangle dummy = triangles.GetComponent<Triangle>();
-                    dummy.resetMe();
-                    triangles.SetActive(false);
-                }
-                else if (tetrahedrons.activeSelf)
-                {
-                    Tetrahedron dummy = tetrahedrons.GetComponent<Tetrahedron>();
-                    dummy.resetMe();
-                    tetrahedrons.SetActive(false);
-                }
-
-                //this is needed since the first time the Start function is being called two times for some reason, and after that not even once
-                if (cubesCounter == 0)
-                {
-                    cubesCounter++;
-                    cubes.GetComponent<DataSpaceHandler>().data = data(ChooserElementsContainer);
-                    cubes.SetActive(true);
-                }
-                else
-                {
-                    cubes.SetActive(true);
-                    cubes.GetComponent<DataSpaceHandler>().changeDatafile(myDataset);
-                }
-
+                Triangle dummy = triangles.GetComponent<Triangle>();
+                dummy.resetMe();
+                triangles.SetActive(false);
             }
-            else if (this.name == "PieChartsButton")
+            else if (tetrahedrons.activeSelf)
             {
-                if (cubes.activeSelf)
-                {
-                    DataSpaceHandler dummy = cubes.GetComponent<DataSpaceHandler>();
-                    dummy.resetMe();
-
-                    cubes.SetActive(false);
-                }
-                else if (triangles.activeSelf)
-                {
-                    Triangle dummy = triangles.GetComponent<Triangle>();
-                    dummy.resetMe();
-                    triangles.SetActive(false);
-                }
-                else if (tetrahedrons.activeSelf)
-                {
-                    Tetrahedron dummy = tetrahedrons.GetComponent<Tetrahedron>();
-                    dummy.resetMe();
-                    tetrahedrons.SetActive(false);
-                }
-
-                //this is needed since the first time the Start function is being called two times for some reason, and after that not even once
-                if (piesCounter == 0)
-                {
-                    piesCounter++;
-                    pies.GetComponent<PieChartMeshController>().data = data(ChooserElementsContainer);
-                    pies.SetActive(true);
-                }
-                else
-                {
-                    pies.SetActive(true);
-                    pies.GetComponent<PieChartMeshController>().changeDatafile(myDataset);
-                }
+                Tetrahedron dummy = tetrahedrons.GetComponent<Tetrahedron>();
+                dummy.resetMe();
+                tetrahedrons.SetActive(false);
             }
-            else if (this.name == "TrianglesButton")
+
+            //this is needed since the first time the Start function is being called two times for some reason, and after that not even once
+            if (cubesCounter == 0)
             {
-                if (cubes.activeSelf)
-                {
-                    DataSpaceHandler dummy = cubes.GetComponent<DataSpaceHandler>();
-                    dummy.resetMe();
-
-                    cubes.SetActive(false);
-                }
-                else if (pies.activeSelf)
-                {
-                    PieChartMeshController dummy = pies.GetComponent<PieChartMeshController>();
-                    dummy.resetMe();
-                    pies.SetActive(false);
-                }
-                else if (tetrahedrons.activeSelf)
-                {
-                    Tetrahedron dummy = tetrahedrons.GetComponent<Tetrahedron>();
-                    dummy.resetMe();
-                    tetrahedrons.SetActive(false);
-                }
-
-                //this is needed since the first time the Start function is being called two times for some reason, and after that not even once
-                if(trnglCounter == 0)
-                {
-                    trnglCounter++;
-                    triangles.GetComponent<Triangle>().data = data(ChooserElementsContainer);
-                    triangles.SetActive(true);
-                }
-                else
-                {
-                    triangles.SetActive(true);
-                    triangles.GetComponent<Triangle>().changeDatafile(myDataset);
-                }
+                cubesCounter++;
+                cubes.GetComponent<DataSpaceHandler>().data = data(ChooserElementsContainer);
+                cubes.SetActive(true);
             }
-            else if (this.name == "TetrahedronsButton")
+            else
             {
-                if (cubes.activeSelf)
-                {
-                    DataSpaceHandler dummy = cubes.GetComponent<DataSpaceHandler>();
-                    dummy.resetMe();
-
-                    cubes.SetActive(false);
-                }
-                else if(pies.activeSelf)
-                {
-                    PieChartMeshController dummy = pies.GetComponent<PieChartMeshController>();
-                    dummy.resetMe();
-                    pies.SetActive(false);
-                }
-                else if (triangles.activeSelf)
-                {
-                    Triangle dummy = triangles.GetComponent<Triangle>();
-                    dummy.resetMe();
-                    triangles.SetActive(false);
-                }
-
-                //this is needed since the first time the Start function is being called two times for some reason, and after that not even once
-                if(ttrhdrnCounter == 0)
-                {
-                    ttrhdrnCounter++;
-                    tetrahedrons.GetComponent<Tetrahedron>().data = data(ChooserElementsContainer);
-                    tetrahedrons.SetActive(true);
-                }
-                else
-                {
-                    tetrahedrons.SetActive(true);
-                    tetrahedrons.GetComponent<Tetrahedron>().changeDatafile(myDataset);
-                }
+                cubes.SetActive(true);
+                cubes.GetComponent<DataSpaceHandler>().changeDatafile(myDataset);
             }
-            lastActivation = Time.time;
+
+        }
+        else if (this.name == "PieChartsButton")
+        {
+            if (cubes.activeSelf)
+            {
+                DataSpaceHandler dummy = cubes.GetComponent<DataSpaceHandler>();
+                dummy.resetMe();
+
+                cubes.SetActive(false);
+            }
+            else if (triangles.activeSelf)
+            {
+                Triangle dummy = triangles.GetComponent<Triangle>();
+                dummy.resetMe();
+                triangles.SetActive(false);
+            }
+            else if (tetrahedrons.activeSelf)
+            {
+                Tetrahedron dummy = tetrahedrons.GetComponent<Tetrahedron>();
+                dummy.resetMe();
+                tetrahedrons.SetActive(false);
+            }
+
+            //this is needed since the first time the Start function is being called two times for some reason, and after that not even once
+            if (piesCounter == 0)
+            {
+                piesCounter++;
+                pies.GetComponent<PieChartMeshController>().data = data(ChooserElementsContainer);
+                pies.SetActive(true);
+            }
+            else
+            {
+                pies.SetActive(true);
+                pies.GetComponent<PieChartMeshController>().changeDatafile(myDataset);
+            }
+        }
+        else if (this.name == "TrianglesButton")
+        {
+            if (cubes.activeSelf)
+            {
+                DataSpaceHandler dummy = cubes.GetComponent<DataSpaceHandler>();
+                dummy.resetMe();
+
+                cubes.SetActive(false);
+            }
+            else if (pies.activeSelf)
+            {
+                PieChartMeshController dummy = pies.GetComponent<PieChartMeshController>();
+                dummy.resetMe();
+                pies.SetActive(false);
+            }
+            else if (tetrahedrons.activeSelf)
+            {
+                Tetrahedron dummy = tetrahedrons.GetComponent<Tetrahedron>();
+                dummy.resetMe();
+                tetrahedrons.SetActive(false);
+            }
+
+            //this is needed since the first time the Start function is being called two times for some reason, and after that not even once
+            if(trnglCounter == 0)
+            {
+                trnglCounter++;
+                triangles.GetComponent<Triangle>().data = data(ChooserElementsContainer);
+                triangles.SetActive(true);
+            }
+            else
+            {
+                triangles.SetActive(true);
+                triangles.GetComponent<Triangle>().changeDatafile(myDataset);
+            }
+        }
+        else if (this.name == "TetrahedronsButton")
+        {
+            if (cubes.activeSelf)
+            {
+                DataSpaceHandler dummy = cubes.GetComponent<DataSpaceHandler>();
+                dummy.resetMe();
+
+                cubes.SetActive(false);
+            }
+            else if(pies.activeSelf)
+            {
+                PieChartMeshController dummy = pies.GetComponent<PieChartMeshController>();
+                dummy.resetMe();
+                pies.SetActive(false);
+            }
+            else if (triangles.activeSelf)
+            {
+                Triangle dummy = triangles.GetComponent<Triangle>();
+                dummy.resetMe();
+                triangles.SetActive(false);
+            }
+
+            //this is needed since the first time the Start function is being called two times for some reason, and after that not even once
+            if(ttrhdrnCounter == 0)
+            {
+                ttrhdrnCounter++;
+                tetrahedrons.GetComponent<Tetrahedron>().data = data(ChooserElementsContainer);
+                tetrahedrons.SetActive(true);
+            }
+            else
+            {
+                tetrahedrons.SetActive(true);
+                tetrahedrons.GetComponent<Tetrahedron>().changeDatafile(myDataset);
+            }
         }
     }
 

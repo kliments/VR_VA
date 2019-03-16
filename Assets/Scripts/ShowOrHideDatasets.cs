@@ -7,8 +7,8 @@ public class ShowOrHideDatasets : MonoBehaviour {
 	// Use this for initialization
 	void Start ()
     {
-        primaryMenuParent = GameObject.Find("PrimaryMenuParent");
-        responsiveMenu = GameObject.Find("ResponsiveMenu");
+        primaryMenuParent = transform.parent.gameObject;
+        responsiveMenu = primaryMenuParent.transform.parent.gameObject;
         foreach (Transform child in responsiveMenu.transform)
         {
             if (child.gameObject.name == "DatasetParent")

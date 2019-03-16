@@ -5,7 +5,6 @@ using UnityEngine.SceneManagement;
 
 public class UniversalButtonScript : MonoBehaviour {
     public GameObject primaryMenu,primaryParent, datasetParent, vizParent, algorithmParent, kmeansParent, dbscanParent, denclueParent, ground;
-    public Material onHoverMaterial, defaultMaterial;
     public ResponsiveMenuScript controller;
     public float difference;
     private Transform responsiveMenu;
@@ -15,6 +14,7 @@ public class UniversalButtonScript : MonoBehaviour {
     private BackButtonMenu menusParent;
     private SwapBetweenMenus swapScript;
     public DenclueAlgorithm denclue;
+    public SilhouetteCoefficient coef;
 
     //for debugging
     public bool loadDataset, loadVis, startDenclue;
@@ -23,8 +23,6 @@ public class UniversalButtonScript : MonoBehaviour {
 	void Start () {
         FindParents();
         meshRenderer = GetComponent<MeshRenderer>();
-        defaultMaterial = meshRenderer.material;
-        onHoverMaterial = Resources.Load("Materials/OnHoverMaterial", typeof(Material)) as Material;
         controller = (ResponsiveMenuScript)FindObjectOfType(typeof(ResponsiveMenuScript));
         primaryMenu = GameObject.Find("MenusParent");
         ptEvtLsnr = (PointerEventListener)FindObjectOfType(typeof(PointerEventListener));
@@ -33,6 +31,7 @@ public class UniversalButtonScript : MonoBehaviour {
         ground = GameObject.Find("Ground");
         denclue = (DenclueAlgorithm)FindObjectOfType(typeof(DenclueAlgorithm));
         loadDataset = loadVis = startDenclue = false;
+        coef = (SilhouetteCoefficient)FindObjectOfType(typeof(SilhouetteCoefficient));
     }
 	
 	// Update is called once per frame
@@ -66,7 +65,18 @@ public class UniversalButtonScript : MonoBehaviour {
 
     void FindParents()
     {
-        responsiveMenu = GameObject.Find("ResponsiveMenu").transform;
+        if (transform.parent.gameObject.name == "ControlsMenu" || transform.parent.gameObject.name == "KMeansControlsMenu")
+        {
+            responsiveMenu = transform.parent.transform.parent.GetChild(1);
+        }
+        else
+        {
+            responsiveMenu = transform;
+            while (responsiveMenu.name != "ResponsiveMenu")
+            {
+                responsiveMenu = responsiveMenu.parent;
+            }
+        }
         foreach(Transform child in responsiveMenu)
         {
             if(child.name == "PrimaryMenuParent")
@@ -200,6 +210,10 @@ public class UniversalButtonScript : MonoBehaviour {
             {
                 GetComponent<PlayScript>().TogglePlayPause();
             }
+            else if (this.name == "SilhouetteCoef")
+            {
+                coef.Calculate();
+            }
         }
         //DBSCAN buttons functionalities
         else if(transform.parent == dbscanParent.transform)
@@ -252,6 +266,10 @@ public class UniversalButtonScript : MonoBehaviour {
             else if(this.name == "Play")
             {
                 GetComponent<DBScanPlay>().TogglePlayPause();
+            }
+            else if (this.name == "SilhouetteCoef")
+            {
+                coef.Calculate();
             }
         }
 
@@ -388,14 +406,6 @@ public class UniversalButtonScript : MonoBehaviour {
     public void CancelAllCalls()
     {
         CancelInvoke();
-    }
-
-    private void OnEnable()
-    {
-        if(meshRenderer!=null && meshRenderer.material != defaultMaterial)
-        {
-            meshRenderer.material = defaultMaterial;
-        }
     }
 
 }

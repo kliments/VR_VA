@@ -16,7 +16,7 @@ public class SwapBetweenMenus : MonoBehaviour {
         device = SteamVR_Controller.Input((int)trackedObj.index);
         oldPos = new Vector2(0,0);
         newPos = new Vector2();
-        threshold = 0.1f;
+        threshold = 0.15f;
         primaryShown = true;
         dontShowControlsMenu = false;
     }
@@ -36,7 +36,7 @@ public class SwapBetweenMenus : MonoBehaviour {
             {
                 oldPos = newPos;
                 newPos = device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
-                if (newPos.y > oldPos.y + threshold && !primaryShown)
+                if (newPos.y < oldPos.y - threshold && !primaryShown)
                 {
                     Debug.Log("primary menu shown");
                     GetComponent<CoverflowScript>().DeselectAllButtons();
@@ -51,7 +51,7 @@ public class SwapBetweenMenus : MonoBehaviour {
                     pipelineSprite.SetActive(true);
                     controlsSprite.SetActive(false);
                 }
-                else if (newPos.y < oldPos.y - threshold && primaryShown)
+                else if (newPos.y > oldPos.y + threshold && primaryShown)
                 {
                     Debug.Log("secondary menu shown");
                     GetComponent<CoverflowScript>().DeselectAllButtons();
@@ -90,7 +90,7 @@ public class SwapBetweenMenus : MonoBehaviour {
             {
                 oldPos = newPos;
                 newPos = device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
-                if (newPos.y > oldPos.y + threshold && !primaryShown)
+                if (newPos.y < oldPos.y - threshold && !primaryShown)
                 {
                     Debug.Log("primary menu shown");
                     menu1.GetComponent<ResponsiveMenuScript>().Reposition();
@@ -102,7 +102,7 @@ public class SwapBetweenMenus : MonoBehaviour {
                     primaryShown = true;
                     
                 }
-                else if (newPos.y < oldPos.y - threshold && primaryShown)
+                else if (newPos.y > oldPos.y + threshold && primaryShown)
                 {
                     Debug.Log("secondary menu shown");
                     menu1.GetComponent<ResponsiveMenuScript>().Reposition();

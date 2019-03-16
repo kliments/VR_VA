@@ -6,7 +6,7 @@ public class GeneralCoverflowProperties : MonoBehaviour {
     public bool isHovered, rotationFinished;
     public GameObject parent, highlight;
     public List<GameObject> leftSideButtons, rightSideButtons;
-    public GameObject ptr, menusParent;
+    public Transform menusParent;
     private List<GameObject> allButtons;
     private Quaternion originalRotation;
     private Vector3 mainPosition, ptrOldPos, ptrNewPos;
@@ -19,13 +19,15 @@ public class GeneralCoverflowProperties : MonoBehaviour {
         leftSideButtons = new List<GameObject>();
         rightSideButtons = new List<GameObject>();
         parent = gameObject.transform.parent.gameObject;
-        ptr = GameObject.Find("Pointer");
-        menusParent = GameObject.Find("MenusParent");
+        //menusParent = GameObject.Find("MenusParent");
+        menusParent = transform;
+        while(menusParent.name != "MenusParent")
+        {
+            menusParent = menusParent.parent;
+        }
         allButtons = new List<GameObject>();
         AssignAccordinglyButtons();
         originalRotation = transform.rotation;
-        ptrOldPos = ptr.transform.localPosition;
-        ptrNewPos = ptr.transform.localPosition;
 
         foreach (Transform child in gameObject.transform)
         {
@@ -41,7 +43,7 @@ public class GeneralCoverflowProperties : MonoBehaviour {
     {
         if (isHovered)
         {
-            menusParent.GetComponent<CoverflowScript>().currentButton = this.gameObject;
+            menusParent.GetComponent<CoverflowScript>().currentButton = gameObject;
             //rotate to be visible
             transform.localRotation = Quaternion.Lerp(transform.localRotation,Quaternion.Euler(0, 0, 0),10f*Time.deltaTime);
             transform.localPosition = Vector3.Lerp(transform.localPosition,mainPosition,10*Time.deltaTime);

@@ -7,7 +7,7 @@ public class PlayScript : MonoBehaviour {
     public GameObject nextStepObj;
     public Sprite playSprite, pauseSprite;
     public SpriteRenderer sprite;
-    private bool iterationHasFinished, nextStepPause;
+    private bool nextStepPause;
 
 	// Use this for initialization
 	void Start () {
@@ -51,9 +51,7 @@ public class PlayScript : MonoBehaviour {
 
     IEnumerator KMeansRepeat()
     {
-        iterationHasFinished = nextStepObj.GetComponent<KMeansAlgorithm>().bestClusterFound;
-
-        while (!iterationHasFinished)
+        while (!nextStepObj.GetComponent<KMeansAlgorithm>().bestClusterFound)
         {
             nextStepObj.GetComponent<KMeansAlgorithm>().StartAlgorithm();
             yield return new WaitForSeconds(0.1f);

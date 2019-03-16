@@ -29,6 +29,10 @@ public class datasetChangerScript : MonoBehaviour
     public GameObject ground;
     public Sprite datasetSelected;
 
+    private DataSpaceHandler cubesData;
+    private PieChartMeshController piesData;
+    private Triangle trianglesData;
+    private Tetrahedron tetrahedronsData;
     public void startTargetedAction()
     {
         ground.GetComponent<SetToGround>().rigPosReset = true;
@@ -41,39 +45,35 @@ public class datasetChangerScript : MonoBehaviour
 
         resetDenclue.GetComponent<DenclueAlgorithm>().ResetMe();
 
-        scatterplot = GameObject.Find("ScatterplotElements");
-        cubes = FindObject(scatterplot, "DataSpace");
-        pies = FindObject(scatterplot, "PieChartCtrl");
-        triangles = FindObject(scatterplot, "Triangle");
-        tetrahedrons = FindObject(scatterplot, "Tetrahedron");
-
-        if (Time.time - lastActivation > 2)
+        if(scatterplot == null) scatterplot = GameObject.Find("ScatterplotElements");
+        if(cubes == null) cubes = FindObject(scatterplot, "DataSpace");
+        if(pies == null) pies = FindObject(scatterplot, "PieChartCtrl");
+        if(triangles == null) triangles = FindObject(scatterplot, "Triangle");
+        if(tetrahedrons == null)tetrahedrons = FindObject(scatterplot, "Tetrahedron");
+        if (cubesData == null) cubesData = FindObjectOfType<DataSpaceHandler>();
+        if (piesData == null) piesData = FindObjectOfType<PieChartMeshController>();
+        if (trianglesData == null) trianglesData = FindObjectOfType<Triangle>();
+        if (tetrahedronsData == null) tetrahedronsData = FindObjectOfType<Tetrahedron>();
+        foreach(Transform obj in transform.parent)
         {
-            lastActivation = Time.time;
-            foreach(datasetChangerScript d in FindObjectsOfType<datasetChangerScript>())
-            {
-                d.GetComponent<datasetChangerScript>().isSelected = false;
-            }
-            isSelected = true;
-            //FindObjectOfType<axisMenueScript>().resetMenue();
-            //FindObjectOfType<pcLoaderScript>().resetMe();
-            if (cubes.activeSelf)
-            {
-                FindObjectOfType<DataSpaceHandler>().changeDatafile(myDataset);
-            }
-            else if (pies.activeSelf)
-            {
-                FindObjectOfType<PieChartMeshController>().changeDatafile(myDataset);
-            }
-            else if (triangles.activeSelf)
-            {
-                FindObjectOfType<Triangle>().changeDatafile(myDataset);
-            }
-            else if (tetrahedrons.activeSelf)
-            {
-                FindObjectOfType<Tetrahedron>().changeDatafile(myDataset);
-            }
-            lastActivation = Time.time;
+            if(obj.GetComponent<datasetChangerScript>() != null) obj.GetComponent<datasetChangerScript>().isSelected = false;
+        }
+        isSelected = true;
+        if (cubes.activeSelf)
+        {
+            cubesData.changeDatafile(myDataset);
+        }
+        else if (pies.activeSelf)
+        {
+            piesData.changeDatafile(myDataset);
+        }
+        else if (triangles.activeSelf)
+        {
+            trianglesData.changeDatafile(myDataset);
+        }
+        else if (tetrahedrons.activeSelf)
+        {
+            tetrahedronsData.changeDatafile(myDataset);
         }
     }
 
@@ -82,7 +82,11 @@ public class datasetChangerScript : MonoBehaviour
     void Start()
     {
         ground = GameObject.Find("Ground");
-        responsiveMenu = GameObject.Find("ResponsiveMenu").transform;
+        responsiveMenu = transform;
+        while(responsiveMenu.name != "ResponsiveMenu")
+        {
+            responsiveMenu = responsiveMenu.parent;
+        }
         foreach(Transform child in responsiveMenu)
         {
             if(child.name == "KMeansParent")

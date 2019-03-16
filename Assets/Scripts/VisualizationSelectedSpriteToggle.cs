@@ -19,14 +19,6 @@ public class VisualizationSelectedSpriteToggle : MonoBehaviour {
 
     public void ShowSprite()
     {
-
-        if (spriteObj == null || visualizationButtonSpriteObj == null)
-        {
-            //checkmark that dataset has been selected
-            spriteObj = GameObject.Find("PrimaryMenuParent").transform.GetChild(0).transform.GetChild(0).gameObject;
-            //sprite notification that disappears after 3 seconds
-            visualizationButtonSpriteObj = GameObject.Find("MenusParent").transform.GetChild(6).gameObject;
-        }
         spriteObj.SetActive(true);
         visualizationButtonSpriteObj.SetActive(true);
         Invoke("HideSprite", 3f);

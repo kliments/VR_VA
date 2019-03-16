@@ -34,11 +34,16 @@ public class SilhouetteCoefficient : MonoBehaviour {
 		if(calculate)
         {
             calculate = false;
-            AssignData();
-            text.text = "S = " + Coef();
-            DrawGraph();
+            Calculate();
         }
 	}
+
+    public void Calculate()
+    {
+        AssignData();
+        text.text = "S = " + Coef();
+        DrawGraph();
+    }
 
     private float Coef()
     {

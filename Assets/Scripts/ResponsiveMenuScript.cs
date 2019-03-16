@@ -58,11 +58,11 @@ public class ResponsiveMenuScript : MonoBehaviour {
                 }
             }
         }
-        if (device.GetTouchDown(SteamVR_Controller.ButtonMask.Touchpad))
+        /*if (device.GetTouchDown(SteamVR_Controller.ButtonMask.Touchpad))
         {
             _newPos = device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
             _oldPos = _newPos;
-        }
+        }*/
         //for moving pointer around when touching the touchpad
         if (device.GetTouch(SteamVR_Controller.ButtonMask.Touchpad) && _slide)
         {
@@ -80,7 +80,7 @@ public class ResponsiveMenuScript : MonoBehaviour {
 
             else if (Mathf.Abs(difference.x) > 0.03f)
             {
-                _actualPos.x = difference.x * 0.1f;
+                _actualPos.x = difference.x * 0.005f;
                 
                 _actualPos.z = 0;
                 _actualPos.y = 0;

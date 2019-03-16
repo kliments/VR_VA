@@ -566,6 +566,8 @@ public class SteamVR_RenderModel : MonoBehaviour
 
 			t.gameObject.AddComponent<MeshFilter>().mesh = model.mesh;
 			t.gameObject.AddComponent<MeshRenderer>().sharedMaterial = model.material;
+            t.gameObject.GetComponent<MeshRenderer>().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            t.gameObject.GetComponent<MeshRenderer>().receiveShadows = false;
 		}
 
 		return true;

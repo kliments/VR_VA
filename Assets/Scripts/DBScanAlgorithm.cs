@@ -80,7 +80,6 @@ public class DBScanAlgorithm : ClusteringAlgorithm {
             resetDenclue.GetComponent<DenclueAlgorithm>().ResetMe();
             silhouetteCoef.currentAlgorithm = this;
 
-            pseudoCodeText.SetActive(true);
             AssignDataPoints();
             PaintAllWhite();
             ShuffleDataPoints();

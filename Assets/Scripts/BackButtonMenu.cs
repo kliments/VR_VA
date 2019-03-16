@@ -15,8 +15,17 @@ public class BackButtonMenu : MonoBehaviour {
         device = SteamVR_Controller.Input((int)trackedObj.index);
         previousMenus = new List<GameObject>();
         //Primary Menu Parent
-        previousMenus.Add(GameObject.Find("PrimaryMenuParent"));
-        swapMenuScript = (SwapBetweenMenus)FindObjectOfType(typeof(SwapBetweenMenus));
+        GameObject primaryMenu = new GameObject();
+        foreach(Transform child in transform.GetChild(1))
+        {
+            if(child.name == "PrimaryMenuParent")
+            {
+                primaryMenu = child.gameObject;
+                break;
+            }
+        }
+        previousMenus.Add(primaryMenu);
+        swapMenuScript = GetComponent<SwapBetweenMenus>();
     }
 	
 	// Update is called once per frame

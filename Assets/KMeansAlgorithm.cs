@@ -115,10 +115,11 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
             }
             //if all are true, the IF statement won't happen again
             allInPlace = AllAreTrue(hasArrived);
-            if (allInPlace)
+            if (allInPlace && !bestClusterFound)
             {
                 Debug.Log(ClusteringCompactness());
 
+                if (currentTextCounter > 3) return;
                 tempText = clusterCompactnessTexts[currentTextCounter].text;
                 tempText = tempText + "Step " + (counter - 1).ToString() + ": " + ClusteringCompactness().ToString() + System.Environment.NewLine;
                 clusterCompactnessTexts[currentTextCounter].text = tempText;
@@ -182,7 +183,7 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
 
     public void StartAlgorithm()
     {
-        pseudoCodeText.SetActive(true);
+        if (bestClusterFound) return;
         AssignDataToGameObjects();
 
         //only generate spheres the first time;
@@ -246,6 +247,7 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
             prevText = pseudoCodeText.transform.GetChild(2).GetComponent<Text>();
 
             //cluster compactness
+            if (currentTextCounter > 3) return;
             tempText = clusterCompactnessTexts[currentTextCounter].text;
             tempText = tempText + "Step " + (counter - 1).ToString() + ": " + ClusteringCompactness().ToString() + System.Environment.NewLine;
             clusterCompactnessTexts[currentTextCounter].text = tempText;
