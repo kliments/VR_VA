@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class ShowProperAlgorithmButtons : MonoBehaviour {
     public GameObject kMeansParent, dbScanParent, denclueParent, responsiveMenu, algorithmsParent, menusParent;
+    public KMeansAlgorithm kMeans;
+    public DBScanAlgorithm dbScan;
+    public DenclueAlgorithm denclue;
     private BackButtonMenu backButton;
 	// Use this for initialization
 	void Start () {
@@ -40,16 +43,16 @@ public class ShowProperAlgorithmButtons : MonoBehaviour {
             kMeansParent.SetActive(true);
             menusParent.GetComponent<CoverflowScript>().AssignValues(kMeansParent);
             backButton.previousMenus.Add(kMeansParent);
-            kMeansParent.GetComponentInChildren<KMeansAlgorithm>().pseudoCodeText.SetActive(true);
-            dbScanParent.GetComponentInChildren<DBScanAlgorithm>().pseudoCodeText.SetActive(false);
+            kMeans.pseudoCodeText.SetActive(true);
+            dbScan.pseudoCodeText.SetActive(false);
         }
         else if(this.name == "DBSCAN")
         {
             dbScanParent.SetActive(true);
             menusParent.GetComponent<CoverflowScript>().AssignValues(dbScanParent);
             backButton.previousMenus.Add(dbScanParent);
-            kMeansParent.GetComponentInChildren<KMeansAlgorithm>().pseudoCodeText.SetActive(false);
-            dbScanParent.GetComponentInChildren<DBScanAlgorithm>().pseudoCodeText.SetActive(true);
+            kMeans.pseudoCodeText.SetActive(false);
+            dbScan.pseudoCodeText.SetActive(true);
         }
         else
         {

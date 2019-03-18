@@ -30,7 +30,7 @@ public class DataSpaceHandler : MonoBehaviour
     public List<Vector3> dataPositions;
     public List<string> classes;
 
-    public DenclueAlgorithm tiledMap;
+    public DenclueAlgorithm denclue;
 
     [SerializeField]
     public TextAsset data;
@@ -352,14 +352,14 @@ public class DataSpaceHandler : MonoBehaviour
                 count++;
             }
         }
-        tiledMap.positions = new Vector3[dataPositions.Count];
+        denclue.positions = new Vector3[dataPositions.Count];
         for(int p=0; p<dataPositions.Count; p++)
         {
-            tiledMap.positions[p] = dataPositions[p];
+            denclue.positions[p] = dataPositions[p];
         }
-        tiledMap.gaussCoef = GetComponent<GaussianCoefficients>();
-        tiledMap.ResetMe();
-        tiledMap.gameObject.SetActive(true);
+        denclue.gaussCoef = GetComponent<GaussianCoefficients>();
+        denclue.ResetMe();
+        denclue.gameObject.SetActive(true);
 
         //        createTiledCube(childCat1);
 

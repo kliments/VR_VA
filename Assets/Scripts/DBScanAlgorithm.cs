@@ -40,7 +40,7 @@ public class DBScanAlgorithm : ClusteringAlgorithm {
     private List<List<GameObject>> processedPoints;
 
     public bool allClustersFound, nextStep;
-    public GameObject playRoutine;
+    public DBScanPlay playRoutine;
 
     private Text prevText1;
     // Use this for initialization
@@ -448,7 +448,7 @@ public class DBScanAlgorithm : ClusteringAlgorithm {
         dataPoints = new List<GameObject>();
         counter = 0;
         allClustersFound = false;
-        playRoutine.GetComponent<DBScanPlay>().StopRoutine();
+        playRoutine.StopRoutine();
         dbscanFinishedPlane.SetActive(false);
         steps = new List<string>();
         processedPoints = new List<List<GameObject>>();

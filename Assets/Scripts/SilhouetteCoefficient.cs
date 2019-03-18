@@ -111,6 +111,7 @@ public class SilhouetteCoefficient : MonoBehaviour {
         //calculate vertices
         for(int i=0; i<clustersValues.Length; i++)
         {
+            if (currentAlgorithm.clusters[i].Count == 0) continue;
             _currentColor = currentAlgorithm.clusters[i][0].GetComponent<MeshRenderer>().material.color;
             for(int j=clustersValues[i].Length -1; j>=0; j--)
             {

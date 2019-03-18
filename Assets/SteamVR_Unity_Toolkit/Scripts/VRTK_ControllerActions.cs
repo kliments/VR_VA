@@ -13,7 +13,7 @@
         private SteamVR_TrackedObject trackedController;
         private SteamVR_Controller.Device device;
         private ushort maxHapticVibration = 3999;
-
+        private Texture tex;
         private Dictionary<GameObject, Material> storedMaterials;
 
         public bool IsControllerVisible()
@@ -95,7 +95,7 @@
                 {
                     storedMaterials.Add(element, new Material(renderer.material));
                 }
-                renderer.material.SetTexture("_MainTex", new Texture());
+                renderer.material.SetTexture("_MainTex", tex);
                 StartCoroutine(CycleColor(renderer.material, new Color(renderer.material.color.r, renderer.material.color.g, renderer.material.color.b), highlight ?? Color.white, fadeDuration));
             }
         }

@@ -17,7 +17,7 @@ public class Triangle : MonoBehaviour {
     public Material material;
     public Color[] colorArray;
     public List<Vector3> dataPositions;
-    public DenclueAlgorithm tiledMap;
+    public DenclueAlgorithm denclue;
 
     public List<Color> listOfColors = new List<Color>();
     private Vector3 dummyPos;
@@ -212,14 +212,14 @@ public class Triangle : MonoBehaviour {
             }
         }
 
-        tiledMap.positions = new Vector3[dataPositions.Count];
+        denclue.positions = new Vector3[dataPositions.Count];
         for (int p = 0; p < dataPositions.Count; p++)
         {
-            tiledMap.positions[p] = dataPositions[p];
+            denclue.positions[p] = dataPositions[p];
         }
-        tiledMap.gaussCoef = GetComponent<GaussianCoefficients>();
-        tiledMap.ResetMe();
-        tiledMap.gameObject.SetActive(true);
+        denclue.gaussCoef = GetComponent<GaussianCoefficients>();
+        denclue.ResetMe();
+        denclue.gameObject.SetActive(true);
 
         int vertexCount = 0;
         for (int g=0; g<listObjects.Length; g++)

@@ -2860,12 +2860,18 @@ public class DenclueAlgorithm : MonoBehaviour {
             temp.Add(_tile1);
             temp.Add(_additionalVertices.Count - 4);
             temp.Add(_tile3);
+            /*_triangles[_countersMatrix[k][l] * 6] = temp[0];
+            _triangles[_countersMatrix[k][l] * 6 + 1] = temp[1];
+            _triangles[_countersMatrix[k][l] * 6 + 2] = temp[2];*/
             _additionalTriangles.Add(temp);
 
             temp = new List<int>();
             temp.Add(_additionalVertices.Count - 4);
             temp.Add(_additionalVertices.Count - 2);
             temp.Add(_tile3);
+            /*_triangles[_countersMatrix[k][l] * 6 + 3] = temp[0];
+            _triangles[_countersMatrix[k][l] * 6 + 4] = temp[1];
+            _triangles[_countersMatrix[k][l] * 6 + 5] = temp[2];*/
             _additionalTriangles.Add(temp);
 
             // lower triangles with cluster color
@@ -2886,7 +2892,6 @@ public class DenclueAlgorithm : MonoBehaviour {
             {
                 _triangles[_countersMatrix[k][l] * 6 + t] = 0;
             }
-
             _additionalVerticesColor[_tile1] = _clusterColor;
             _additionalVerticesColor[_tile3] = _clusterColor;
             _clustered[k][l] = true;

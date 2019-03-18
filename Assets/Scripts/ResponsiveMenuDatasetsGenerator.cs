@@ -7,8 +7,6 @@ public class ResponsiveMenuDatasetsGenerator : MonoBehaviour {
     public List<GameObject> datasetButtons;
     public TextAsset[] datasets;
     public GameObject primaryMenu;
-
-    public Sprite spr;
     private float x, y, z;
     // Use this for initialization
     void Start () {
@@ -22,7 +20,6 @@ public class ResponsiveMenuDatasetsGenerator : MonoBehaviour {
 
     private void Awake()
     {
-        spr = new Sprite();
         int s = 1;
         x = -0.24f;
         y = 0;

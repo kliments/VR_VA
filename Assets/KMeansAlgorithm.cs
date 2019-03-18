@@ -76,7 +76,7 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
     public GameObject ground;
 
     //Used for reset, in case the Play button was pressed
-    public GameObject play;
+    public PlayScript play;
 
     public bool nextStep;
 
@@ -518,7 +518,7 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
     {
         ground.GetComponent<SetToGround>().rigPosReset = true;
         ground.GetComponent<SetToGround>().RemoveParenthoodFromRig();
-        play.GetComponent<PlayScript>().StopRoutine();
+        play.StopRoutine();
         movedSteps = 0;
         bestClusterFound = false;
         counter = 0;

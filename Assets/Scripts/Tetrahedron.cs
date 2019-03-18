@@ -13,7 +13,7 @@ public class Tetrahedron : MonoBehaviour
     List<TetrahedronMesh> listObjects;
     public Vector3 Positions;
     public List<Vector3> dataPositions;
-    public DenclueAlgorithm tiledMap;
+    public DenclueAlgorithm denclue;
     public GameObject dummy;
     private Vector3 dummyPos;
 
@@ -318,14 +318,14 @@ public class Tetrahedron : MonoBehaviour
             }
         }
 
-        tiledMap.positions = new Vector3[dataPositions.Count];
+        denclue.positions = new Vector3[dataPositions.Count];
         for (int p = 0; p < dataPositions.Count; p++)
         {
-            tiledMap.positions[p] = dataPositions[p];
+            denclue.positions[p] = dataPositions[p];
         }
-        tiledMap.gaussCoef = GetComponent<GaussianCoefficients>();
-        tiledMap.ResetMe();
-        tiledMap.gameObject.SetActive(true);
+        denclue.gaussCoef = GetComponent<GaussianCoefficients>();
+        denclue.ResetMe();
+        denclue.gameObject.SetActive(true);
         //        createCombinedTetrahedron(listObjects);
         dummy.SetActive(false);
     }

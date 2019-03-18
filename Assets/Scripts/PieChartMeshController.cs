@@ -14,7 +14,7 @@ public class PieChartMeshController : MonoBehaviour
 	private int timer = 0;
 	PieChartMesh[] listObjects;
     public Camera myCamera;
-    public DenclueAlgorithm tiledMap;
+    public DenclueAlgorithm denclue;
     private Vector3 target;
 
     private GameObject[] rotateObjects;
@@ -31,10 +31,6 @@ public class PieChartMeshController : MonoBehaviour
         if (dummy.GetComponent<PieChartMesh>() == null)
         {
             dummy.AddComponent<PieChartMesh>();
-        }
-        if (counterData == 0)
-        {
-            data = FindObjectOfType<datasetChooserWallScript>().datasets[0];
         }
 
         string[] lines = data.text.Split('\n');
@@ -176,14 +172,14 @@ public class PieChartMeshController : MonoBehaviour
             }
         }
 
-        tiledMap.positions = new Vector3[dataPositions.Count];
+        denclue.positions = new Vector3[dataPositions.Count];
         for (int p = 0; p < dataPositions.Count; p++)
         {
-            tiledMap.positions[p] = dataPositions[p];
+            denclue.positions[p] = dataPositions[p];
         }
-        tiledMap.gaussCoef = GetComponent<GaussianCoefficients>();
-        tiledMap.ResetMe();
-        tiledMap.gameObject.SetActive(true);
+        denclue.gaussCoef = GetComponent<GaussianCoefficients>();
+        denclue.ResetMe();
+        denclue.gameObject.SetActive(true);
         dummy.SetActive (false);
     }
 
