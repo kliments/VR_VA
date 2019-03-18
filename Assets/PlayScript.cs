@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayScript : MonoBehaviour {
 
-    public GameObject nextStepObj;
+    public KMeansAlgorithm nextStepObj;
     public Sprite playSprite, pauseSprite;
     public SpriteRenderer sprite;
     private bool nextStepPause;
@@ -51,9 +51,9 @@ public class PlayScript : MonoBehaviour {
 
     IEnumerator KMeansRepeat()
     {
-        while (!nextStepObj.GetComponent<KMeansAlgorithm>().bestClusterFound)
+        while (!nextStepObj.bestClusterFound)
         {
-            nextStepObj.GetComponent<KMeansAlgorithm>().StartAlgorithm();
+            nextStepObj.StartAlgorithm();
             yield return new WaitForSeconds(0.1f);
         }
     }

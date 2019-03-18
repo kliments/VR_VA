@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class DBScanPlay : MonoBehaviour {
-    public GameObject dbScanButton;
+    public DBScanAlgorithm dbScanButton;
     public bool play;
     private bool allClustersFound, nextStepPause;
     public Sprite playSprite, pauseSprite;
@@ -51,11 +51,11 @@ public class DBScanPlay : MonoBehaviour {
 
     IEnumerator DBScanRepeat()
     {
-        allClustersFound = dbScanButton.GetComponent<DBScanAlgorithm>().allClustersFound;
+        allClustersFound = dbScanButton.allClustersFound;
 
         while (!allClustersFound)
         {
-            dbScanButton.GetComponent<DBScanAlgorithm>().StartDBSCAN();
+            dbScanButton.StartDBSCAN();
             yield return new WaitForSeconds(1f);
         }
 

@@ -6,7 +6,8 @@ using UnityEngine.UI;
 public class KMeansAlgorithm : ClusteringAlgorithm {
 
     public Transform scatterplot;
-    public GameObject resetDBScan, resetDenclue;
+    public DBScanAlgorithm resetDBScan;
+    public DenclueAlgorithm resetDenclue;
     public GameObject sphere;
     private GameObject dataVisuals;
     public GameObject kMeansFinishedPlane;

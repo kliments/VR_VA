@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class UniversalButtonScript : MonoBehaviour {
-    public GameObject primaryMenu,primaryParent, datasetParent, vizParent, algorithmParent, kmeansParent, dbscanParent, denclueParent, ground;
+    public GameObject primaryMenu,primaryParent, datasetParent, vizParent, algorithmParent, kmeansParent, dbscanParent, denclueParent, ground, kMeansController,dbScanController, denclueController;
     public ResponsiveMenuScript controller;
     public float difference;
     private Transform responsiveMenu;
@@ -32,6 +32,10 @@ public class UniversalButtonScript : MonoBehaviour {
         denclue = (DenclueAlgorithm)FindObjectOfType(typeof(DenclueAlgorithm));
         loadDataset = loadVis = startDenclue = false;
         coef = (SilhouetteCoefficient)FindObjectOfType(typeof(SilhouetteCoefficient));
+
+        kMeansController = GameObject.Find("KMeansAlgorithmController");
+        dbScanController = GameObject.Find("DBScanAlgorithmController");
+        denclueController = GameObject.Find("DenclueAlgorithmController");
     }
 	
 	// Update is called once per frame
@@ -185,7 +189,8 @@ public class UniversalButtonScript : MonoBehaviour {
             //increase or decrease number of spheres
             if (this.name == "NrOfSpheres")
             {
-                increaseDecreseObj = GetComponent<IncreaseDecrease>();
+                //increaseDecreseObj = GetComponent<IncreaseDecrease>();
+                increaseDecreseObj = kMeansController.GetComponent<IncreaseDecrease>();
                 Vector2 pos = controller.device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
                 if (difference > 0f)
                 {
@@ -200,15 +205,15 @@ public class UniversalButtonScript : MonoBehaviour {
             }
             else if(this.name == "Step Backward")
             {
-                GetComponent<PreviousStep>().obj.GetComponent<KMeansAlgorithm>().PreviousStep();
+                kMeansController.GetComponent<KMeansAlgorithm>().PreviousStep();
             }
             else if(this.name == "K-Means Step Forward")
             {
-                GetComponent<KMeansAlgorithm>().StartAlgorithm();
+                kMeansController.GetComponent<KMeansAlgorithm>().StartAlgorithm();
             }
             else if(this.name == "Play")
             {
-                GetComponent<PlayScript>().TogglePlayPause();
+                kMeansController.GetComponent<PlayScript>().TogglePlayPause();
             }
             else if (this.name == "SilhouetteCoef")
             {
@@ -221,7 +226,7 @@ public class UniversalButtonScript : MonoBehaviour {
             menusParent.GetComponent<CoverflowScript>().AssignValues(dbscanParent);
             if (this.name == "epsilon")
             {
-                increaseDecreseObj = GetComponent<IncreaseDecrease>();
+                increaseDecreseObj = dbScanController.GetComponents<IncreaseDecrease>()[0];
                 Vector2 pos = controller.device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
                 if (difference > 0f)
                 {
@@ -236,7 +241,7 @@ public class UniversalButtonScript : MonoBehaviour {
             }
             else if(this.name == "minPts")
             {
-                increaseDecreseObj = GetComponent<IncreaseDecrease>();
+                increaseDecreseObj = dbScanController.GetComponents<IncreaseDecrease>()[1];
                 Vector2 pos = controller.device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
                 if (difference > 0f)
                 {
@@ -253,19 +258,19 @@ public class UniversalButtonScript : MonoBehaviour {
             }
             else if(this.name == "EucledianManhattan")
             {
-                GetComponent<ToggleEucledianManhattan>().Toggle();
+                dbScanController.GetComponent<ToggleEucledianManhattan>().Toggle();
             }
             else if(this.name == "StepBackward")
             {
-                GetComponent<DBPrevious>().dbSCAN.GetComponent<DBScanAlgorithm>().DBBackwards();
+                dbScanController.GetComponent<DBScanAlgorithm>().DBBackwards();
             }
             else if(this.name == "DBScan Step Forward")
             {
-                GetComponent<DBScanAlgorithm>().StartDBSCAN();
+                dbScanController.GetComponent<DBScanAlgorithm>().StartDBSCAN();
             }
             else if(this.name == "Play")
             {
-                GetComponent<DBScanPlay>().TogglePlayPause();
+                dbScanController.GetComponent<DBScanPlay>().TogglePlayPause();
             }
             else if (this.name == "SilhouetteCoef")
             {
@@ -279,7 +284,7 @@ public class UniversalButtonScript : MonoBehaviour {
             menusParent.GetComponent<CoverflowScript>().AssignValues(denclueParent);
             if(this.name == "influence")
             {
-                increaseDecreseObj = GetComponent<IncreaseDecrease>();
+                increaseDecreseObj = denclueController.GetComponents<IncreaseDecrease>()[0];
                 Vector2 pos = controller.device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
                 if (difference > 0f)
                 {
@@ -296,7 +301,7 @@ public class UniversalButtonScript : MonoBehaviour {
             }
             else if(this.name == "threshold")
             {
-                increaseDecreseObj = GetComponent<IncreaseDecrease>();
+                increaseDecreseObj = denclueController.GetComponents<IncreaseDecrease>()[1];
                 Vector2 pos = controller.device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
                 if (difference > 0f)
                 {
@@ -313,15 +318,15 @@ public class UniversalButtonScript : MonoBehaviour {
             }
             else if(this.name == "SquareGaussian")
             {
-                GetComponent<SquareGaussian>().ToggleSquareGaussian();
+                denclueController.GetComponent<SquareGaussian>().ToggleSquareGaussian();
             }
             else if(this.name == "DencluePlay")
             {
-                denclue.StartDenclue();
+                denclueController.GetComponent<DenclueAlgorithm>().StartDenclue();
             }
             else if (this.name == "SingleMultiCentered")
             {
-                GetComponent<ToggleSingleMultiCentered>().Toggle();
+                denclueController.GetComponent<ToggleSingleMultiCentered>().Toggle();
             }
         }
         

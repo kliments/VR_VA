@@ -9,12 +9,10 @@ public class datasetChangerScript : MonoBehaviour
     public TextAsset myDataset;
     public GameObject textPrefab;
     public GameObject scatterplot;
-    public GameObject buttonText;
 
     private float lastActivation = 0;
     private GameObject myText;
-
-    public GameObject parentViz;
+    
     public Transform responsiveMenu;
     public GameObject cubes;
     public GameObject pies;
@@ -23,9 +21,9 @@ public class datasetChangerScript : MonoBehaviour
     public bool isSelected;
     public bool isHovered = false;
 
-    public GameObject resetKmeans;
-    public GameObject resetDBScan;
-    public GameObject resetDenclue;
+    public KMeansAlgorithm resetKmeans;
+    public DBScanAlgorithm resetDBScan;
+    public DenclueAlgorithm resetDenclue;
     public GameObject ground;
     public Sprite datasetSelected;
 
@@ -38,12 +36,12 @@ public class datasetChangerScript : MonoBehaviour
         ground.GetComponent<SetToGround>().rigPosReset = true;
         ground.GetComponent<SetToGround>().RemoveParenthoodFromRig();
         //Reset the K-means algorithm in case the dataset is changed
-        resetKmeans.GetComponent<KMeansAlgorithm>().ResetMe();
+        resetKmeans.ResetMe();
 
         //Reset the DBScan algorithm in case the dataset is changed
-        resetDBScan.GetComponent<DBScanAlgorithm>().ResetMe();
+        resetDBScan.ResetMe();
 
-        resetDenclue.GetComponent<DenclueAlgorithm>().ResetMe();
+        resetDenclue.ResetMe();
 
         if(scatterplot == null) scatterplot = GameObject.Find("ScatterplotElements");
         if(cubes == null) cubes = FindObject(scatterplot, "DataSpace");
@@ -87,39 +85,9 @@ public class datasetChangerScript : MonoBehaviour
         {
             responsiveMenu = responsiveMenu.parent;
         }
-        foreach(Transform child in responsiveMenu)
-        {
-            if(child.name == "KMeansParent")
-            {
-                foreach(Transform childOfChild in child)
-                {
-                    if(childOfChild.name == "K-Means Step Forward")
-                    {
-                        resetKmeans = childOfChild.gameObject;
-                    }
-                }
-            }
-            else if(child.name == "DBSCANParent")
-            {
-                foreach (Transform childOfChild in child)
-                {
-                    if (childOfChild.name == "DBScan Step Forward")
-                    {
-                        resetDBScan = childOfChild.gameObject;
-                    }
-                }
-            }
-            else if (child.name == "DENCLUEParent")
-            {
-                foreach (Transform childOfChild in child)
-                {
-                    if (childOfChild.name == "DencluePlay")
-                    {
-                        resetDenclue = childOfChild.gameObject;
-                    }
-                }
-            }
-        }
+        resetKmeans = (KMeansAlgorithm)FindObjectOfType(typeof(KMeansAlgorithm));
+        resetDBScan = (DBScanAlgorithm)FindObjectOfType(typeof(DBScanAlgorithm));
+        resetDenclue = (DenclueAlgorithm)FindObjectOfType(typeof(DenclueAlgorithm));
     }
 
     public void initText() { 
@@ -156,11 +124,5 @@ public class datasetChangerScript : MonoBehaviour
             }
         }
         return null;
-    }
-
-    public void ChangeText(string text)
-    {
-        text = text.Remove(0, 4);
-        buttonText.transform.GetChild(0).GetComponent<Text>().text = text;
     }
 }

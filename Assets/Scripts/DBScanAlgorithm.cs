@@ -9,8 +9,8 @@ public class DBScanAlgorithm : ClusteringAlgorithm {
 
     public SilhouetteCoefficient silhouetteCoef;
     public Transform scatterplot;
-    public GameObject resetKMeans;
-    public GameObject resetDenclue;
+    public KMeansAlgorithm resetKMeans;
+    public DenclueAlgorithm resetDenclue;
 
     //current data points visualisation
     private GameObject dataVisuals;

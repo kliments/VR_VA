@@ -27,9 +27,9 @@ public class VisualizationChangerScript : MonoBehaviour {
 
 
     private int cubesCounter, piesCounter, trnglCounter, ttrhdrnCounter = 0;
-    public GameObject resetKmeans;
-    public GameObject resetDBScan;
-    public GameObject resetDenclue;
+    public KMeansAlgorithm resetKmeans;
+    public DBScanAlgorithm resetDBScan;
+    public DenclueAlgorithm resetDenclue;
 
     private int vizLength;
     public void startSelectedAction()
@@ -37,9 +37,9 @@ public class VisualizationChangerScript : MonoBehaviour {
         ground.GetComponent<SetToGround>().rigPosReset = true;
         ground.GetComponent<SetToGround>().RemoveParenthoodFromRig();
 
-        resetKmeans.GetComponent<KMeansAlgorithm>().ResetMe();
-        resetDBScan.GetComponent<DBScanAlgorithm>().ResetMe();
-        resetDenclue.GetComponent<DenclueAlgorithm>().ResetMe();
+        resetKmeans.ResetMe();
+        resetDBScan.ResetMe();
+        resetDenclue.ResetMe();
         
         vizLength = typeOfVisualization.Length;
         if(cubes == null) cubes = FindObject(Scatterplot, "DataSpace");

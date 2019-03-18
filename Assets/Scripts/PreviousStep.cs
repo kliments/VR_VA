@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PreviousStep : MonoBehaviour {
 
-    public GameObject obj;
+    public KMeansAlgorithm obj;
 	// Use this for initialization
 	void Start () {
 		
