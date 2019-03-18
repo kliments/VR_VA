@@ -9,7 +9,7 @@ public class GeneralCoverflowProperties : MonoBehaviour {
     public Transform menusParent;
     private List<GameObject> allButtons;
     private Quaternion originalRotation;
-    private Vector3 mainPosition, ptrOldPos, ptrNewPos;
+    private Vector3 mainPosition;
 
     private float speed=0.5f;
     // Use this for initialization

@@ -63,6 +63,16 @@ public class ResponsiveMenuScript : MonoBehaviour {
             _newPos = device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
             _oldPos = _newPos;
         }*/
+        if(device.GetPress(SteamVR_Controller.ButtonMask.Touchpad))
+        {
+            Vector2 difference = device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
+            if (_currentButton.tag == "increaseDecrease")
+            {
+                _currentButton.GetComponent<UniversalButtonScript>().difference = difference.y;
+                _currentButton.GetComponent<UniversalButtonScript>().Press();
+                _slide = false;
+            }
+        }
         //for moving pointer around when touching the touchpad
         if (device.GetTouch(SteamVR_Controller.ButtonMask.Touchpad) && _slide)
         {
@@ -70,26 +80,18 @@ public class ResponsiveMenuScript : MonoBehaviour {
             _oldPos = _newPos;
             _newPos = device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
             Vector2 difference = _newPos - _oldPos;
-
-            if (_currentButton.tag == "increaseDecrease" && Mathf.Abs(difference.y) > 0.05f)
+            if (Mathf.Abs(difference.x) > 0.03f)
             {
-                _currentButton.GetComponent<UniversalButtonScript>().difference = difference.y;
-                _currentButton.GetComponent<UniversalButtonScript>().Press();
-                _slide = false;
-            }
-
-            else if (Mathf.Abs(difference.x) > 0.03f)
-            {
-                _actualPos.x = difference.x * 0.005f;
+                _actualPos.x = difference.x * 0.01f;
                 
                 _actualPos.z = 0;
                 _actualPos.y = 0;
-                if (pointer.transform.localPosition.x < -0.28f && difference.x < 0)
+                if (pointer.transform.localPosition.x < -0.4f && difference.x < 0)
                 {
                     _actualPos.x = 0;
                 }
 
-                if (pointer.transform.localPosition.x > 0.28f && difference.x > 0)
+                if (pointer.transform.localPosition.x > 0.4f && difference.x > 0)
                 {
                     _actualPos.x = 0;
                 }

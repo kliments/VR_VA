@@ -195,12 +195,12 @@ public class UniversalButtonScript : MonoBehaviour {
                 if (difference > 0f)
                 {
                     if (IsInvoking("DecreaseNrSpheres")) CancelInvoke("DecreaseNrSpheres");
-                    if (!IsInvoking("IncreaseNrSpheres")) InvokeRepeating("IncreaseNrSpheres", 0, 0.2f);
+                    if (!IsInvoking("IncreaseNrSpheres")) InvokeRepeating("IncreaseNrSpheres", 0, 0.5f);
                 }
                 else if (difference < 0f)
                 {
                     if (IsInvoking("IncreaseNrSpheres")) CancelInvoke("IncreaseNrSpheres");
-                    if (!IsInvoking("DecreaseNrSpheres")) InvokeRepeating("DecreaseNrSpheres", 0, 0.2f);
+                    if (!IsInvoking("DecreaseNrSpheres")) InvokeRepeating("DecreaseNrSpheres", 0, 0.5f);
                 }
             }
             else if(this.name == "Step Backward")
@@ -231,12 +231,12 @@ public class UniversalButtonScript : MonoBehaviour {
                 if (difference > 0f)
                 {
                     if (IsInvoking("DecreaseEpsilon")) CancelInvoke("DecreaseEpsilon");
-                    if (!IsInvoking("IncreaseEpsilon")) InvokeRepeating("IncreaseEpsilon", 0, 0.2f);
+                    if (!IsInvoking("IncreaseEpsilon")) InvokeRepeating("IncreaseEpsilon", 0, 0.5f);
                 }
                 else if (difference < 0f)
                 {
                     if (IsInvoking("IncreaseEpsilon")) CancelInvoke("IncreaseEpsilon");
-                    if (!IsInvoking("DecreaseEpsilon")) InvokeRepeating("DecreaseEpsilon", 0, 0.2f);
+                    if (!IsInvoking("DecreaseEpsilon")) InvokeRepeating("DecreaseEpsilon", 0, 0.5f);
                 }
             }
             else if(this.name == "minPts")
@@ -247,13 +247,13 @@ public class UniversalButtonScript : MonoBehaviour {
                 {
 
                     if (IsInvoking("DecreaseMinPts")) CancelInvoke("DecreaseMinPts");
-                    if (!IsInvoking("IncreaseMinPts")) InvokeRepeating("IncreaseMinPts", 0, 0.2f);
+                    if (!IsInvoking("IncreaseMinPts")) InvokeRepeating("IncreaseMinPts", 0, 0.5f);
                 }
                 else if (difference < 0f)
                 {
 
                     if (IsInvoking("IncreaseMinPts")) CancelInvoke("IncreaseMinPts");
-                    if (!IsInvoking("DecreaseMinPts")) InvokeRepeating("DecreaseMinPts", 0, 0.2f);
+                    if (!IsInvoking("DecreaseMinPts")) InvokeRepeating("DecreaseMinPts", 0, 0.5f);
                 }
             }
             else if(this.name == "EucledianManhattan")
@@ -290,13 +290,13 @@ public class UniversalButtonScript : MonoBehaviour {
                 {
 
                     if (IsInvoking("DecreaseInfluence")) CancelInvoke("DecreaseInfluence");
-                    if (!IsInvoking("IncreaseInfluence")) InvokeRepeating("IncreaseInfluence", 0, 0.2f);
+                    if (!IsInvoking("IncreaseInfluence")) InvokeRepeating("IncreaseInfluence", 0, 0.5f);
                 }
                 else if (difference < 0f)
                 {
 
                     if (IsInvoking("IncreaseInfluence")) CancelInvoke("IncreaseInfluence");
-                    if (!IsInvoking("DecreaseInfluence")) InvokeRepeating("DecreaseInfluence", 0, 0.2f);
+                    if (!IsInvoking("DecreaseInfluence")) InvokeRepeating("DecreaseInfluence", 0, 0.5f);
                 }
             }
             else if(this.name == "threshold")
@@ -307,13 +307,13 @@ public class UniversalButtonScript : MonoBehaviour {
                 {
 
                     if (IsInvoking("DecreaseThreshold")) CancelInvoke("DecreaseThreshold");
-                    if (!IsInvoking("IncreaseThreshold")) InvokeRepeating("IncreaseThreshold", 0, 0.2f);
+                    if (!IsInvoking("IncreaseThreshold")) InvokeRepeating("IncreaseThreshold", 0, 0.5f);
                 }
                 else if (difference < 0f)
                 {
 
                     if (IsInvoking("IncreaseThreshold")) CancelInvoke("IncreaseThreshold");
-                    if (!IsInvoking("DecreaseThreshold")) InvokeRepeating("DecreaseThreshold", 0, 0.2f);
+                    if (!IsInvoking("DecreaseThreshold")) InvokeRepeating("DecreaseThreshold", 0, 0.5f);
                 }
             }
             else if(this.name == "SquareGaussian")

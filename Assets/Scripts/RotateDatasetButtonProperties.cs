@@ -9,8 +9,7 @@ public class RotateDatasetButtonProperties : MonoBehaviour {
     private List<GameObject> allButtons;
     private Quaternion originalRotation;
     private Vector3 mainPosition;
-    public GameObject sprite, ptr, menusParent;
-    private Vector3 ptrOldPos, ptrNewPos;
+    public GameObject sprite, menusParent;
     public Sprite mySprite;
     // Use this for initialization
     void Start () {
@@ -22,10 +21,7 @@ public class RotateDatasetButtonProperties : MonoBehaviour {
         AssignAccordinglyButtons();
         originalRotation = transform.rotation;
         sprite = GameObject.Find("PCAProjectionSprite");
-        ptr = GameObject.Find("Pointer");
         menusParent = GameObject.Find("MenusParent");
-        ptrOldPos = ptr.transform.localPosition;
-        ptrNewPos = ptr.transform.localPosition;
     }
 	
 	// Update is called once per frame

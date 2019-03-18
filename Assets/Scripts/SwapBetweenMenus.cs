@@ -50,6 +50,7 @@ public class SwapBetweenMenus : MonoBehaviour {
                     //show label for it
                     pipelineSprite.SetActive(true);
                     controlsSprite.SetActive(false);
+                    GetComponentInParent<PointerEventListener>().MenuAction = MENU_ACTION.SELECTDATA;
                 }
                 else if (newPos.y > oldPos.y + threshold && primaryShown)
                 {

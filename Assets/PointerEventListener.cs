@@ -498,6 +498,8 @@ public LayerMask layersToIgnoreAdd = Physics.IgnoreRaycastLayer;
             //free selection again
             fixSelection = false;
         }
+        updateRotation = false;
+        updateScaling = false;
     }
 
     /// <summary>
@@ -532,6 +534,7 @@ public LayerMask layersToIgnoreAdd = Physics.IgnoreRaycastLayer;
             updateRotation = false;
 
         }
+        updateScaling = false;
     }
 
     /// <summary>
@@ -566,6 +569,7 @@ public LayerMask layersToIgnoreAdd = Physics.IgnoreRaycastLayer;
             updateScaling = false;
 
         }
+        updateRotation = false;
     }
 
     public void setAddMode()
