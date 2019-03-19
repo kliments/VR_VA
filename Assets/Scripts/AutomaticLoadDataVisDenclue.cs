@@ -24,7 +24,7 @@ public class AutomaticLoadDataVisDenclue : MonoBehaviour {
     }
     void LoadDenclue()
     {
-        denclue.GetComponent<UniversalButtonScript>().denclue.StartDenclue();
+        denclue.GetComponent<DenclueAlgorithm>().StartDenclue();
     }
     void LoadDBscan()
     {
@@ -39,7 +39,7 @@ public class AutomaticLoadDataVisDenclue : MonoBehaviour {
     {
         Invoke("LoadData", 1f);
         Invoke("LoadVis", 1.1f);
-        //Invoke("LoadDenclue", 1.2f);
+        Invoke("LoadDenclue", 1.2f);
         //Invoke("LoadDBscan", 1.2f);
         //Invoke("LoadKmeans", 1.2f);
     }
