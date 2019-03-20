@@ -264,8 +264,6 @@ public class DenclueAlgorithm : MonoBehaviour {
     //counts the total number of "tiles"
     public void CountTiles()
     {
-        _minHeight = 1;
-        _maxHeight = 0;
         for (int x = 0; x < mapTilesInfluence.Length; x++)
         {
             for (int z = 0; z < mapTilesInfluence[x].Length; z++)
@@ -277,18 +275,6 @@ public class DenclueAlgorithm : MonoBehaviour {
                 else if(mapTilesInfluence[x][z]>0 && gaussianCalculation)
                 {
                     _counter++;
-                }
-                //find highest and lowest point
-                if (mapTilesInfluence[x][z] > 0)
-                {
-                    if (_maxHeight < mapTilesInfluence[x][z] / 100)
-                    {
-                        _maxHeight = mapTilesInfluence[x][z] / 100;
-                    }
-                    if (_minHeight > mapTilesInfluence[x][z] / 100)
-                    {
-                        _minHeight = mapTilesInfluence[x][z] / 100;
-                    }
                 }
             }
         }
@@ -305,6 +291,9 @@ public class DenclueAlgorithm : MonoBehaviour {
     //creates 4 vertices and 2 triangles on each tile
     private void CreateVerticesAndTriangles()
     {
+        _minHeight = 1;
+        _maxHeight = 0;
+
         _verticesMatrix = new Vector3[_counter][];
         _trianglesMatrix = new int[_counter][];
         _countersMatrix = new int[150][];
@@ -458,13 +447,18 @@ public class DenclueAlgorithm : MonoBehaviour {
                         _trianglesMatrix[currentTile][16] = count - 3;                                 // 1
                         _trianglesMatrix[currentTile][17] = (_countersMatrix[x][z - 1] + 1) * 4 - 1;   // 3 from tile down
 						
-						for (int c = 0; c < 4; c++)
-						{
-							_matrixColors[currentTile][c] = new Color(_verticesMatrix[currentTile][c].y, 0, Math.Abs(1 - _verticesMatrix[currentTile][c].y));
-                            _tiledMapColors[x][z][c] = new Color(NormalizeColor(_verticesMatrix[currentTile][c].y), 0, Math.Abs(1 - NormalizeColor(_verticesMatrix[currentTile][c].y)));
-                        }
                         _verticesMaximumMatrix[x][z] = _tiledMapVertices[x][z][0];
                         currentTile++;
+
+                        //find highest and lowest point
+                        if (_maxHeight < _verticesMaximumMatrix[x][z].y)
+                        {
+                            _maxHeight = _verticesMaximumMatrix[x][z].y;
+                        }
+                        if (_minHeight > _verticesMaximumMatrix[x][z].y)
+                        {
+                            _minHeight = _verticesMaximumMatrix[x][z].y;
+                        }
                     }
                 }
 
@@ -472,7 +466,11 @@ public class DenclueAlgorithm : MonoBehaviour {
                 else
                 {
                     if (mapTilesInfluence[x][z] > 0)
-                    { 
+                    {
+                        if (x == 47 && z == 112)
+                        {
+                            Debug.Log("");
+                        }
                         _verticesMatrix[currentTile] = new Vector3[4];
 						_matrixColors[currentTile] = new Color[4];
                         //bottom left vertex
@@ -516,8 +514,6 @@ public class DenclueAlgorithm : MonoBehaviour {
                 if(_indexesList.Count != 0) _counterIndexes.Add(_indexesList);
             }
         }
-        Debug.Log("max height " + _maxHeight.ToString());
-        Debug.Log("min height "+ _minHeight.ToString());
         //need to start from begining, to reposition vertices in Gaussian mesh
         currentTile = 0;
         if(gaussianCalculation)
@@ -528,22 +524,27 @@ public class DenclueAlgorithm : MonoBehaviour {
                 {
                     if (mapTilesInfluence[i][j] > 0)
                     {
-
                         _verticesMatrix[currentTile] = ChangeVertices(_verticesMatrix[currentTile], i, j, _tiledMapVertices[i][j + 1][0].y, _tiledMapVertices[i][j - 1][3].y, _tiledMapVertices[i + 1][j + 1][0].y,
                                                                      _tiledMapVertices[i + 1][j][0].y, _tiledMapVertices[i - 1][j - 1][3].y, _tiledMapVertices[i - 1][j][3].y);
                         _tiledMapVertices[i][j] = _verticesMatrix[currentTile];
                         _verticesMaximumMatrix[i][j] = returnMax(_verticesMatrix[currentTile][0], _verticesMatrix[currentTile][1], _verticesMatrix[currentTile][2], _verticesMatrix[currentTile][3]);
-
-                        for (int c = 0; c < 4; c++)
-                        {
-                            _matrixColors[currentTile][c] = new Color(_verticesMatrix[currentTile][c].y, 0, Math.Abs(1 - _verticesMatrix[currentTile][c].y));
-                            _tiledMapColors[i][j][c] = new Color(_verticesMatrix[currentTile][c].y, 0, Math.Abs(1 - _verticesMatrix[currentTile][c].y));
-                        }
                         currentTile++;
+
+                        //find highest and lowest point
+                        if (_maxHeight < _verticesMaximumMatrix[i][j].y)
+                        {
+                            _maxHeight = _verticesMaximumMatrix[i][j].y;
+                        }
+                        if (_minHeight > _verticesMaximumMatrix[i][j].y)
+                        {
+                            _minHeight = _verticesMaximumMatrix[i][j].y;
+                        }
                     }
                 }
             }
         }
+        Debug.Log("min height " + _minHeight);
+        Debug.Log("max height " + _maxHeight);
 
         ConvertMatrixToArray();
     }
@@ -591,18 +592,37 @@ public class DenclueAlgorithm : MonoBehaviour {
             }
         }
         nextVertex = 0;
+        int currentTile = 0;
         for(int i=0; i< 150; i++)
         {
             for(int j=0; j< 150; j++)
             {
-                if(_tiledMapColors[i][j][0].r >0 || _tiledMapColors[i][j][0].b >0)
+
+                if ((mapTilesInfluence[i][j] > 0 || HasNeighbours(i, j)) && !gaussianCalculation)
                 {
-                    for(int k=0; k<4; k++)
+                    for (int k = 0; k < 4; k++)
                     {
+                        _matrixColors[currentTile][k] = new Color(NormalizeColor(_verticesMatrix[currentTile][k].y + 0.002f), 0, Math.Abs(1 - NormalizeColor(_verticesMatrix[currentTile][k].y + 0.002f)));
+                        _tiledMapColors[i][j][k] = new Color(NormalizeColor(_verticesMatrix[currentTile][k].y + 0.002f), 0, Math.Abs(1 - NormalizeColor(_verticesMatrix[currentTile][k].y + 0.002f)));
+
                         _colors[nextVertex] = _tiledMapColors[i][j][k];
                         _additionalVerticesColor.Add(_tiledMapColors[i][j][k]);
                         nextVertex++;
                     }
+                    currentTile++;
+                }
+                else if (mapTilesInfluence[i][j] > 0 && gaussianCalculation)
+                {
+                    for (int k = 0; k < 4; k++)
+                    {
+                        _matrixColors[currentTile][k] = new Color(NormalizeColor(_verticesMatrix[currentTile][k].y + 0.002f), 0, Math.Abs(1 - NormalizeColor(_verticesMatrix[currentTile][k].y + 0.002f)));
+                        _tiledMapColors[i][j][k] = new Color(NormalizeColor(_verticesMatrix[currentTile][k].y + 0.002f), 0, Math.Abs(1 - NormalizeColor(_verticesMatrix[currentTile][k].y + 0.002f)));
+
+                        _colors[nextVertex] = _tiledMapColors[i][j][k];
+                        _additionalVerticesColor.Add(_tiledMapColors[i][j][k]);
+                        nextVertex++;
+                    }
+                    currentTile++;
                 }
             }
         }
@@ -1130,10 +1150,6 @@ public class DenclueAlgorithm : MonoBehaviour {
     void ColorTiles(int k, int l, Color color)
     {
         if(k==99 && l == 100)
-        {
-            Debug.Log("break");
-        }
-        if (k == 99 && l == 101)
         {
             Debug.Log("break");
         }
@@ -2176,7 +2192,9 @@ public class DenclueAlgorithm : MonoBehaviour {
             //color from the right tile, for 1,2,3 triangle
             _color = _additionalVerticesColor[_countersMatrix[k + 1][l] * 4 + 2];
         }
+        _additionalVerticesPreviousIndex[k][l] = 0;
         Vector3 vertex = new Vector3();
+        int indexCounter = -1;
         //paint all vertices if all of them above the threshold
         if (AllVerticesAbove(_tiledMapVertices[k][l], threshold))
         {
@@ -2227,6 +2245,10 @@ public class DenclueAlgorithm : MonoBehaviour {
         //if 1,2,3 vertices are above the threshold, find points where it cuts the thresholdPlane
         else if (ThreeVerticesAbove(_tiledMapVertices[k][l][1], _tiledMapVertices[k][l][2], _tiledMapVertices[k][l][3], threshold))
         {
+            _additionalVerticesIndexCounter += 4;
+            indexCounter = _additionalVerticesIndexCounter;
+            _additionalVerticesPreviousIndex[k][l] += 4;
+
             if (Physics.Raycast(_pos1, _pos0 - _pos1, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
@@ -2236,7 +2258,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                 _additionalVertices.Add(vertex); // -4
                 _additionalVertices.Add(vertex); // -3
                 _additionalVerticesColor.Add(_clusterColor);
-                _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
             }
             if (Physics.Raycast(_pos2, _pos0 - _pos2, out _hit, 5f, _layerMask))
             {
@@ -2247,7 +2269,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                 _additionalVertices.Add(vertex); // -2
                 _additionalVertices.Add(vertex); // -1
                 _additionalVerticesColor.Add(_clusterColor);
-                _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
             }
             //upper triangles with cluster color
             List<int> temp = new List<int>();
@@ -2298,8 +2320,14 @@ public class DenclueAlgorithm : MonoBehaviour {
         //if 0,2,3 vertices are above the threshold..
         else if (ThreeVerticesAbove(_tiledMapVertices[k][l][0], _tiledMapVertices[k][l][2], _tiledMapVertices[k][l][3], threshold))
         {
-            if(multiCentered || !Is12Tilted(_tiledMapVertices[k][l]))
+            if (multiCentered || !Is12Tilted(_tiledMapVertices[k][l]))
             {
+                if(!multiCentered)
+                {
+                    _additionalVerticesIndexCounter += 4;
+                    indexCounter = _additionalVerticesIndexCounter;
+                    _additionalVerticesPreviousIndex[k][l] += 4;
+                }
                 if (Physics.Raycast(_pos0, _pos1 - _pos0, out _hit, 5f, _layerMask))
                 {
                     vertex = _hit.point;
@@ -2309,7 +2337,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                     _additionalVertices.Add(vertex); // -4
                     _additionalVertices.Add(vertex); // -3
                     _additionalVerticesColor.Add(_clusterColor);
-                    _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                    _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
                 }
                 if (Physics.Raycast(_pos3, _pos1 - _pos3, out _hit, 5f, _layerMask))
                 {
@@ -2320,7 +2348,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                     _additionalVertices.Add(vertex); // -2
                     _additionalVertices.Add(vertex); // -1
                     _additionalVerticesColor.Add(_clusterColor);
-                    _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                    _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - vertex.y)));
                 }
 
                 //upper triangles with cluster color
@@ -2368,6 +2396,9 @@ public class DenclueAlgorithm : MonoBehaviour {
             }
             else
             {
+                _additionalVerticesIndexCounter += 6;
+                indexCounter = _additionalVerticesIndexCounter;
+                _additionalVerticesPreviousIndex[k][l] += 6;
                 if (Physics.Raycast(_pos0, _pos1 - _pos0, out _hit, 5f, _layerMask))
                 {
                     vertex = _hit.point;
@@ -2377,7 +2408,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                     _additionalVertices.Add(vertex); // -8
                     _additionalVertices.Add(vertex); // -7
                     _additionalVerticesColor.Add(_clusterColor);
-                    _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                    _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
                 }
                 if (Physics.Raycast(_pos2, _pos1 - _pos2, out _hit, 5f, _layerMask))
                 {
@@ -2392,7 +2423,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                     _additionalVerticesColor.Add(_color);
                     _additionalVerticesColor.Add(_clusterColor);
                     _additionalVerticesColor.Add(_color);
-                    _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                    _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
                 }
                 if (Physics.Raycast(_pos3, _pos1 - _pos3, out _hit, 5f, _layerMask))
                 {
@@ -2403,7 +2434,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                     _additionalVertices.Add(vertex); // -2
                     _additionalVertices.Add(vertex); // -1
                     _additionalVerticesColor.Add(_color);
-                    _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                    _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
                 }
 
                 //upper triangles with left-cluster color
@@ -2459,6 +2490,12 @@ public class DenclueAlgorithm : MonoBehaviour {
         {
             if(multiCentered || !Is12Tilted(_tiledMapVertices[k][l]))
             {
+                if(!multiCentered)
+                {
+                    _additionalVerticesIndexCounter += 4;
+                    indexCounter = _additionalVerticesIndexCounter;
+                    _additionalVerticesPreviousIndex[k][l] += 4;
+                }
                 if (Physics.Raycast(_pos0, _pos2 - _pos0, out _hit, 5f, _layerMask))
                 {
                     vertex = _hit.point;
@@ -2468,7 +2505,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                     _additionalVertices.Add(vertex); // -4
                     _additionalVertices.Add(vertex); // -3
                     _additionalVerticesColor.Add(_clusterColor);
-                    _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                    _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
                 }
                 if (Physics.Raycast(_pos3, _pos2 - _pos3, out _hit, 5f, _layerMask))
                 {
@@ -2479,7 +2516,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                     _additionalVertices.Add(vertex); // -2
                     _additionalVertices.Add(vertex); // -1
                     _additionalVerticesColor.Add(_clusterColor);
-                    _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                    _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
                 }
                 //upper triangles with cluster color
                 List<int> temp = new List<int>();
@@ -2520,6 +2557,10 @@ public class DenclueAlgorithm : MonoBehaviour {
             }
             else
             {
+                _additionalVerticesIndexCounter += 6;
+                indexCounter = _additionalVerticesIndexCounter;
+                _additionalVerticesPreviousIndex[k][l] += 6;
+
                 if (Physics.Raycast(_pos0, _pos2 - _pos0, out _hit, 5f, _layerMask))
                 {
                     vertex = _hit.point;
@@ -2529,7 +2570,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                     _additionalVertices.Add(vertex); // -8
                     _additionalVertices.Add(vertex); // -7
                     _additionalVerticesColor.Add(_clusterColor);
-                    _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                    _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
                 }
                 if (Physics.Raycast(_pos1, _pos2 - _pos1, out _hit, 5f, _layerMask))
                 {
@@ -2544,7 +2585,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                     _additionalVerticesColor.Add(_color);
                     _additionalVerticesColor.Add(_clusterColor);
                     _additionalVerticesColor.Add(_color);
-                    _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                    _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
                 }
                 if (Physics.Raycast(_pos3, _pos2 - _pos3, out _hit, 5f, _layerMask))
                 {
@@ -2555,7 +2596,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                     _additionalVertices.Add(vertex); // -2
                     _additionalVertices.Add(vertex); // -1
                     _additionalVerticesColor.Add(_color);
-                    _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                    _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
                 }
                 //upper triangles with cluster color
                 List<int> temp = new List<int>();
@@ -2609,6 +2650,10 @@ public class DenclueAlgorithm : MonoBehaviour {
         //if 0,1,2 vertices are above the threshold..
         else if (ThreeVerticesAbove(_tiledMapVertices[k][l][0], _tiledMapVertices[k][l][1], _tiledMapVertices[k][l][2], threshold))
         {
+            _additionalVerticesIndexCounter += 4;
+            indexCounter = _additionalVerticesIndexCounter;
+            _additionalVerticesPreviousIndex[k][l] += 4;
+
             if (Physics.Raycast(_pos2, _pos3 - _pos2, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
@@ -2618,7 +2663,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                 _additionalVertices.Add(vertex); // -4
                 _additionalVertices.Add(vertex); // -3
                 _additionalVerticesColor.Add(_clusterColor);
-                _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
             }
             if (Physics.Raycast(_pos1, _pos3 - _pos1, out _hit, 5f, _layerMask))
             {
@@ -2629,7 +2674,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                 _additionalVertices.Add(vertex); // -2
                 _additionalVertices.Add(vertex); // -1
                 _additionalVerticesColor.Add(_clusterColor);
-                _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
             }
             //upper triangles with cluster color
             List<int> temp = new List<int>();
@@ -2683,6 +2728,9 @@ public class DenclueAlgorithm : MonoBehaviour {
         #region 2VerticesAbove
         else if (TwoVerticesAbove(_tiledMapVertices[k][l][2], _tiledMapVertices[k][l][3], threshold))
         {
+            _additionalVerticesIndexCounter += 4;
+            indexCounter = _additionalVerticesIndexCounter;
+            _additionalVerticesPreviousIndex[k][l] += 4;
             if (Physics.Raycast(_pos2, _pos0 - _pos2, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
@@ -2692,7 +2740,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                 _additionalVertices.Add(vertex); // -4
                 _additionalVertices.Add(vertex); // -3
                 _additionalVerticesColor.Add(_clusterColor);
-                _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
             }
             if (Physics.Raycast(_pos3, _pos1 - _pos3, out _hit, 5f, _layerMask))
             {
@@ -2703,7 +2751,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                 _additionalVertices.Add(vertex); // -2
                 _additionalVertices.Add(vertex); // -1
                 _additionalVerticesColor.Add(_clusterColor);
-                _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
             }
 
             // upper triangles with cluster color
@@ -2754,6 +2802,10 @@ public class DenclueAlgorithm : MonoBehaviour {
 
         else if (TwoVerticesAbove(_tiledMapVertices[k][l][0], _tiledMapVertices[k][l][1], threshold))
         {
+            _additionalVerticesIndexCounter += 4;
+            indexCounter = _additionalVerticesIndexCounter;
+            _additionalVerticesPreviousIndex[k][l] += 4;
+
             if (Physics.Raycast(_pos0, _pos2 - _pos0, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
@@ -2763,7 +2815,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                 _additionalVertices.Add(vertex); // -4
                 _additionalVertices.Add(vertex); // -3
                 _additionalVerticesColor.Add(_clusterColor);
-                _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
             }
             if (Physics.Raycast(_pos1, _pos3 - _pos1, out _hit, 5f, _layerMask))
             {
@@ -2774,7 +2826,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                 _additionalVertices.Add(vertex); // -2
                 _additionalVertices.Add(vertex); // -1
                 _additionalVerticesColor.Add(_clusterColor);
-                _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
             }
 
             // upper triangles with cluster color
@@ -2825,6 +2877,10 @@ public class DenclueAlgorithm : MonoBehaviour {
 
         else if (TwoVerticesAbove(_tiledMapVertices[k][l][0], _tiledMapVertices[k][l][2], threshold))
         {
+            _additionalVerticesIndexCounter += 4;
+            indexCounter = _additionalVerticesIndexCounter;
+            _additionalVerticesPreviousIndex[k][l] += 4;
+
             if (Physics.Raycast(_pos0, _pos1 - _pos0, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
@@ -2834,7 +2890,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                 _additionalVertices.Add(vertex); // -4
                 _additionalVertices.Add(vertex); // -3
                 _additionalVerticesColor.Add(_clusterColor);
-                _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
             }
             if (Physics.Raycast(_pos2, _pos3 - _pos2, out _hit, 5f, _layerMask))
             {
@@ -2845,7 +2901,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                 _additionalVertices.Add(vertex); // -2
                 _additionalVertices.Add(vertex); // -1
                 _additionalVerticesColor.Add(_clusterColor);
-                _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
             }
             // upper triangles with cluster color
             List<int> temp = new List<int>();
@@ -2895,6 +2951,10 @@ public class DenclueAlgorithm : MonoBehaviour {
 
         else if (TwoVerticesAbove(_tiledMapVertices[k][l][1], _tiledMapVertices[k][l][3], threshold))
         {
+            _additionalVerticesIndexCounter += 4;
+            indexCounter = _additionalVerticesIndexCounter;
+            _additionalVerticesPreviousIndex[k][l] += 4;
+
             if (Physics.Raycast(_pos1, _pos0 - _pos1, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
@@ -2904,7 +2964,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                 _additionalVertices.Add(vertex); // -4
                 _additionalVertices.Add(vertex); // -3
                 _additionalVerticesColor.Add(_clusterColor);
-                _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
             }
             if (Physics.Raycast(_pos3, _pos2 - _pos3, out _hit, 5f, _layerMask))
             {
@@ -2915,7 +2975,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                 _additionalVertices.Add(vertex); // -2
                 _additionalVertices.Add(vertex); // -1
                 _additionalVerticesColor.Add(_clusterColor);
-                _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
             }
 
             // upper triangles with cluster color
@@ -2923,18 +2983,12 @@ public class DenclueAlgorithm : MonoBehaviour {
             temp.Add(_tile1);
             temp.Add(_additionalVertices.Count - 4);
             temp.Add(_tile3);
-            /*_triangles[_countersMatrix[k][l] * 6] = temp[0];
-            _triangles[_countersMatrix[k][l] * 6 + 1] = temp[1];
-            _triangles[_countersMatrix[k][l] * 6 + 2] = temp[2];*/
             _additionalTriangles.Add(temp);
 
             temp = new List<int>();
             temp.Add(_additionalVertices.Count - 4);
             temp.Add(_additionalVertices.Count - 2);
             temp.Add(_tile3);
-            /*_triangles[_countersMatrix[k][l] * 6 + 3] = temp[0];
-            _triangles[_countersMatrix[k][l] * 6 + 4] = temp[1];
-            _triangles[_countersMatrix[k][l] * 6 + 5] = temp[2];*/
             _additionalTriangles.Add(temp);
 
             // lower triangles with cluster color
@@ -2971,6 +3025,10 @@ public class DenclueAlgorithm : MonoBehaviour {
         
         else if (TwoVerticesAbove(_tiledMapVertices[k][l][1], _tiledMapVertices[k][l][2], threshold))
         {
+            _additionalVerticesIndexCounter += 4;
+            indexCounter = _additionalVerticesIndexCounter;
+            _additionalVerticesPreviousIndex[k][l] += 4;
+
             if (Physics.Raycast(_pos1, _pos0 - _pos1, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
@@ -2980,7 +3038,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                 _additionalVertices.Add(vertex); // -8
                 _additionalVertices.Add(vertex); // -7
                 _additionalVerticesColor.Add(_clusterColor);
-                _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
             }
             if (Physics.Raycast(_pos2, _pos0 - _pos2, out _hit, 5f, _layerMask))
             {
@@ -2991,7 +3049,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                 _additionalVertices.Add(vertex); // -6
                 _additionalVertices.Add(vertex); // -5
                 _additionalVerticesColor.Add(_clusterColor);
-                _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
             }
             if (Physics.Raycast(_pos1, _pos3 - _pos1, out _hit, 5f, _layerMask))
             {
@@ -3002,7 +3060,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                 _additionalVertices.Add(vertex); // -4
                 _additionalVertices.Add(vertex); // -3
                 _additionalVerticesColor.Add(_clusterColor);
-                _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
             }
             if (Physics.Raycast(_pos2, _pos3 - _pos2, out _hit, 5f, _layerMask))
             {
@@ -3013,7 +3071,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                 _additionalVertices.Add(vertex); // -2
                 _additionalVertices.Add(vertex); // -1
                 _additionalVerticesColor.Add(_clusterColor);
-                _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
             }
             // upper triangles with cluster color
             List<int> temp = new List<int>();
@@ -3062,6 +3120,10 @@ public class DenclueAlgorithm : MonoBehaviour {
         //tilted tile
         else if (TwoVerticesAbove(_tiledMapVertices[k][l][0], _tiledMapVertices[k][l][3], threshold))
         {
+            _additionalVerticesIndexCounter += 6;
+            indexCounter = _additionalVerticesIndexCounter;
+            _additionalVerticesPreviousIndex[k][l] += 6;
+
             if (Physics.Raycast(_pos0, _pos1 - _pos0, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
@@ -3071,7 +3133,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                 _additionalVertices.Add(vertex); // -8
                 _additionalVertices.Add(vertex); // -7
                 _additionalVerticesColor.Add(_clusterColor);
-                _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
             }
             if (Physics.Raycast(_pos3, _pos1 - _pos3, out _hit, 5f, _layerMask))
             {
@@ -3082,7 +3144,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                 _additionalVertices.Add(vertex); // -6
                 _additionalVertices.Add(vertex); // -5
                 _additionalVerticesColor.Add(_color);
-                _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
             }
             if (Physics.Raycast(_pos0, _pos2 - _pos0, out _hit, 5f, _layerMask))
             {
@@ -3093,7 +3155,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                 _additionalVertices.Add(vertex); // -4
                 _additionalVertices.Add(vertex); // -3
                 _additionalVerticesColor.Add(_clusterColor);
-                _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
             }
             if (Physics.Raycast(_pos3, _pos2 - _pos3, out _hit, 5f, _layerMask))
             {
@@ -3104,7 +3166,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                 _additionalVertices.Add(vertex); // -2
                 _additionalVertices.Add(vertex); // -1
                 _additionalVerticesColor.Add(_color);
-                _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
             }
             // upper triangles with cluster color
             List<int> temp = new List<int>();
@@ -3169,6 +3231,10 @@ public class DenclueAlgorithm : MonoBehaviour {
 
         else if ((_tiledMapVertices[k][l][0].y + 0.002f) > threshold)
         {
+            _additionalVerticesIndexCounter += 4;
+            indexCounter = _additionalVerticesIndexCounter;
+            _additionalVerticesPreviousIndex[k][l] += 4;
+
             if (Physics.Raycast(_pos0, _pos1 - _pos0, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
@@ -3178,7 +3244,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                 _additionalVertices.Add(vertex); // -4
                 _additionalVertices.Add(vertex); // -3
                 _additionalVerticesColor.Add(_clusterColor);
-                _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
             }
             if (Physics.Raycast(_pos0, _pos2 - _pos0, out _hit, 5f, _layerMask))
             {
@@ -3189,7 +3255,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                 _additionalVertices.Add(vertex); // -2
                 _additionalVertices.Add(vertex); // -1
                 _additionalVerticesColor.Add(_clusterColor);
-                _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
             }
 
             //upper triangle with cluster color
@@ -3238,6 +3304,10 @@ public class DenclueAlgorithm : MonoBehaviour {
         }
         else if (_tiledMapVertices[k][l][2].y + 0.002f > threshold)
         {
+            _additionalVerticesIndexCounter += 4;
+            indexCounter = _additionalVerticesIndexCounter;
+            _additionalVerticesPreviousIndex[k][l] += 4;
+
             if (Physics.Raycast(_pos2, _pos0 - _pos2, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
@@ -3247,7 +3317,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                 _additionalVertices.Add(vertex); // -4
                 _additionalVertices.Add(vertex); // -3
                 _additionalVerticesColor.Add(_clusterColor);
-                _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
             }
             if (Physics.Raycast(_pos2, _pos3 - _pos2, out _hit, 5f, _layerMask))
             {
@@ -3258,7 +3328,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                 _additionalVertices.Add(vertex); // -2
                 _additionalVertices.Add(vertex); // -1
                 _additionalVerticesColor.Add(_clusterColor);
-                _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
             }
 
             //upper triangle with cluster color
@@ -3307,6 +3377,10 @@ public class DenclueAlgorithm : MonoBehaviour {
         }
         else if ((_tiledMapVertices[k][l][1].y + 0.002f) > threshold)
         {
+            _additionalVerticesIndexCounter += 4;
+            indexCounter = _additionalVerticesIndexCounter;
+            _additionalVerticesPreviousIndex[k][l] += 4;
+
             if (Physics.Raycast(_pos1, _pos0 - _pos1, out _hit, 5f, _layerMask))
             {
                 vertex = _hit.point;
@@ -3316,7 +3390,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                 _additionalVertices.Add(vertex); // -4
                 _additionalVertices.Add(vertex); // -3
                 _additionalVerticesColor.Add(_clusterColor);
-                _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
             }
             if (Physics.Raycast(_pos1, _pos3 - _pos1, out _hit, 5f, _layerMask))
             {
@@ -3327,7 +3401,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                 _additionalVertices.Add(vertex); // -2
                 _additionalVertices.Add(vertex); // -1
                 _additionalVerticesColor.Add(_clusterColor);
-                _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
             }
 
             //upper triangle with cluster color
@@ -3376,6 +3450,10 @@ public class DenclueAlgorithm : MonoBehaviour {
         }
         else if (_tiledMapVertices[k][l][3].y + 0.002f > threshold)
         {
+            _additionalVerticesIndexCounter += 4;
+            indexCounter = _additionalVerticesIndexCounter;
+            _additionalVerticesPreviousIndex[k][l] += 4;
+
             if (Is12Tilted(_tiledMapVertices[k][l]) && !multiCentered) _clusterColor = _color;
             if (Physics.Raycast(_pos3, _pos2 - _pos3, out _hit, 5f, _layerMask))
             {
@@ -3386,7 +3464,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                 _additionalVertices.Add(vertex); // -4
                 _additionalVertices.Add(vertex); // -3
                 _additionalVerticesColor.Add(_clusterColor);
-                _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
             }
             if (Physics.Raycast(_pos3, _pos1 - _pos3, out _hit, 5f, _layerMask))
             {
@@ -3397,7 +3475,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                 _additionalVertices.Add(vertex); // -2
                 _additionalVertices.Add(vertex); // -1
                 _additionalVerticesColor.Add(_clusterColor);
-                _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
             }
 
             //upper triangle with cluster color
@@ -3445,6 +3523,21 @@ public class DenclueAlgorithm : MonoBehaviour {
             }
         }
         #endregion
+
+
+        if (_additionalVerticesIndex[k][l] != -1)
+        {
+            _additionalVerticesPreviousIndex[k][l] = _additionalVerticesIndex[k][l] - _additionalVerticesPreviousIndex[k][l];
+            for (int v = _additionalVerticesPreviousIndex[k][l]; v < _additionalVerticesIndex[k][l]; v++)
+            {
+                for (int t = 0; t < _additionalTriangles[v].Count; t++)
+                {
+                    _additionalTriangles[v][t] = 0;
+                }
+            }
+        }
+        //update new index counter
+        _additionalVerticesIndex[k][l] = indexCounter;
     }
 
     private void MultiCenteredSquaredWaveClusters()
@@ -3552,7 +3645,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                         _additionalVertices.Add(vertex); // -4
                         _additionalVertices.Add(vertex); // -3
                         _additionalVerticesColor.Add(_clusterColor);
-                        _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                        _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
                     }
                     if (Physics.Raycast(_pos1, _downPos3 - _pos1, out _hit, 5f, _layerMask))
                     {
@@ -3563,7 +3656,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                         _additionalVertices.Add(vertex); // -2
                         _additionalVertices.Add(vertex); // -1
                         _additionalVerticesColor.Add(_clusterColor);
-                        _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                        _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
                     }
                     //upper triangles with cluster color
                     temp = new List<int>();
@@ -3605,7 +3698,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                         _additionalVertices.Add(vertex); // -4
                         _additionalVertices.Add(vertex); // -3
                         _additionalVerticesColor.Add(_clusterColor);
-                        _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                        _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
                     }
                     if (Physics.Raycast(_pos2, _leftPos3 - _pos2, out _hit, 5f, _layerMask))
                     {
@@ -3616,7 +3709,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                         _additionalVertices.Add(vertex); // -2
                         _additionalVertices.Add(vertex); // -1
                         _additionalVerticesColor.Add(_clusterColor);
-                        _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                        _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
                     }
 
                     //upper triangles with cluster color
@@ -3659,7 +3752,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                         _additionalVertices.Add(vertex); // -4
                         _additionalVertices.Add(vertex); // -3
                         _additionalVerticesColor.Add(_clusterColor);
-                        _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                        _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
                     }
                     if (Physics.Raycast(_pos3, _rightPos2 - _pos3, out _hit, 5f, _layerMask))
                     {
@@ -3670,7 +3763,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                         _additionalVertices.Add(vertex); // -2
                         _additionalVertices.Add(vertex); // -1
                         _additionalVerticesColor.Add(_clusterColor);
-                        _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                        _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
                     }
                     
                     //upper triangles with cluster color
@@ -3713,7 +3806,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                         _additionalVertices.Add(vertex); // -4
                         _additionalVertices.Add(vertex); // -3
                         _additionalVerticesColor.Add(_clusterColor);
-                        _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                        _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
                     }
                     if (Physics.Raycast(_pos3, _upPos1 - _pos3, out _hit, 5f, _layerMask))
                     {
@@ -3724,7 +3817,7 @@ public class DenclueAlgorithm : MonoBehaviour {
                         _additionalVertices.Add(vertex); // -2
                         _additionalVertices.Add(vertex); // -1
                         _additionalVerticesColor.Add(_clusterColor);
-                        _additionalVerticesColor.Add(new Color(vertex.y, 0, Mathf.Abs(1 - vertex.y)));
+                        _additionalVerticesColor.Add(new Color(NormalizeColor(vertex.y), 0, Mathf.Abs(1 - NormalizeColor(vertex.y))));
                     }
 
                     //upper triangles with cluster color
