@@ -204,7 +204,7 @@ public class Tetrahedron : MonoBehaviour
             }
             
 
-            //adding specific color accodring to each class
+            /*//adding specific color accodring to each class
             Color[] colorArray = new Color[classes.Count];
             float r, g, b;
             for (int k = 0; k < classes.Count; k++)
@@ -213,7 +213,7 @@ public class Tetrahedron : MonoBehaviour
                 g = UnityEngine.Random.Range(0.0f, 1.0f);
                 b = UnityEngine.Random.Range(0.0f, 1.0f);
                 colorArray[k] = new Color(r, g, b);
-            }
+            }*/
 
 
             normData = normalization(dataset);
@@ -273,14 +273,13 @@ public class Tetrahedron : MonoBehaviour
                     {
                         if (strDataset[i, cols - 1] == classes[z])
                         {
-                            tetrahedron.GetComponent<MeshRenderer>().material.color = colorArray[z];
-                            bar.GetComponent<TetrahedronBehaviour>().color = colorArray[z];
+                            tetrahedron.GetComponent<MeshRenderer>().material.color = listOfColors[z];
+                            bar.GetComponent<TetrahedronBehaviour>().color = listOfColors[z];
                         }
                     }
                     colors[t] = bar.GetComponent<MeshRenderer>().material.color;
                 }
                 mesh.colors = colors;
-                listOfColors.Add(bar.GetComponent<MeshRenderer>().material.color);
                 listObjects.Add(bar);
             }
         }
@@ -310,10 +309,7 @@ public class Tetrahedron : MonoBehaviour
                 tetrahedron.transform.localScale -= new Vector3(0.991F, 0.991F, 0.991F);
                 tetrahedron.transform.localRotation = Quaternion.AngleAxis(180, Vector3.up);
                 tetrahedron.GetComponent<Renderer>().material.color = color;
-
-
-                listOfColors.Add(color);
-
+                
                 listObjects.Add(bar);
             }
         }
@@ -438,7 +434,6 @@ public class Tetrahedron : MonoBehaviour
         data = newData;
         dataPositions = new List<Vector3>();
         resetMe();
-        listOfColors.Clear();
         this.Start();
     }
 

@@ -232,16 +232,18 @@ public class DataSpaceHandler : MonoBehaviour
             }
           
 
-            //adding specific color accodring to each class
+            /*//adding specific color accodring to each class
             Color[] colorArray = new Color[classes.Count];
             float r,g,b;
             for (int k=0; k<classes.Count;k++)
             {
-                r = UnityEngine.Random.Range(0.0f, 1.0f);
+                r = UnityEngine.
+                
+            .Range(0.0f, 1.0f);
                 g = UnityEngine.Random.Range(0.0f, 1.0f);
                 b = UnityEngine.Random.Range(0.0f, 1.0f);
                 colorArray[k] = new Color(r,g,b);
-            }
+            }*/
 
 
             normData = normalization(dataset);
@@ -293,16 +295,14 @@ public class DataSpaceHandler : MonoBehaviour
                     {
                         if (strDataset[i, cols-1] == classes[z])
                         {
-                            dataPoint.GetComponent<Renderer>().material.color = colorArray[z];
-                            colors[t] = colorArray[z];
-                            tempColor = colorArray[z];
+                            dataPoint.GetComponent<Renderer>().material.color = listOfColors[z];
+                            colors[t] = listOfColors[z];
+                            tempColor = listOfColors[z];
                         }
                     }
-                    
                 }
                 mesh.colors = colors;
                 childCat1.Add(dataPoint);
-                listOfColors.Add(tempColor);
                 
                 dataPoint.AddComponent<PreviousStepProperties>();
                 dataPoint.AddComponent<DBScanProperties>();
@@ -345,7 +345,6 @@ public class DataSpaceHandler : MonoBehaviour
                 }
                 mesh.colors = colors;
                 childCat1.Add(dataPoint);
-                listOfColors.Add(colors[0]);
                 dataPoint.AddComponent<PreviousStepProperties>();
                 dataPoint.AddComponent<DBScanProperties>();
                 dataPoint.GetComponent<TiledCubeVariables>().trackObj = trackObj;
@@ -554,7 +553,6 @@ public class DataSpaceHandler : MonoBehaviour
         data = newData;
         dataPositions = new List<Vector3>();
         resetMe();
-        listOfColors.Clear();
         this.Start();
     }
     

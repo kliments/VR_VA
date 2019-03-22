@@ -1,134 +1,109 @@
-Base path: C:/Program Files/Unity/Editor/Data
+Base path: C:/Program Files/Unity_2018_2_0/Editor/Data
 Cmd: initializeCompiler
-Cmd: disassembleShader
-  api=4 insize=1970 outsize=3375 ok=1
-Cmd: disassembleShader
-  api=4 insize=1970 outsize=3375 ok=1
-Cmd: disassembleShader
-  api=4 insize=2718 outsize=4429 ok=1
-Cmd: disassembleShader
-  api=4 insize=2182 outsize=3686 ok=1
-Cmd: disassembleShader
-  api=1 insize=1340 outsize=2186 ok=1
-Cmd: disassembleShader
-  api=4 insize=2706 outsize=4360 ok=1
-Cmd: disassembleShader
-  api=4 insize=1982 outsize=3444 ok=1
-Cmd: disassembleShader
-  api=1 insize=3608 outsize=6683 ok=1
-Cmd: disassembleShader
-  api=4 insize=5798 outsize=8416 ok=1
-Cmd: disassembleShader
-  api=4 insize=7250 outsize=10227 ok=1
-Cmd: disassembleShader
-  api=1 insize=1748 outsize=3163 ok=1
-Cmd: disassembleShader
-  api=4 insize=1670 outsize=3054 ok=1
-Cmd: disassembleShader
-  api=4 insize=1766 outsize=3145 ok=1
-Cmd: disassembleShader
-  api=4 insize=1670 outsize=3059 ok=1
-Cmd: disassembleShader
-  api=4 insize=1766 outsize=3150 ok=1
-Cmd: disassembleShader
-  api=4 insize=1670 outsize=3054 ok=1
-Cmd: disassembleShader
-  api=1 insize=1160 outsize=1894 ok=1
-Cmd: disassembleShader
-  api=4 insize=1670 outsize=3054 ok=1
-Cmd: disassembleShader
-  api=1 insize=1160 outsize=1894 ok=1
-Cmd: disassembleShader
-  api=4 insize=1978 outsize=3456 ok=1
-Cmd: disassembleShader
-  api=4 insize=1670 outsize=3054 ok=1
-Cmd: disassembleShader
-  api=4 insize=1766 outsize=3145 ok=1
-Cmd: disassembleShader
-  api=1 insize=1160 outsize=1894 ok=1
-Cmd: disassembleShader
-  api=4 insize=3338 outsize=4934 ok=1
-Cmd: disassembleShader
-  api=4 insize=3574 outsize=5272 ok=1
-Cmd: disassembleShader
-  api=1 insize=2132 outsize=3818 ok=1
-Cmd: disassembleShader
-  api=4 insize=4526 outsize=6469 ok=1
-Cmd: disassembleShader
-  api=4 insize=5002 outsize=7325 ok=1
-Cmd: disassembleShader
-  api=1 insize=1456 outsize=2472 ok=1
-Cmd: disassembleShader
-  api=4 insize=2494 outsize=4040 ok=1
-Cmd: disassembleShader
-  api=4 insize=2926 outsize=4591 ok=1
-Cmd: disassembleShader
-  api=4 insize=3830 outsize=5928 ok=1
-Cmd: disassembleShader
-  api=4 insize=182 outsize=599 ok=1
-Cmd: disassembleShader
-  api=4 insize=1806 outsize=3163 ok=1
-Cmd: disassembleShader
-  api=4 insize=1902 outsize=3254 ok=1
-Cmd: disassembleShader
-  api=4 insize=1806 outsize=3163 ok=1
-Cmd: disassembleShader
-  api=4 insize=2334 outsize=4159 ok=1
-Cmd: disassembleShader
-  api=4 insize=2310 outsize=4132 ok=1
-Cmd: disassembleShader
-  api=1 insize=1084 outsize=1855 ok=1
-Cmd: disassembleShader
-  api=1 insize=2128 outsize=3398 ok=1
-Cmd: disassembleShader
-  api=1 insize=1456 outsize=2376 ok=1
-Cmd: disassembleShader
-  api=4 insize=2918 outsize=4671 ok=1
-Cmd: disassembleShader
-  api=4 insize=2870 outsize=4604 ok=1
-Cmd: disassembleShader
-  api=4 insize=2230 outsize=3710 ok=1
-Cmd: disassembleShader
-  api=4 insize=2718 outsize=4429 ok=1
-Cmd: disassembleShader
-  api=1 insize=2128 outsize=3398 ok=1
-Cmd: disassembleShader
-  api=4 insize=2830 outsize=4681 ok=1
-Cmd: disassembleShader
-  api=1 insize=4152 outsize=7560 ok=1
-Cmd: disassembleShader
-  api=4 insize=2670 outsize=4473 ok=1
-Cmd: disassembleShader
-  api=4 insize=4502 outsize=6775 ok=1
-Cmd: disassembleShader
-  api=1 insize=1124 outsize=1821 ok=1
-Cmd: disassembleShader
-  api=1 insize=1132 outsize=1802 ok=1
-Cmd: disassembleShader
-  api=1 insize=1296 outsize=2084 ok=1
-Cmd: disassembleShader
-  api=4 insize=1918 outsize=3323 ok=1
-Cmd: disassembleShader
-  api=1 insize=1124 outsize=1821 ok=1
-Cmd: disassembleShader
-  api=4 insize=1842 outsize=3234 ok=1
-Cmd: disassembleShader
-  api=4 insize=1778 outsize=3214 ok=1
-Cmd: disassembleShader
-  api=4 insize=1918 outsize=3323 ok=1
-Cmd: disassembleShader
-  api=4 insize=2462 outsize=4227 ok=1
-Cmd: disassembleShader
-  api=1 insize=1596 outsize=2516 ok=1
-Cmd: disassembleShader
-  api=4 insize=4242 outsize=6161 ok=1
-Cmd: disassembleShader
-  api=4 insize=1750 outsize=3214 ok=1
-Cmd: disassembleShader
-  api=1 insize=896 outsize=1418 ok=1
-Cmd: disassembleShader
-  api=4 insize=1734 outsize=3168 ok=1
-Cmd: disassembleShader
-  api=4 insize=1462 outsize=2783 ok=1
-Cmd: disassembleShader
-  api=4 insize=934 outsize=1771 ok=1
+Cmd: compileSnippet
+  api=4 type=0 insize=12817 outsize=1802 kw=UNITY_PASS_PREPASSFINAL LIGHTPROBE_SH UNITY_HDR_ON pd=UNITY_ENABLE_REFLECTION_BUFFERS UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BOX_PROJECTION UNITY_SPECCUBE_BLENDING UNITY_ENABLE_DETAIL_NORMALMAP SHADER_API_DESKTOP UNITY_LIGHT_PROBE_PROXY_VOLUME UNITY_LIGHTMAP_RGBM_ENCODING ok=1
+Cmd: compileSnippet
+  api=4 type=1 insize=12817 outsize=738 kw=UNITY_PASS_PREPASSFINAL LIGHTPROBE_SH UNITY_HDR_ON pd=UNITY_ENABLE_REFLECTION_BUFFERS UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BOX_PROJECTION UNITY_SPECCUBE_BLENDING UNITY_ENABLE_DETAIL_NORMALMAP SHADER_API_DESKTOP UNITY_LIGHT_PROBE_PROXY_VOLUME UNITY_LIGHTMAP_RGBM_ENCODING ok=1
+Cmd: compileSnippet
+  api=4 type=1 insize=13353 outsize=1242 kw=UNITY_PASS_DEFERRED DIRLIGHTMAP_COMBINED DYNAMICLIGHTMAP_ON pd=UNITY_ENABLE_REFLECTION_BUFFERS UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BOX_PROJECTION UNITY_SPECCUBE_BLENDING UNITY_ENABLE_DETAIL_NORMALMAP SHADER_API_DESKTOP UNITY_LIGHT_PROBE_PROXY_VOLUME UNITY_LIGHTMAP_RGBM_ENCODING ok=1
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: compileSnippet
+  api=4 type=1 insize=1155 outsize=454 kw=UNITY_SINGLE_PASS_STEREO pd=UNITY_ENABLE_REFLECTION_BUFFERS UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BOX_PROJECTION UNITY_SPECCUBE_BLENDING UNITY_ENABLE_DETAIL_NORMALMAP SHADER_API_DESKTOP UNITY_LIGHT_PROBE_PROXY_VOLUME UNITY_LIGHTMAP_RGBM_ENCODING ok=1
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler

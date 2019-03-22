@@ -7,15 +7,16 @@ public class UniversalButtonScript : MonoBehaviour {
     public GameObject primaryMenu,primaryParent, datasetParent, vizParent, algorithmParent, kmeansParent, dbscanParent, denclueParent, ground, kMeansController,dbScanController, denclueController;
     public ResponsiveMenuScript controller;
     public float difference;
+    public DenclueAlgorithm denclue;
+    public SilhouetteCoefficient coef;
+
     private Transform responsiveMenu;
     private MeshRenderer meshRenderer;
     private IncreaseDecrease increaseDecreseObj;
     private PointerEventListener ptEvtLsnr;
     private BackButtonMenu menusParent;
     private SwapBetweenMenus swapScript;
-    public DenclueAlgorithm denclue;
-    public SilhouetteCoefficient coef;
-
+    private int index = 0;
     //for debugging
     public bool loadDataset, loadVis, startDenclue;
 
@@ -44,19 +45,35 @@ public class UniversalButtonScript : MonoBehaviour {
         if (loadDataset)
         {
             loadDataset = false;
-            if (transform.parent == datasetParent.transform && GetComponent<datasetChangerScript>().isSelected)
+            /*if (transform.parent == datasetParent.transform && GetComponent<datasetChangerScript>().isSelected)
             {
                 GetComponent<datasetChangerScript>().startTargetedAction();
+            }*/
+            index = 0;
+            foreach(Transform child in transform.parent)
+            {
+                if (child == transform) break;
+                index++;
             }
+            NetworkScriptController.commandSender.index = index;
+            NetworkScriptController.commandSender.LoadDataset();
         }
 
         if (loadVis)
         {
             loadVis = false;
-            if (transform.parent == vizParent.transform && GetComponent<VisualizationChangerScript>().isSelected)
+            /*if (transform.parent == vizParent.transform && GetComponent<VisualizationChangerScript>().isSelected)
             {
                 GetComponent<VisualizationChangerScript>().startSelectedAction();
+            }*/
+            index = 0;
+            foreach (Transform child in transform.parent)
+            {
+                if (child == transform) break;
+                index++;
             }
+            NetworkScriptController.commandSender.index = index;
+            NetworkScriptController.commandSender.LoadVisualization();
         }
 
         if (startDenclue)
@@ -167,14 +184,31 @@ public class UniversalButtonScript : MonoBehaviour {
         //change to proper dataset
         else if (transform.parent == datasetParent.transform)
         {
-            GetComponent<datasetChangerScript>().startTargetedAction();
+            //GetComponent<datasetChangerScript>().startTargetedAction();
+            index = 0;
+            foreach (Transform child in transform.parent)
+            {
+                if (child == transform) break;
+                index++;
+            }
+            NetworkScriptController.commandSender.index = index;
+            NetworkScriptController.commandSender.LoadDataset();
+
             menusParent.GetComponent<BackButtonMenu>().GoBackInMenu();
             GetComponent<DatasetSelectedSpriteToggle>().ShowSprite();
         }
         //change to proper visualization
         else if (transform.parent == vizParent.transform)
         {
-            GetComponent<VisualizationChangerScript>().startSelectedAction();
+            index = 0;
+            foreach (Transform child in transform.parent)
+            {
+                if (child == transform) break;
+                index++;
+            }
+            NetworkScriptController.commandSender.index = index;
+            NetworkScriptController.commandSender.LoadVisualization();
+
             menusParent.GetComponent<BackButtonMenu>().GoBackInMenu();
             GetComponent<VisualizationSelectedSpriteToggle>().ShowSprite();
         }

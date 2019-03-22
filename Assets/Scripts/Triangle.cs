@@ -15,7 +15,6 @@ public class Triangle : MonoBehaviour {
     public GameObject parent;
     public GameObject scatterplot;
     public Material material;
-    public Color[] colorArray;
     public List<Vector3> dataPositions;
     public DenclueAlgorithm denclue;
 
@@ -105,7 +104,7 @@ public class Triangle : MonoBehaviour {
             }
             
 
-            //adding specific color accodring to each class
+            /*//adding specific color accodring to each class
             Color[] colorArray = new Color[classes.Count];
             float r, g, b;
             for (int k = 0; k < classes.Count; k++)
@@ -114,7 +113,7 @@ public class Triangle : MonoBehaviour {
                 g = UnityEngine.Random.Range(0.0f, 1.0f);
                 b = UnityEngine.Random.Range(0.0f, 1.0f);
                 colorArray[k] = new Color(r, g, b);
-            }
+            }*/
 
 
             normData = normalization(dataset);
@@ -173,13 +172,10 @@ public class Triangle : MonoBehaviour {
                     {
                         if (strDataset[i, cols - 1] == classes[z])
                         {
-                            triangle.GetComponent<MeshRenderer>().material.color = colorArray[z];
-                            bar.GetComponent<triangleBehaviour>().color = colorArray[z];
+                            triangle.GetComponent<MeshRenderer>().material.color = listOfColors[z];
+                            bar.GetComponent<triangleBehaviour>().color = listOfColors[z];
                         }
                     }
-
-                //}
-                listOfColors.Add(bar.GetComponent<MeshRenderer>().material.color);
             }
         }
 

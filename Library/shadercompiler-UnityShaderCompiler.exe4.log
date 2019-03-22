@@ -1,134 +1,119 @@
-Base path: C:/Program Files/Unity/Editor/Data
+Base path: C:/Program Files/Unity_2018_2_0/Editor/Data
 Cmd: initializeCompiler
-Cmd: disassembleShader
-  api=4 insize=2610 outsize=4269 ok=1
-Cmd: disassembleShader
-  api=4 insize=2718 outsize=4429 ok=1
-Cmd: disassembleShader
-  api=4 insize=2182 outsize=3686 ok=1
-Cmd: disassembleShader
-  api=4 insize=1874 outsize=3284 ok=1
-Cmd: disassembleShader
-  api=4 insize=2706 outsize=4360 ok=1
-Cmd: disassembleShader
-  api=4 insize=1982 outsize=3444 ok=1
-Cmd: disassembleShader
-  api=1 insize=1340 outsize=2186 ok=1
-Cmd: disassembleShader
-  api=4 insize=2610 outsize=4269 ok=1
-Cmd: disassembleShader
-  api=4 insize=5798 outsize=8416 ok=1
-Cmd: disassembleShader
-  api=1 insize=4152 outsize=7560 ok=1
-Cmd: disassembleShader
-  api=4 insize=6390 outsize=9272 ok=1
-Cmd: disassembleShader
-  api=4 insize=1670 outsize=3054 ok=1
-Cmd: disassembleShader
-  api=1 insize=1160 outsize=1894 ok=1
-Cmd: disassembleShader
-  api=4 insize=1778 outsize=3214 ok=1
-Cmd: disassembleShader
-  api=1 insize=1160 outsize=1894 ok=1
-Cmd: disassembleShader
-  api=4 insize=1766 outsize=3145 ok=1
-Cmd: disassembleShader
-  api=1 insize=1160 outsize=1894 ok=1
-Cmd: disassembleShader
-  api=1 insize=1160 outsize=1894 ok=1
-Cmd: disassembleShader
-  api=4 insize=1978 outsize=3456 ok=1
-Cmd: disassembleShader
-  api=4 insize=1670 outsize=3054 ok=1
-Cmd: disassembleShader
-  api=1 insize=1912 outsize=3333 ok=1
-Cmd: disassembleShader
-  api=1 insize=1868 outsize=3274 ok=1
-Cmd: disassembleShader
-  api=4 insize=5174 outsize=7417 ok=1
-Cmd: disassembleShader
-  api=4 insize=4438 outsize=6386 ok=1
-Cmd: disassembleShader
-  api=1 insize=2800 outsize=4971 ok=1
-Cmd: disassembleShader
-  api=4 insize=2258 outsize=3702 ok=1
-Cmd: disassembleShader
-  api=4 insize=2494 outsize=4040 ok=1
-Cmd: disassembleShader
-  api=4 insize=3162 outsize=4929 ok=1
-Cmd: disassembleShader
-  api=4 insize=3450 outsize=5319 ok=1
-Cmd: disassembleShader
-  api=4 insize=1414 outsize=2269 ok=1
-Cmd: disassembleShader
-  api=1 insize=1316 outsize=2141 ok=1
-Cmd: disassembleShader
-  api=4 insize=1902 outsize=3254 ok=1
-Cmd: disassembleShader
-  api=1 insize=1316 outsize=2141 ok=1
-Cmd: disassembleShader
-  api=4 insize=1902 outsize=3254 ok=1
-Cmd: disassembleShader
-  api=1 insize=952 outsize=1663 ok=1
-Cmd: disassembleShader
-  api=4 insize=2438 outsize=4344 ok=1
-Cmd: disassembleShader
-  api=4 insize=2414 outsize=4317 ok=1
-Cmd: disassembleShader
-  api=4 insize=2182 outsize=3686 ok=1
-Cmd: disassembleShader
-  api=4 insize=2918 outsize=4671 ok=1
-Cmd: disassembleShader
-  api=4 insize=2870 outsize=4604 ok=1
-Cmd: disassembleShader
-  api=1 insize=1456 outsize=2376 ok=1
-Cmd: disassembleShader
-  api=4 insize=2918 outsize=4671 ok=1
-Cmd: disassembleShader
-  api=4 insize=2870 outsize=4604 ok=1
-Cmd: disassembleShader
-  api=1 insize=1456 outsize=2376 ok=1
-Cmd: disassembleShader
-  api=4 insize=2918 outsize=4671 ok=1
-Cmd: disassembleShader
-  api=1 insize=1240 outsize=2116 ok=1
-Cmd: disassembleShader
-  api=4 insize=2934 outsize=4867 ok=1
-Cmd: disassembleShader
-  api=4 insize=6302 outsize=9189 ok=1
-Cmd: disassembleShader
-  api=1 insize=1132 outsize=1802 ok=1
-Cmd: disassembleShader
-  api=1 insize=1124 outsize=1821 ok=1
-Cmd: disassembleShader
-  api=4 insize=1918 outsize=3323 ok=1
-Cmd: disassembleShader
-  api=4 insize=1822 outsize=3232 ok=1
-Cmd: disassembleShader
-  api=1 insize=1132 outsize=1802 ok=1
-Cmd: disassembleShader
-  api=4 insize=1918 outsize=3323 ok=1
-Cmd: disassembleShader
-  api=4 insize=1778 outsize=3214 ok=1
-Cmd: disassembleShader
-  api=4 insize=1978 outsize=3456 ok=1
-Cmd: disassembleShader
-  api=1 insize=1144 outsize=1854 ok=1
-Cmd: disassembleShader
-  api=1 insize=1240 outsize=1985 ok=1
-Cmd: disassembleShader
-  api=4 insize=2202 outsize=3816 ok=1
-Cmd: disassembleShader
-  api=4 insize=1930 outsize=3431 ok=1
-Cmd: disassembleShader
-  api=1 insize=548 outsize=899 ok=1
-Cmd: disassembleShader
-  api=4 insize=1842 outsize=3379 ok=1
-Cmd: disassembleShader
-  api=4 insize=2838 outsize=4508 ok=1
-Cmd: disassembleShader
-  api=1 insize=1204 outsize=1889 ok=1
-Cmd: disassembleShader
-  api=1 insize=520 outsize=849 ok=1
-Cmd: disassembleShader
-  api=4 insize=350 outsize=907 ok=1
+Cmd: compileSnippet
+  api=4 type=0 insize=12817 outsize=2066 kw=UNITY_PASS_PREPASSFINAL DIRLIGHTMAP_COMBINED DYNAMICLIGHTMAP_ON UNITY_HDR_ON UNITY_SINGLE_PASS_STEREO pd=UNITY_ENABLE_REFLECTION_BUFFERS UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BOX_PROJECTION UNITY_SPECCUBE_BLENDING UNITY_ENABLE_DETAIL_NORMALMAP SHADER_API_DESKTOP UNITY_LIGHT_PROBE_PROXY_VOLUME UNITY_LIGHTMAP_RGBM_ENCODING ok=1
+Cmd: compileSnippet
+  api=4 type=1 insize=12817 outsize=766 kw=UNITY_PASS_PREPASSFINAL pd=UNITY_ENABLE_REFLECTION_BUFFERS UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BOX_PROJECTION UNITY_SPECCUBE_BLENDING UNITY_ENABLE_DETAIL_NORMALMAP SHADER_API_DESKTOP UNITY_LIGHT_PROBE_PROXY_VOLUME UNITY_LIGHTMAP_RGBM_ENCODING ok=1
+Cmd: compileSnippet
+  api=4 type=1 insize=12817 outsize=974 kw=UNITY_PASS_PREPASSFINAL DIRLIGHTMAP_COMBINED DYNAMICLIGHTMAP_ON UNITY_HDR_ON pd=UNITY_ENABLE_REFLECTION_BUFFERS UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BOX_PROJECTION UNITY_SPECCUBE_BLENDING UNITY_ENABLE_DETAIL_NORMALMAP SHADER_API_DESKTOP UNITY_LIGHT_PROBE_PROXY_VOLUME UNITY_LIGHTMAP_RGBM_ENCODING ok=1
+Cmd: compileSnippet
+  api=4 type=0 insize=13353 outsize=1290 kw=UNITY_PASS_DEFERRED DIRLIGHTMAP_COMBINED DYNAMICLIGHTMAP_ON UNITY_HDR_ON pd=UNITY_ENABLE_REFLECTION_BUFFERS UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BOX_PROJECTION UNITY_SPECCUBE_BLENDING UNITY_ENABLE_DETAIL_NORMALMAP SHADER_API_DESKTOP UNITY_LIGHT_PROBE_PROXY_VOLUME UNITY_LIGHTMAP_RGBM_ENCODING ok=1
+Cmd: compileSnippet
+  api=4 type=1 insize=13353 outsize=762 kw=UNITY_PASS_DEFERRED pd=UNITY_ENABLE_REFLECTION_BUFFERS UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BOX_PROJECTION UNITY_SPECCUBE_BLENDING UNITY_ENABLE_DETAIL_NORMALMAP SHADER_API_DESKTOP UNITY_LIGHT_PROBE_PROXY_VOLUME UNITY_LIGHTMAP_RGBM_ENCODING ok=1
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: compileSnippet
+  api=4 type=0 insize=12817 outsize=1802 kw=UNITY_PASS_PREPASSFINAL pd=UNITY_ENABLE_REFLECTION_BUFFERS UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BOX_PROJECTION UNITY_SPECCUBE_BLENDING UNITY_ENABLE_DETAIL_NORMALMAP SHADER_API_DESKTOP UNITY_LIGHT_PROBE_PROXY_VOLUME UNITY_LIGHTMAP_RGBM_ENCODING ok=1
+Cmd: compileSnippet
+  api=4 type=0 insize=13353 outsize=1370 kw=UNITY_PASS_DEFERRED DIRLIGHTMAP_COMBINED DYNAMICLIGHTMAP_ON UNITY_SINGLE_PASS_STEREO pd=UNITY_ENABLE_REFLECTION_BUFFERS UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BOX_PROJECTION UNITY_SPECCUBE_BLENDING UNITY_ENABLE_DETAIL_NORMALMAP SHADER_API_DESKTOP UNITY_LIGHT_PROBE_PROXY_VOLUME UNITY_LIGHTMAP_RGBM_ENCODING ok=1
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: compileSnippet
+  api=4 type=0 insize=912 outsize=2038 kw=UNITY_SINGLE_PASS_STEREO pd=UNITY_ENABLE_REFLECTION_BUFFERS UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BOX_PROJECTION UNITY_SPECCUBE_BLENDING UNITY_ENABLE_DETAIL_NORMALMAP SHADER_API_DESKTOP UNITY_LIGHT_PROBE_PROXY_VOLUME UNITY_LIGHTMAP_RGBM_ENCODING ok=1
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: compileSnippet
+  api=4 type=0 insize=1901 outsize=1382 kw=UNITY_SINGLE_PASS_STEREO pd=UNITY_ENABLE_REFLECTION_BUFFERS UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS UNITY_PBS_USE_BRDF1 UNITY_SPECCUBE_BOX_PROJECTION UNITY_SPECCUBE_BLENDING UNITY_ENABLE_DETAIL_NORMALMAP SHADER_API_DESKTOP UNITY_LIGHT_PROBE_PROXY_VOLUME UNITY_LIGHTMAP_RGBM_ENCODING ok=1
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
+Cmd: initializeCompiler
