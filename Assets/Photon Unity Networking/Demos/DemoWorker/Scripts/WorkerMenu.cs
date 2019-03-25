@@ -6,8 +6,6 @@
 
 using System;
 using UnityEngine;
-using 
-    = UnityEngine.Random;
 using ExitGames.Client.Photon;
 
 public class WorkerMenu : MonoBehaviour
@@ -55,7 +53,7 @@ public class WorkerMenu : MonoBehaviour
         // generate a name for this player, if none is assigned yet
         if (String.IsNullOrEmpty(PhotonNetwork.playerName))
         {
-            PhotonNetwork.playerName = "Guest" + Random.Range(1, 9999);
+            PhotonNetwork.playerName = "Guest" + UnityEngine.Random.Range(1, 9999);
         }
 
         // if you wanted more debug out, turn this on:

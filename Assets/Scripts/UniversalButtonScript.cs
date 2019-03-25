@@ -18,7 +18,7 @@ public class UniversalButtonScript : MonoBehaviour {
     private SwapBetweenMenus swapScript;
     private int index = 0;
     //for debugging
-    public bool loadDataset, loadVis, startDenclue;
+    public bool loadDataset, loadVis, startKmeans, startDenclue;
 
     // Use this for initialization
 	void Start () {
@@ -75,7 +75,11 @@ public class UniversalButtonScript : MonoBehaviour {
             NetworkScriptController.commandSender.index = index;
             NetworkScriptController.commandSender.LoadVisualization();
         }
-
+        if(startKmeans)
+        {
+            startKmeans = false;
+            NetworkScriptController.commandSender.KMeansAlgorithm();
+        }
         if (startDenclue)
         {
             startDenclue = false;
@@ -220,6 +224,7 @@ public class UniversalButtonScript : MonoBehaviour {
         //K-means buttons functionalities
         else if(transform.parent == kmeansParent.transform)
         {
+            NetworkScriptController.commandSender.master = true;
             //increase or decrease number of spheres
             if (this.name == "NrOfSpheres")
             {
@@ -243,7 +248,8 @@ public class UniversalButtonScript : MonoBehaviour {
             }
             else if(this.name == "K-Means Step Forward")
             {
-                kMeansController.GetComponent<KMeansAlgorithm>().StartAlgorithm();
+                //kMeansController.GetComponent<KMeansAlgorithm>().StartAlgorithm();
+                NetworkScriptController.commandSender.KMeansAlgorithm();
             }
             else if(this.name == "Play")
             {

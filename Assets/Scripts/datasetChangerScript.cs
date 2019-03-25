@@ -7,12 +7,8 @@ public class datasetChangerScript : MonoBehaviour
 {
 
     public TextAsset myDataset;
-    public GameObject textPrefab;
     public GameObject scatterplot;
-
-    private float lastActivation = 0;
-    private GameObject myText;
-    
+        
     public Transform responsiveMenu;
     public GameObject cubes;
     public GameObject pies;
@@ -25,13 +21,12 @@ public class datasetChangerScript : MonoBehaviour
     public DBScanAlgorithm resetDBScan;
     public DenclueAlgorithm resetDenclue;
     public GameObject ground;
-    public Sprite datasetSelected;
 
     private DataSpaceHandler cubesData;
     private PieChartMeshController piesData;
     private Triangle trianglesData;
     private Tetrahedron tetrahedronsData;
-    public void startTargetedAction()
+    public void LoadDataset()
     {
         ground.GetComponent<SetToGround>().rigPosReset = true;
         ground.GetComponent<SetToGround>().RemoveParenthoodFromRig();
@@ -88,23 +83,6 @@ public class datasetChangerScript : MonoBehaviour
         resetKmeans = (KMeansAlgorithm)FindObjectOfType(typeof(KMeansAlgorithm));
         resetDBScan = (DBScanAlgorithm)FindObjectOfType(typeof(DBScanAlgorithm));
         resetDenclue = (DenclueAlgorithm)FindObjectOfType(typeof(DenclueAlgorithm));
-    }
-
-    public void initText() { 
-        myText = Instantiate(textPrefab);
-        myText.transform.parent = this.transform;
-        myText.transform.localPosition = new Vector3(0, 0, 0);
-        /*myText.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
-        myText.transform.localScale = new Vector3(0.05f, 0.1f, 0.1f);*/
-
-        String value = myDataset.name;
-        //remove the first 4 characters, 'PCA_'
-        value = value.Remove(0, 4);
-        
-        Text mesher = myText.transform.GetChild(0).gameObject.GetComponent<Text>();
-        mesher.fontSize = 100;
-        mesher.text = value;
-
     }
     
 	

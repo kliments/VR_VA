@@ -58,8 +58,7 @@ namespace ExitGames.Demos
 				new DemoData()
 				{
 					Title = "Demo Boxes",
-					Description = "Uses ConnectAndJoin
-                    script.\n" +
+					Description = "Uses ConnectAndJoinscript.\n" +
 						"(joins a random room or creates one)\n" +
 						"\n" +
 						"Instantiates simple prefabs.\n" +

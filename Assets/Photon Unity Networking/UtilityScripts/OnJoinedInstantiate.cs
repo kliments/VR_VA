@@ -21,8 +21,7 @@ public class OnJoinedInstantiate : MonoBehaviour
                     spawnPos = this.SpawnPosition.position;
                 }
 
-                Vector3 
-                    = Random.insideUnitSphere;
+                Vector3 random = Random.insideUnitSphere;
                 random.y = 0;
                 random = random.normalized;
                 Vector3 itempos = spawnPos + this.PositionOffset * random;

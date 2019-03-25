@@ -19,7 +19,7 @@ public class ListStringIntComparer : IComparer<KeyValuePair<string, int>>
 /// Splits objects into individual cubes (and minimizes the count of unity game objects while doing so)
 /// </summary>
 [System.Serializable]
-public class DataSpaceHandler : MonoBehaviour
+public class DataSpaceHandler : GeneralVisualization
 {
     public GameObject dataObject;
     public GameObject planeBox;

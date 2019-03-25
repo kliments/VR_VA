@@ -28,6 +28,19 @@ public class UpdateThreshold : MonoBehaviour {
             DecreaseThreshold();
             photonView.RPC("DecreaseThreshold", PhotonTargets.AllBuffered);
         }
+        else if(Input.GetKeyDown(KeyCode.O))
+        {
+            photonView.RPC("LoadDatasetController", PhotonTargets.AllViaServer, Random.Range(0,20));
+        }
+        else if(Input.GetKeyDown(KeyCode.P))
+        {
+            photonView.RPC("LoadVisualizationController", PhotonTargets.AllViaServer, Random.Range(0, 4));
+        }
+        else if(Input.GetKeyDown(KeyCode.K))
+        {
+            NetworkScriptController.commandSender.master = true;
+            photonView.RPC("RunKMeans", PhotonTargets.AllViaServer);
+        }
     }
 
     [PunRPC]

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Tetrahedron : MonoBehaviour
+public class Tetrahedron : GeneralVisualization
 {
 
     public TetrahedronMesh tetrahedron;

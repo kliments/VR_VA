@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Triangle : MonoBehaviour {
+public class Triangle : GeneralVisualization {
 
     public TriangleMesh Triangle1;
     float[] data1 = new float[] { 0.4f, 0.5f, 0.6f };

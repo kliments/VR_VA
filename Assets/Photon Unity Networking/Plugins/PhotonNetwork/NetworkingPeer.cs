@@ -1319,7 +1319,7 @@ internal class NetworkingPeer : LoadBalancingPeer, IPhotonPeerListener
         }
         else
         {
-            Debug.LogError("Adding player twice: " + ID);
+            Debug.Log("Adding player twice: " + ID);
         }
     }
 

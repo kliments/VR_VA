@@ -116,46 +116,6 @@ public LayerMask layersToIgnoreAdd = Physics.IgnoreRaycastLayer;
 
     private void Update()
     {
-        //adapt rotation of the selection to track the parent
-        if(updateRotation)
-        {
-            selection.transform.rotation = Quaternion.FromToRotation(initialRotationDiff,selection.transform.position-gameObject.transform.position)*Quaternion.Euler(initialRotationEulerAngles);
-        }
-
-        //adapt scaling based on the difference in height from the original starting point of the selection
-        if(updateScaling)
-        {
-            float scaleDiff = 1+(gameObject.transform.position.y-initialPosition.y)*1.2f;
-            selection.transform.localScale = initialScale*scaleDiff;
-        }
-        
-        if(press)
-        {
-            press = false;
-            kMeansButton.GetComponent<KMeansAlgorithm>().StartAlgorithm();
-        }
-
-        if(pressBack)
-        {
-            pressBack = false;
-            kMeansButton.GetComponent<KMeansAlgorithm>().PreviousStep();
-        }
-        if(pressTriangles)
-        {
-            pressTriangles = false;
-            trianglesButton.GetComponent<VisualizationChangerScript>().startSelectedAction();
-        }
-        if (pressTetrahedrons)
-        {
-            pressTetrahedrons = false;
-            tetrahedronButton.GetComponent<VisualizationChangerScript>().startSelectedAction();
-        }
-
-        if(pressDBscan)
-        {
-            pressDBscan = false;
-            dbscanButton.GetComponent<DBScanAlgorithm>().StartDBSCAN();
-        }
 
     }
 
@@ -300,13 +260,7 @@ public LayerMask layersToIgnoreAdd = Physics.IgnoreRaycastLayer;
     /// <param name="selectedObject">The object to remove</param>
     private void deleteObject(GameObject selectedObject)
     {
-        //Dataset choosers wont be affected
-        if (selectedObject.tag == "WallChooser")
-        {
-            return;
-        }
         Destroy(selectedObject);
-
     }
 
 
@@ -316,132 +270,6 @@ public LayerMask layersToIgnoreAdd = Physics.IgnoreRaycastLayer;
     /// <param name="selectedObject">Creates new </param>
     private void selectDataMode(GameObject selectedObject)
     {
-        //change the dataset
-        if (selectedObject.tag == "WallChooser")
-        {
-            selectedObject.GetComponent<datasetChangerScript>().startTargetedAction();
-        }
-        //change the visualisation
-        else if(selectedObject.tag == "VisChooser")
-        {
-            selectedObject.GetComponent<VisualizationChangerScript>().startSelectedAction();
-        }
-        //start K-Means algorithm
-        else if (selectedObject.name == "KMeansNextStep")
-        {
-            selectedObject.GetComponent<KMeansAlgorithm>().StartAlgorithm();
-        }
-        //previous step of K-Means algorithm
-        else if(selectedObject.name == "KMeansPrevStep")
-        {
-            selectedObject.GetComponent<PreviousStep>().obj.GetComponent<KMeansAlgorithm>().PreviousStep();
-        }
-        //Play K-Means algorithm automatically
-        else if (selectedObject.name == "KMeansPlay")
-        {
-
-        }
-        //Increase the number of spheres for K-Means
-        else if (selectedObject.name == "IncreaseSpheres")
-        {
-            selectedObject.GetComponent<IncreaseDecrease>().IncreaseNrSpheres();
-        }
-        //Decrease the spheres for K-Means
-        else if (selectedObject.name == "DecreaseSpheres")
-        {
-            selectedObject.GetComponent<IncreaseDecrease>().DecreaseNrSpheres();
-        }
-
-        //Start DBSCAN algorithm
-        else if (selectedObject.name == "DBNextStep")
-        {
-            selectedObject.GetComponent<DBScanAlgorithm>().StartDBSCAN();
-        }
-        //Go back one step in DBSCAN algorithm
-        else if (selectedObject.name == "DBPreviousStep")
-        {
-            selectedObject.GetComponent<DBPrevious>().dbSCAN.GetComponent<DBScanAlgorithm>().DBBackwards();
-        }
-        //Increase epsilon value
-        else if(selectedObject.name == "IncreaseEpsilon")
-        {
-            selectedObject.GetComponent<IncreaseDecrease>().IncreaseEpsilon();
-        }
-        //Decrease epsilon value
-        else if (selectedObject.name == "DecreaseEpsilon")
-        {
-            selectedObject.GetComponent<IncreaseDecrease>().DecreaseEpsilon();
-        }
-        //Increase minPts value
-        else if (selectedObject.name == "IncreaseMinPts")
-        {
-            selectedObject.GetComponent<IncreaseDecrease>().IncreaseMinPts();
-        }
-        //Decrease minPts value
-        else if (selectedObject.name == "DecreaseMinPts")
-        {
-            selectedObject.GetComponent<IncreaseDecrease>().DecreaseMinPts();
-        }
-        else if (selectedObject.name == "DBScanPlay")
-        {
-
-        }
-
-        //Reload the whole scene
-        else if (selectedObject.name == "ShowHideMirror")
-        {
-            selectedObject.GetComponent<ShowHideMirror>().ToggleMirror();
-        }
-
-        //Reload the whole scene
-        else if (selectedObject.name == "Reset")
-        {
-            SceneManager.LoadScene("MainScene");
-        }
-        //Position the player back on the ground
-        else if (selectedObject.name == "Ground")
-        {
-            selectedObject.GetComponent<SetToGround>().rigPosReset = true;
-        }
-        //Position the player on the sphere
-        else if(selectedObject.tag == "sphere")
-        {
-            selectedObject.GetComponent<MoveCameraToSphere>().calculate = true;
-            selectedObject.GetComponent<MoveCameraToSphere>().setParent = true;
-        }
-
-        else if (selectedObject.tag == "DataButton")
-        {
-            //Show/Hide the dataset buttons
-            if(selectedObject.name == "Datasets")
-            {
-                selectedObject.GetComponent<ShowHideDatasets>().Toggle();
-            }
-            //Show/Hide the visualzation buttons
-            else if (selectedObject.name == "Viz Techniques")
-            {
-                selectedObject.GetComponent<ShowHideVisualizations>().Toggle();
-            }
-            //Show/Hide the algorithm buttons
-            else if (selectedObject.name == "Algorithms")
-            {
-                selectedObject.GetComponent<ShowHideAlgorithms>().Toggle();
-            }
-        }
-
-        else if(selectedObject.tag == "AlgorithmButton")
-        {
-            //Show/Hide the K-Means buttons
-            if(selectedObject.name == "K-Means")
-            {
-                selectedObject.GetComponent<ShowHideKMeansButtons>().Toggle();
-            }
-            //Show/Hide the DBSCAN buttons
-            else if(selectedObject.name == "DBScan")
-            {
-                selectedObject.GetComponent<ShowHideDBSCANAlgorithm>().Toggle();
-            }
-        }
 
     }
     /// <summary>
@@ -451,12 +279,6 @@ public LayerMask layersToIgnoreAdd = Physics.IgnoreRaycastLayer;
     /// <param name="start">if true the object is parented to the controller. if false it's unparented again</param>
     private void moveSelection(GameObject selectedObject,bool start)
     {
-        //Dataset choosers wont be affected
-        if (selectedObject.tag == "WallChooser")
-        {
-            return;
-        }
-
         if (start)
         {
             if(selectedObject.name == "ThresholdPlane")
@@ -509,12 +331,6 @@ public LayerMask layersToIgnoreAdd = Physics.IgnoreRaycastLayer;
     /// <param name="start">if true the rotation mode is started if false it's disabled</param>
     private void rotateSelection(GameObject selectedObject, bool start)
     {
-        //Dataset choosers wont be affected
-        if (selectedObject.tag == "WallChooser")
-        {
-            return;
-        }
-
         if (start)
         {
             //disallow the changing of the selection while the move is progress
@@ -544,12 +360,6 @@ public LayerMask layersToIgnoreAdd = Physics.IgnoreRaycastLayer;
     /// <param name="start">if true the scaling mode is started if false it's disabled</param>
     private void scaleSelection(GameObject selectedObject,bool start)
     {
-        //Dataset choosers wont be affected
-        if (selectedObject.tag == "WallChooser")
-        {
-            return;
-        }
-
         if (start)
         {
             //dissalow the changing of the selection while the scaling is in process

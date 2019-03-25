@@ -27,5 +27,13 @@ public class MoveCamera : MonoBehaviour {
         {
             transform.position += transform.right * 0.1f;
         }
+        else if (Input.GetKeyDown(KeyCode.Q))
+        {
+            transform.position += transform.up * 0.1f;
+        }
+        else if (Input.GetKeyDown(KeyCode.E))
+        {
+            transform.position -= transform.up * 0.1f;
+        }
     }
 }

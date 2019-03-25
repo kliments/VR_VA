@@ -79,8 +79,7 @@ public class RpsDemoConnect : PunBehaviour
         {
             Debug.Log("ReJoining previous room: " + this.previousRoom);
             PhotonNetwork.ReJoinRoom(this.previousRoom);
-            this.previousRoom = null;       // we only will try to re-join once. if this fails, we will get into a 
-            /new room
+            this.previousRoom = null;       // we only will try to re-join once. if this fails, we will get into a new room
         }
         else
         {

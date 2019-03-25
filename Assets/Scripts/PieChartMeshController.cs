@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using System;
 
-public class PieChartMeshController : MonoBehaviour
+public class PieChartMeshController : GeneralVisualization
 {
     public PieChartMesh mPieChart;
     float[] mData;

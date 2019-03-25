@@ -25,7 +25,7 @@ using Hashtable = ExitGames.Client.Photon.Hashtable;
 /// They are synced when joining a room.
 /// </remarks>
 /// \ingroup publicApi
-public class PhotonPlayer : IComparable<PhotonPlayer>, IComparable<int>, IEquatable<PhotonPlayer>, IEquatable<int>
+public class PhotonPlayer : MonoBehaviour, IComparable<PhotonPlayer>, IComparable<int>, IEquatable<PhotonPlayer>, IEquatable<int>
 {
     /// <summary>This player's actorID</summary>
     public int ID
@@ -400,6 +400,10 @@ public class PhotonPlayer : IComparable<PhotonPlayer>, IComparable<int>, IEquata
         return string.Format("#{0:00} '{1}'{2} {3}", this.ID, this.NickName, this.IsInactive ? " (inactive)" : "", this.CustomProperties.ToStringFull());
     }
 
+    public NetworkScriptController networkController()
+    {
+        return (NetworkScriptController)FindObjectOfType(typeof(NetworkScriptController));
+    }
 
     #region Obsoleted variable names
 

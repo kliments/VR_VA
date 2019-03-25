@@ -14,7 +14,7 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
     public List<Color> spheresColor;
     private List<GameObject> spheres;
     public SilhouetteCoefficient silhouetteCoef;
-
+    public List<Vector3> spheresStartPositions;
     //offset for X and Z values, because the 0 coordinates of the local position from each data point is shifted from their parent to x=-0,581 and z=-0,63
     private float xOffset = 0.581f;
     private float zOffset = 0.63f;
@@ -442,6 +442,7 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
             clusters[a] = new List<GameObject>();
         }
         spheres = new List<GameObject>();
+        spheresStartPositions = new List<Vector3>();
         distance = new float[i];
         newPos = new Vector3[i];
         oldPos = new Vector3[i];
@@ -462,14 +463,24 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
         for (int i = 0; i < nrOfSpheres; i++)
         {
             GameObject newSphere = Instantiate(sphere, scatterplot);
-
-            spheres.Add(newSphere);
-            //for X and Z it has to be between -0.6 and 0.6, cause coordinate 0.0 is in the center but not in the begining of the scatterplot (its shifted)
-            Vector3 position = new Vector3(UnityEngine.Random.Range(-0.6f, 0.6f), UnityEngine.Random.Range(0.2f, 0.8f), UnityEngine.Random.Range(-0.6f, 0.6f));
-            newSphere.transform.localPosition = position;
-            newSphere.GetComponent<MeshRenderer>().material.color = spheresColor[i];
             newSphere.name = "sphere";
             newSphere.tag = "sphere";
+
+            //put on random position if script is called from Master
+            if(NetworkScriptController.commandSender.master)
+            {
+                //for X and Z it has to be between -0.6 and 0.6, cause coordinate 0.0 is in the center but not in the begining of the scatterplot (its shifted)
+                Vector3 position = new Vector3(UnityEngine.Random.Range(-0.6f, 0.6f), UnityEngine.Random.Range(0.2f, 0.8f), UnityEngine.Random.Range(-0.6f, 0.6f));
+                newSphere.transform.localPosition = position;
+                spheresStartPositions.Add(position);
+            }
+            //load from previously added position from Master
+            else
+            {
+                newSphere.transform.localPosition = spheresStartPositions[i];
+            }
+            newSphere.GetComponent<MeshRenderer>().material.color = spheresColor[i];
+            spheres.Add(newSphere);
         }
     }
 
@@ -556,6 +567,9 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
 
         tempText = "";
         currentTextCounter = 0;
+        currentTextCounter = 0;
+        spheresStartPositions = new List<Vector3>();
+        NetworkScriptController.commandSender.algorithmStep = 0;
     }
 
     public bool AllAreTrue(bool[] array)
