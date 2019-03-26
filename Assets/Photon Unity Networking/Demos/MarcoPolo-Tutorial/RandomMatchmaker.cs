@@ -1,7 +1,6 @@
 using UnityEngine;
 
-public class 
-    Matchmaker : Photon.PunBehaviour
+public class RandomMatchmaker : Photon.PunBehaviour
 {
     private PhotonView myPhotonView;
 

@@ -164,8 +164,7 @@ public interface IPunCallbacks
     /// Called after leaving a lobby.
     /// </summary>
     /// <remarks>
-    /// When you leave a lobby, [CreateRoom](@ref PhotonNetwork.CreateRoom) and [Join
-    /// Room](@ref PhotonNetwork.JoinRandomRoom)
+    /// When you leave a lobby, [CreateRoom](@ref PhotonNetwork.CreateRoom) and [JoinRandomRoom](@ref PhotonNetwork.JoinRandomRoom)
     /// automatically refer to the default lobby.
     /// </remarks>
     void OnLeftLobby();

@@ -108,8 +108,7 @@ public class RoomInfo
     /// <summary>
     /// Defines if the room can be joined.
     /// This does not affect listing in a lobby but joining the room will fail if not open.
-    /// If not open, the room is excluded from 
-    /// matchmaking.
+    /// If not open, the room is excluded from random matchmaking.
     /// Due to racing conditions, found matches might become closed before they are joined.
     /// Simply re-connect to master and find another.
     /// Use property "IsVisible" to not list the room.

@@ -132,9 +132,7 @@ public enum PhotonNetworkingMessage
     /// Called after leaving a lobby.
     /// </summary>
     /// <remarks>
-    /// When you leave a lobby, [CreateRoom](@ref PhotonNetwork.CreateRoom) and [Join
-    /// 
-    /// Room](@ref PhotonNetwork.JoinRandomRoom)
+    /// When you leave a lobby, [CreateRoom](@ref PhotonNetwork.CreateRoom) and [JoinRandomRoom](@ref PhotonNetwork.JoinRandomRoom)
     /// automatically refer to the default lobby.
     ///
     /// Example: void OnLeftLobby() { ... }

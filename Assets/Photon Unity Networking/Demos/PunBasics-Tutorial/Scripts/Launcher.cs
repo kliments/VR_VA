@@ -16,8 +16,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement; 
 
 /// <summary>
-/// Launch manager. Connect, join a 
-/// room or create one if none or all full.
+/// Launch manager. Connect, join a random room or create one if none or all full.
 /// </summary>
 namespace ExitGames.Demos.DemoAnimator
 {

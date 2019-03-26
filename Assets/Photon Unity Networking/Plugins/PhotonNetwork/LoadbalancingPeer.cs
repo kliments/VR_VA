@@ -302,9 +302,7 @@ using ExitGames.Client.Photon;
 
 
         /// <summary>
-        /// Operation to join a 
-        /// 
-        /// , available room. Overloads take additional player properties.
+        /// Operation to join a random, available room. Overloads take additional player properties.
         /// This is an async request which triggers a OnOperationResponse() call.
         /// If all rooms are closed or full, the OperationResponse will have a returnCode of ErrorCode.NoRandomMatchFound.
         /// If successful, the OperationResponse contains a gameserver address and the name of some room.

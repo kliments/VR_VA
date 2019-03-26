@@ -42,9 +42,7 @@ public enum ClientState
     Authenticated,
 
     /// <summary>Client is in the lobby of the Master Server and gets room listings.</summary>
-    /// <remarks>Use Join, Create or Join
-    /// 
-    /// to get into a room to play.</remarks>
+    /// <remarks>Use Join, Create or JoinRandom to get into a room to play.</remarks>
     JoinedLobby,
 
     /// <summary>Disconnecting.</summary>
@@ -1319,7 +1317,7 @@ internal class NetworkingPeer : LoadBalancingPeer, IPhotonPeerListener
         }
         else
         {
-            Debug.Log("Adding player twice: " + ID);
+            Debug.LogError("Adding player twice: " + ID);
         }
     }
 

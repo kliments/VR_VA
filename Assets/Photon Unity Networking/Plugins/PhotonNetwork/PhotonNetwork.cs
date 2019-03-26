@@ -583,8 +583,7 @@ public static class PhotonNetwork
     /// Enabled by default.
     ///
     /// The room listing will not become available.
-    /// Rooms can be created and joined (
-    /// ly) without joining the lobby (and getting sent the room list).
+    /// Rooms can be created and joined (randomly) without joining the lobby (and getting sent the room list).
     /// </remarks>
     public static bool autoJoinLobby
     {

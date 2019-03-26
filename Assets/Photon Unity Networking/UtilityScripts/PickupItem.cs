@@ -27,9 +27,7 @@ public class PickupItem : Photon.MonoBehaviour, IPunObservable
     public float SecondsBeforeRespawn = 2;
 
     /// <summary>The most likely trigger to pick up an item. Set in inspector!</summary>
-    /// <remarks>Edit the collider and set collision masks to avoid pickups by 
-    /// 
-    /// objects.</remarks>
+    /// <remarks>Edit the collider and set collision masks to avoid pickups by random objects.</remarks>
     public bool PickupOnTrigger;
 
     /// <summary>If the pickup item is currently yours. Interesting in OnPickedUp(PickupItem item).</summary>

@@ -4,8 +4,7 @@ using System.Collections;
 
 /// <summary>
 /// This script automatically connects to Photon (using the settings file),
-/// tries to join a 
-/// room and creates one if none was found (which is ok).
+/// tries to join a random room and creates one if none was found (which is ok).
 /// </summary>
 public class ConnectAndJoinRandom : Photon.MonoBehaviour
 {

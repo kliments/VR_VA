@@ -10,8 +10,7 @@ using UnityEngine;
 
 /// <summary>
 /// This MonoBehaviour is a basic GUI for the Photon client's network-simulation feature.
-/// It can modify lag (fixed delay), jitter (
-/// lag) and packet loss.
+/// It can modify lag (fixed delay), jitter (random lag) and packet loss.
 /// </summary>
 /// \ingroup optionalGui
 public class PhotonLagSimulationGui : MonoBehaviour
