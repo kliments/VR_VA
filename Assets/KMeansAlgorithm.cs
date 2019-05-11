@@ -9,16 +9,17 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
     public DBScanAlgorithm resetDBScan;
     public DenclueAlgorithm resetDenclue;
     public GameObject sphere;
-    private GameObject dataVisuals;
     public GameObject kMeansFinishedPlane;
     public List<Color> spheresColor;
-    private List<GameObject> spheres;
+    public List<GameObject> spheres;
     public SilhouetteCoefficient silhouetteCoef;
     public List<Vector3> spheresStartPositions;
     //offset for X and Z values, because the 0 coordinates of the local position from each data point is shifted from their parent to x=-0,581 and z=-0,63
     private float xOffset = 0.581f;
     private float zOffset = 0.63f;
-    
+
+    //parent of all data points objects
+    private GameObject dataVisuals;
 
     //average center position
     private Vector3[] avgCenter;
@@ -78,7 +79,7 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
     //Used for reset, in case the Play button was pressed
     public PlayScript play;
 
-    public bool nextStep;
+    public bool nextStep, prevStep;
 
     public Text[] clusterCompactnessTexts;
     private string tempText;
@@ -125,6 +126,7 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
                 tempText = tempText + "Step " + (counter - 1).ToString() + ": " + ClusteringCompactness().ToString() + System.Environment.NewLine;
                 clusterCompactnessTexts[currentTextCounter].text = tempText;
                 if (counter != 0 && (counter - 1) % 20 == 0) currentTextCounter++;
+                silhouetteCoef.Calculate();
             }
         }
 
@@ -156,6 +158,7 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
 
             if(AllAreTrue(numberOfPoints) && AllAreTrue(posOfSpheres))
             {
+                clusterID = 0;
                 Debug.Log("K-means clustering is finished in " + counter.ToString() + " steps!");
                 kMeansFinishedPlane.SetActive(true);
                 kMeansFinishedPlane.transform.GetChild(0).gameObject.GetComponent<TextMesh>().text = "Best clustering found in " + counter.ToString() + " steps!";
@@ -179,6 +182,11 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
         {
             nextStep = false;
             StartAlgorithm();
+        }
+        if(prevStep)
+        {
+            prevStep = false;
+            PreviousStep();
         }
 	}
 
@@ -223,7 +231,17 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
 
             foreach(Transform dataPoint in dataVisuals.transform)
             {
-                dataPoint.gameObject.GetComponent<MeshRenderer>().material.color = Color.white;
+                if (dataVisuals.name == "PieChartCtrl")
+                {
+                    foreach (var mat in dataPoint.gameObject.GetComponent<MeshRenderer>().materials)
+                    {
+                        mat.color = Color.white;
+                    }
+                }
+                else
+                {
+                    dataPoint.gameObject.GetComponent<MeshRenderer>().material.color = Color.white;
+                }
                 clusteredPoints++;
             }
             foreach(var text in clusterCompactnessTexts)
@@ -312,6 +330,13 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
             prevText.color = Color.black;
             prevText = pseudoCodeText.transform.GetChild(3).GetComponent<Text>();
         }
+
+        if (bestClusterFound)
+        {
+            kMeansFinishedPlane.SetActive(false);
+            bestClusterFound = false;
+            PreviousStep();
+        }
     }
 
     private void ChangePointsColors()
@@ -353,7 +378,18 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
 
             if(changeColors)
             {
-                child.gameObject.GetComponent<MeshRenderer>().material.SetColor("_Color", spheres[smallestDistanceIndex].GetComponent<Renderer>().material.color);
+                //because PieChart mesh has 3 submeshes
+                if(dataVisuals.name == "PieChartCtrl")
+                {
+                    foreach(var mat in child.gameObject.GetComponent<MeshRenderer>().materials)
+                    {
+                        mat.SetColor("_Color", spheres[smallestDistanceIndex].GetComponent<Renderer>().material.color);
+                    }
+                }
+                else
+                {
+                    child.gameObject.GetComponent<MeshRenderer>().material.SetColor("_Color", spheres[smallestDistanceIndex].GetComponent<Renderer>().material.color);
+                }
                 child.gameObject.GetComponent<PreviousStepProperties>().colorList.Add(spheres[smallestDistanceIndex].GetComponent<Renderer>().material.color);
                 clusters[smallestDistanceIndex].Add(child.gameObject);
                 newTotal[smallestDistanceIndex]++;
@@ -364,22 +400,45 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
             {
                 //if it has more than one color
                 if (child.gameObject.GetComponent<PreviousStepProperties>().colorList.Count >= 2)
+                {
+                    child.gameObject.GetComponent<PreviousStepProperties>().colorList.RemoveAt(child.gameObject.GetComponent<PreviousStepProperties>().colorList.Count - 1);
+                    if (dataVisuals.name == "PieChartCtrl")
                     {
-                        child.gameObject.GetComponent<PreviousStepProperties>().colorList.RemoveAt(child.gameObject.GetComponent<PreviousStepProperties>().colorList.Count - 1);
+                        foreach (var mat in child.gameObject.GetComponent<MeshRenderer>().materials)
+                        {
+                            mat.color = child.gameObject.GetComponent<PreviousStepProperties>().colorList[child.gameObject.GetComponent<PreviousStepProperties>().colorList.Count - 1];
+                        }
+                    }
+                    else
+                    {
                         child.gameObject.GetComponent<MeshRenderer>().material.color = child.gameObject.GetComponent<PreviousStepProperties>().colorList[child.gameObject.GetComponent<PreviousStepProperties>().colorList.Count - 1];
+                    }
                     for (int pC = 0; pC < nrOfSpheres; pC++)
                     {
                         if (child.gameObject.GetComponent<MeshRenderer>().material.color == spheres[pC].GetComponent<MeshRenderer>().material.color)
-                            {
-                                clusters[pC].Add(child.gameObject);
-                                newTotal[pC]++;
-                                break;
-                            }
+                        {
+                            child.gameObject.GetComponent<ClusterQualityValues>().clusterID = pC;
+                            clusters[pC].Add(child.gameObject);
+                            newTotal[pC]++;
+                            break;
                         }
                     }
+                }
             }
         }
-        Debug.Log(ClusteringCompactness());
+        for(int i=0; i<newTotal.Length; i++)
+        {
+            allInPlace = false;
+            if (oldTotal[i] != newTotal[i]) allInPlace = true;
+        }
+        if(!allInPlace)
+        {
+            for(int i=0; i<spheres.Count; i++)
+            {
+                oldPos[i] = spheres[i].transform.localPosition;
+            }
+        }
+        silhouetteCoef.Calculate();
     }
     
     private void RepositionTheSpheres()
@@ -467,18 +526,10 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
             newSphere.tag = "sphere";
 
             //put on random position if script is called from Master
-            if(NetworkScriptController.commandSender.master)
-            {
-                //for X and Z it has to be between -0.6 and 0.6, cause coordinate 0.0 is in the center but not in the begining of the scatterplot (its shifted)
-                Vector3 position = new Vector3(UnityEngine.Random.Range(-0.6f, 0.6f), UnityEngine.Random.Range(0.2f, 0.8f), UnityEngine.Random.Range(-0.6f, 0.6f));
-                newSphere.transform.localPosition = position;
-                spheresStartPositions.Add(position);
-            }
-            //load from previously added position from Master
-            else
-            {
-                newSphere.transform.localPosition = spheresStartPositions[i];
-            }
+            //for X and Z it has to be between -0.6 and 0.6, cause coordinate 0.0 is in the center but not in the begining of the scatterplot (its shifted)
+            Vector3 position = new Vector3(UnityEngine.Random.Range(-0.6f, 0.6f), UnityEngine.Random.Range(0.2f, 0.8f), UnityEngine.Random.Range(-0.6f, 0.6f));
+            newSphere.transform.localPosition = position;
+            spheresStartPositions.Add(position);
             newSphere.GetComponent<MeshRenderer>().material.color = spheresColor[i];
             spheres.Add(newSphere);
         }
@@ -551,10 +602,17 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
         }
         if(dataVisuals != null)
         {
-            foreach (Transform child in dataVisuals.transform)
+            if(dataVisuals.name == "PieChartCtrl")
             {
-                child.GetComponent<MeshRenderer>().material.color = child.GetComponent<PreviousStepProperties>().originalColor;
-                child.GetComponent<PreviousStepProperties>().colorList = new List<Color>();
+                dataVisuals.GetComponent<PieChartMeshController>().ReturnOriginalColors();
+            }
+            else
+            {
+                foreach (Transform child in dataVisuals.transform)
+                {
+                    child.GetComponent<MeshRenderer>().material.color = child.GetComponent<PreviousStepProperties>().originalColor;
+                    child.GetComponent<PreviousStepProperties>().colorList = new List<Color>();
+                }
             }
         }
         changeColors = true;
@@ -569,7 +627,8 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
         currentTextCounter = 0;
         currentTextCounter = 0;
         spheresStartPositions = new List<Vector3>();
-        NetworkScriptController.commandSender.algorithmStep = 0;
+        //NetworkScriptController.commandSender.algorithmStep = 0;
+        silhouetteCoef.ResetMe();
     }
 
     public bool AllAreTrue(bool[] array)
@@ -588,14 +647,12 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
     {
         float compact = 0;
         int cluster = 0;
-        int nrPoints = 0;
         foreach(Transform point in dataVisuals.transform)
         {
             cluster = point.GetComponent<ClusterQualityValues>().clusterID;
             compact += Mathf.Sqrt(Vector3.Distance(point.position, spheres[cluster].transform.position));
-            nrPoints++;
         }
-        int roundedInt = (int)(compact * 10000 / nrPoints);
+        int roundedInt = (int)(compact * 10000);
         return (float) roundedInt/10000;
     }
 }

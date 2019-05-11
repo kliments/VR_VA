@@ -110,7 +110,7 @@ public class NetworkScriptController : MonoBehaviour {
                     }
                     for(int i=0; i<kMeansController.GetComponent<KMeansAlgorithm>().spheresStartPositions.Count; i++)
                     {
-                        player.networkController().kMeansController.GetComponent<KMeansAlgorithm>().spheresStartPositions[i] = kMeansController.GetComponent<KMeansAlgorithm>().spheresStartPositions[i];
+                        //player.networkController().kMeansController.GetComponent<KMeansAlgorithm>().spheresStartPositions[i] = kMeansController.GetComponent<KMeansAlgorithm>().spheresStartPositions[i];
                     }
                 }
             }

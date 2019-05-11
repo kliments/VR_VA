@@ -48,7 +48,7 @@ public class ResponsiveMenuDatasetsGenerator : MonoBehaviour {
             {
                 element.GetComponent<GeneralCoverflowProperties>().isHovered = true;
             }
-
+            element.GetComponent<UniversalButtonScript>().indexID = i;
         }
     }
 

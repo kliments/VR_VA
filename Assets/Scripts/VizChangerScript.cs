@@ -5,7 +5,7 @@ using UnityEngine;
 public class VizChangerScript : MonoBehaviour
 {
     public int currentVizIndex;
-
+    public static VizChangerScript vizChanger;
     private DataChangerScript dataChanger;
     private TextAsset currentDataset;
     private GameObject scatterplot, cubes, pies, triangles, tetrahedrons;
@@ -199,5 +199,14 @@ public class VizChangerScript : MonoBehaviour
             }
         }
         return null;
+    }
+
+    private void OnEnable()
+    {
+        if (vizChanger == null) vizChanger = this;
+    }
+    private void OnDisable()
+    {
+        if (vizChanger != null) vizChanger = null;
     }
 }

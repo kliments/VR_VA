@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PieChartBehaviour : MonoBehaviour
 {
+    public Shader shader;
     public Camera myCamera;
     private Vector3 target;
     public GameObject trackObj;
@@ -17,7 +18,7 @@ public class PieChartBehaviour : MonoBehaviour
     void Start()
     {
         layerMask = 1 << LayerMask.NameToLayer("Environment");
-        material = gameObject.GetComponent<MeshRenderer>().material;
+        material = new Material(shader);
         material.color = color;
         mesh = pointMesh.gameObject.GetComponent<MeshFilter>().sharedMesh;
     }

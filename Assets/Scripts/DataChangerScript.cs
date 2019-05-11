@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class DataChangerScript : MonoBehaviour {
+    public static DataChangerScript dataChanger;
     public TextAsset[] datasets;
     public bool isSelected;
     public int currentDataIndex;
@@ -83,5 +84,14 @@ public class DataChangerScript : MonoBehaviour {
             }
         }
         return null;
+    }
+
+    private void OnEnable()
+    {
+        if (dataChanger == null) dataChanger = this;
+    }
+    private void OnDisable()
+    {
+        if (dataChanger != null) dataChanger = null;
     }
 }

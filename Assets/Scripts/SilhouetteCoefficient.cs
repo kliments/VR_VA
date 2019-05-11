@@ -24,6 +24,7 @@ public class SilhouetteCoefficient : MonoBehaviour {
     void Start () {
         _obj = new GameObject();
         _obj.transform.parent = transform;
+        _obj.transform.localPosition = new Vector3(0,0,-0.007f);
         _obj.AddComponent<MeshFilter>();
         _obj.AddComponent<MeshRenderer>();
         _obj.GetComponent<MeshRenderer>().material = mat;
@@ -57,16 +58,34 @@ public class SilhouetteCoefficient : MonoBehaviour {
             if (point.GetComponent<ClusterQualityValues>().clusterID == currentAlgorithm.NOISE) continue;
             minAverage = 10;
             clusterID = point.GetComponent<ClusterQualityValues>().clusterID;
-            ai = AverageDistance(point, currentAlgorithm.clusters[clusterID]);
-            point.GetComponent<ClusterQualityValues>().Ai = ai;
-            for(int i=0; i<currentAlgorithm.clusters.Count; i++)
+            if(currentAlgorithm.GetType().Equals(typeof(KMeansAlgorithm)))
             {
-                if (i == clusterID) continue;
-                if (minAverage > AverageDistance(point, currentAlgorithm.clusters[i])) minAverage = AverageDistance(point, currentAlgorithm.clusters[i]);
+                foreach (var sphere in currentAlgorithm.GetComponent<KMeansAlgorithm>().spheres)
+                {
+                    if (point.GetComponent<MeshRenderer>().material.color == sphere.GetComponent<MeshRenderer>().material.color)
+                    {
+                        point.GetComponent<ClusterQualityValues>().Ai = Vector3.Distance(point.transform.position, sphere.transform.position);
+                        break;
+                    }
+                }
+
+                foreach (var sphere in currentAlgorithm.GetComponent<KMeansAlgorithm>().spheres)
+                {
+                    if (point.GetComponent<MeshRenderer>().material.color == sphere.GetComponent<MeshRenderer>().material.color) continue;
+                    if (minAverage > Vector3.Distance(point.transform.position, sphere.transform.position)) minAverage = Vector3.Distance(point.transform.position, sphere.transform.position);
+                }
+            }
+            else
+            {
+                point.GetComponent<ClusterQualityValues>().Ai = AverageDistance(point, currentAlgorithm.clusters[clusterID]);
+                for (int i = 0; i < currentAlgorithm.clusters.Count; i++)
+                {
+                    if (i == clusterID) continue;
+                    if (minAverage > AverageDistance(point, currentAlgorithm.clusters[i])) minAverage = AverageDistance(point, currentAlgorithm.clusters[i]);
+                }
             }
             point.GetComponent<ClusterQualityValues>().Bi = minAverage;
-            si = (point.GetComponent<ClusterQualityValues>().Bi - point.GetComponent<ClusterQualityValues>().Ai) / Mathf.Max(point.GetComponent<ClusterQualityValues>().Ai, point.GetComponent<ClusterQualityValues>().Bi);
-            point.GetComponent<ClusterQualityValues>().Si = si;
+            point.GetComponent<ClusterQualityValues>().Si = (point.GetComponent<ClusterQualityValues>().Bi - point.GetComponent<ClusterQualityValues>().Ai) / Mathf.Max(point.GetComponent<ClusterQualityValues>().Ai, point.GetComponent<ClusterQualityValues>().Bi);
             coef += point.GetComponent<ClusterQualityValues>().Si;
             count++;
         }
@@ -90,7 +109,7 @@ public class SilhouetteCoefficient : MonoBehaviour {
     float AverageDistance(GameObject point, List<GameObject> cluster)
     {
         float totalDist = 0;
-        foreach(var p in cluster)
+        foreach (var p in cluster)
         {
             if (p == point) continue;
             totalDist += Vector3.Distance(point.transform.position, p.transform.position);
@@ -186,5 +205,11 @@ public class SilhouetteCoefficient : MonoBehaviour {
         tempVertex.z = 2.996f;
         averageLine.position = tempVertex;
         averageLine.gameObject.SetActive(true);
+    }
+
+    public void ResetMe()
+    {
+        text.text = "";
+        _obj.GetComponent<MeshFilter>().mesh.Clear();
     }
 }

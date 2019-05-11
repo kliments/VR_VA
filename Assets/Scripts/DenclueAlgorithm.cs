@@ -8,7 +8,7 @@ public class DenclueAlgorithm : MonoBehaviour {
     public float threshold;
     public Vector3[] positions;
     public List<Vector3> peaks, _peaksPosition;
-    public Material mat, mat2;
+    public Material mat;
     public bool gaussianCalculation, resizeMesh, _multiCenteredGaussian, _multiCenteredSquareWave, returnPeaks, _singleCenteredSquaredWave, _singleCenteredGaussian, multiCentered;
     //plus/minus neighbourhood cubes around the center cube in the matrix
     public int halfLengthOfNeighbourhood;
@@ -19,6 +19,8 @@ public class DenclueAlgorithm : MonoBehaviour {
     public int colorCounter = 0;
     public List<Color> clusterColors;
     public GameObject pseudoCode;
+    public List<Material> materials;
+    public MeshRenderer table;
 
     private GameObject _obj;
     private Mesh _mesh;
@@ -165,6 +167,8 @@ public class DenclueAlgorithm : MonoBehaviour {
         thresholdPlane.SetActive(true);
         IncreaseInfluence();
         resizeMesh = true;
+
+        table.material = materials[0];
 
         pseudoCode.SetActive(true);
         prevText = pseudoCode.transform.GetChild(1).GetComponent<Text>();
@@ -719,6 +723,7 @@ public class DenclueAlgorithm : MonoBehaviour {
 
         pseudoCode.SetActive(false);
         if (prevText != null) prevText.color = Color.black;
+        table.material = materials[1];
     }
 
     //checks whether a tile has any neighbours around that are part of the mesh

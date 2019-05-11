@@ -38,7 +38,7 @@ public class UpdateThreshold : MonoBehaviour {
         }
         else if(Input.GetKeyDown(KeyCode.K))
         {
-            NetworkScriptController.commandSender.master = true;
+            //NetworkScriptController.commandSender.master = true;
             photonView.RPC("RunKMeans", PhotonTargets.AllViaServer);
         }
     }

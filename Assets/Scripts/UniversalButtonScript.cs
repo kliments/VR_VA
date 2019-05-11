@@ -9,6 +9,7 @@ public class UniversalButtonScript : MonoBehaviour {
     public float difference;
     public DenclueAlgorithm denclue;
     public SilhouetteCoefficient coef;
+    public int indexID;
 
     private Transform responsiveMenu;
     private MeshRenderer meshRenderer;
@@ -18,7 +19,7 @@ public class UniversalButtonScript : MonoBehaviour {
     private SwapBetweenMenus swapScript;
     private int index = 0;
     //for debugging
-    public bool loadDataset, loadVis, startKmeans, startDenclue;
+    public bool loadDataset, loadVis, startKmeans, startDBScan, startDenclue, silhouetteCoef;
 
     // Use this for initialization
 	void Start () {
@@ -55,8 +56,9 @@ public class UniversalButtonScript : MonoBehaviour {
                 if (child == transform) break;
                 index++;
             }
-            NetworkScriptController.commandSender.index = index;
-            NetworkScriptController.commandSender.LoadDataset();
+            /*NetworkScriptController.commandSender.index = index;
+            NetworkScriptController.commandSender.LoadDataset();*/
+            DataChangerScript.dataChanger.LoadDataset(indexID);
         }
 
         if (loadVis)
@@ -72,18 +74,32 @@ public class UniversalButtonScript : MonoBehaviour {
                 if (child == transform) break;
                 index++;
             }
-            NetworkScriptController.commandSender.index = index;
-            NetworkScriptController.commandSender.LoadVisualization();
+            /*NetworkScriptController.commandSender.index = index;
+            NetworkScriptController.commandSender.LoadVisualization();*/
+            VizChangerScript.vizChanger.ChangeVisualization(indexID);
         }
         if(startKmeans)
         {
             startKmeans = false;
-            NetworkScriptController.commandSender.KMeansAlgorithm();
+            //NetworkScriptController.commandSender.KMeansAlgorithm();
+            kMeansController.GetComponent<KMeansAlgorithm>().StartAlgorithm();
+
+        }
+        if(startDBScan)
+        {
+            startDBScan = false;
+            //dbScanController.GetComponent<DBScanAlgorithm>().StartDBSCAN();
+            dbScanController.GetComponent<DBScanAlgorithm>().StartDBSCAN();
         }
         if (startDenclue)
         {
             startDenclue = false;
-            denclue.StartDenclue();
+            denclueController.GetComponent<DenclueAlgorithm>().StartDenclue();
+        }
+        if(silhouetteCoef)
+        {
+            silhouetteCoef = false;
+            coef.Calculate();
         }
     }
     
@@ -195,9 +211,9 @@ public class UniversalButtonScript : MonoBehaviour {
                 if (child == transform) break;
                 index++;
             }
-            NetworkScriptController.commandSender.index = index;
-            NetworkScriptController.commandSender.LoadDataset();
-
+            /*NetworkScriptController.commandSender.index = index;
+            NetworkScriptController.commandSender.LoadDataset();*/
+            DataChangerScript.dataChanger.LoadDataset(indexID);
             menusParent.GetComponent<BackButtonMenu>().GoBackInMenu();
             GetComponent<DatasetSelectedSpriteToggle>().ShowSprite();
         }
@@ -210,8 +226,9 @@ public class UniversalButtonScript : MonoBehaviour {
                 if (child == transform) break;
                 index++;
             }
-            NetworkScriptController.commandSender.index = index;
-            NetworkScriptController.commandSender.LoadVisualization();
+            /*NetworkScriptController.commandSender.index = index;
+            NetworkScriptController.commandSender.LoadVisualization();*/
+            VizChangerScript.vizChanger.ChangeVisualization(indexID);
 
             menusParent.GetComponent<BackButtonMenu>().GoBackInMenu();
             GetComponent<VisualizationSelectedSpriteToggle>().ShowSprite();
@@ -224,7 +241,7 @@ public class UniversalButtonScript : MonoBehaviour {
         //K-means buttons functionalities
         else if(transform.parent == kmeansParent.transform)
         {
-            NetworkScriptController.commandSender.master = true;
+            //NetworkScriptController.commandSender.master = true;
             //increase or decrease number of spheres
             if (this.name == "NrOfSpheres")
             {
@@ -249,7 +266,8 @@ public class UniversalButtonScript : MonoBehaviour {
             else if(this.name == "K-Means Step Forward")
             {
                 //kMeansController.GetComponent<KMeansAlgorithm>().StartAlgorithm();
-                NetworkScriptController.commandSender.KMeansAlgorithm();
+                //NetworkScriptController.commandSender.KMeansAlgorithm();
+                kMeansController.GetComponent<KMeansAlgorithm>().StartAlgorithm();
             }
             else if(this.name == "Play")
             {

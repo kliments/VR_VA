@@ -185,15 +185,7 @@ public class PieChartMeshController : GeneralVisualization
 
     void Update()
     {
-     /*   for (int i = 0; i < listObjects.Length; i++) 
-		{
-            if(listObjects[i]!= null)
-            {
-                target = new Vector3(myCamera.transform.position.x, myCamera.transform.position.y, myCamera.transform.position.z);
-                listObjects[i].transform.LookAt(target);
-            }
-        }
-        */
+
     }
     public void changeDatafile(TextAsset newData)
     {
@@ -211,7 +203,16 @@ public class PieChartMeshController : GeneralVisualization
         {
             Destroy(child.gameObject);
         }
+    }
 
+    public void ReturnOriginalColors()
+    {
+        foreach (Transform child in transform)
+        {
+            child.GetComponent<MeshRenderer>().materials[0].color = Color.red;
+            child.GetComponent<MeshRenderer>().materials[1].color = Color.blue;
+            child.GetComponent<MeshRenderer>().materials[2].color = Color.green;
+        }
     }
 
     //converts the IRIS eigen vector matrix to the proper one, since the function from the library does not do the proper work
