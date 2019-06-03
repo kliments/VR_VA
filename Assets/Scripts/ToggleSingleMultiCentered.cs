@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class ToggleSingleMultiCentered : MonoBehaviour {
+public class ToggleSingleMultiCentered : NetworkBehaviour {
     public SpriteRenderer sprite;
     public Sprite singleCenSpr, multiCenSpr;
     public DenclueAlgorithm denclue;

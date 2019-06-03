@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class DBScanPlay : MonoBehaviour {
+public class DBScanPlay : NetworkBehaviour {
     public DBScanAlgorithm dbScanButton;
     public bool play;
     private bool allClustersFound, nextStepPause;

@@ -1,9 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
-public abstract class ClusteringAlgorithm : MonoBehaviour {
+public abstract class ClusteringAlgorithm : NetworkBehaviour {
 
     public List<List<GameObject>> clusters;
     public GameObject pseudoCodeText;

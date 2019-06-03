@@ -1,9 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
-public class SquareGaussian : MonoBehaviour {
+public class SquareGaussian : NetworkBehaviour {
     public DenclueAlgorithm denclue;
     public SpriteRenderer sprite;
     public Sprite gaussian, square;

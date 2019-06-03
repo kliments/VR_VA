@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class DenclueAlgorithm : MonoBehaviour {
+public class DenclueAlgorithm : ClusteringAlgorithm {
     public float[][] mapTilesInfluence;
     public float threshold;
     public Vector3[] positions;
@@ -45,7 +45,7 @@ public class DenclueAlgorithm : MonoBehaviour {
     private int _counter, _tile0, _tile1, _tile2, _tile3, a, b, c, d, _layerMask, _additionalVerticesIndexCounter;
     private float _x, _y, _z, _dist, _crossP1, _crossP2, _maxHeight, _minHeight;
     private RaycastHit _hit;
-    private Text prevText;
+    //private Text prevText;
     // Use this for initialization
     void Start () {
         _x = -0.25f;

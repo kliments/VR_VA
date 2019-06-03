@@ -1,9 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
-public class ToggleEucledianManhattan : MonoBehaviour {
+public class ToggleEucledianManhattan : NetworkBehaviour {
     public SpriteRenderer sprite;
     public Sprite euclideanSpr, mannhattanSpr;
     private DBScanAlgorithm distance;

@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class PlayScript : MonoBehaviour {
+public class PlayScript : NetworkBehaviour {
 
     public KMeansAlgorithm nextStepObj;
     public Sprite playSprite, pauseSprite;

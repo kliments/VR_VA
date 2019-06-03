@@ -1,9 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
-public class SilhouetteCoefficient : MonoBehaviour {
+public class SilhouetteCoefficient : NetworkBehaviour {
     public bool calculate;
     public Transform dataContainer, averageLine;
     public ClusteringAlgorithm currentAlgorithm;

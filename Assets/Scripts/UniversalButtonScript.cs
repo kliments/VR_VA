@@ -58,7 +58,7 @@ public class UniversalButtonScript : MonoBehaviour {
             }
             /*NetworkScriptController.commandSender.index = index;
             NetworkScriptController.commandSender.LoadDataset();*/
-            DataChangerScript.dataChanger.LoadDataset(indexID);
+            DataChangerScript.dataChanger.CmdLoadDataset(indexID);
         }
 
         if (loadVis)
@@ -76,7 +76,7 @@ public class UniversalButtonScript : MonoBehaviour {
             }
             /*NetworkScriptController.commandSender.index = index;
             NetworkScriptController.commandSender.LoadVisualization();*/
-            VizChangerScript.vizChanger.ChangeVisualization(indexID);
+            VizChangerScript.vizChanger.CmdChangeVisualization(indexID);
         }
         if(startKmeans)
         {
@@ -213,7 +213,7 @@ public class UniversalButtonScript : MonoBehaviour {
             }
             /*NetworkScriptController.commandSender.index = index;
             NetworkScriptController.commandSender.LoadDataset();*/
-            DataChangerScript.dataChanger.LoadDataset(indexID);
+            DataChangerScript.dataChanger.CmdLoadDataset(indexID);
             menusParent.GetComponent<BackButtonMenu>().GoBackInMenu();
             GetComponent<DatasetSelectedSpriteToggle>().ShowSprite();
         }
@@ -228,7 +228,7 @@ public class UniversalButtonScript : MonoBehaviour {
             }
             /*NetworkScriptController.commandSender.index = index;
             NetworkScriptController.commandSender.LoadVisualization();*/
-            VizChangerScript.vizChanger.ChangeVisualization(indexID);
+            VizChangerScript.vizChanger.CmdChangeVisualization(indexID);
 
             menusParent.GetComponent<BackButtonMenu>().GoBackInMenu();
             GetComponent<VisualizationSelectedSpriteToggle>().ShowSprite();
