@@ -94,7 +94,7 @@ public class IncreaseDecrease : NetworkBehaviour {
         if(denclue.halfLengthOfNeighbourhood < 10)
         {
             denclue.halfLengthOfNeighbourhood++;
-            denclue.StartDenclue();
+            denclue.CmdStartDenclue();
         }
         text.text = "ε: " + denclue.halfLengthOfNeighbourhood.ToString();
     }
@@ -105,7 +105,7 @@ public class IncreaseDecrease : NetworkBehaviour {
         {
             denclue.ResetMe();
             denclue.halfLengthOfNeighbourhood--;
-            denclue.StartDenclue();
+            denclue.CmdStartDenclue();
         }
         text.text = "ε: " + denclue.halfLengthOfNeighbourhood.ToString();
     }

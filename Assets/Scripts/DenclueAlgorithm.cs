@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
 public class DenclueAlgorithm : ClusteringAlgorithm {
@@ -26,7 +27,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
     private Mesh _mesh;
     private List<List<int>> _additionalTriangles, _indexIterationBuffer, _counterIndexes;
     private List<GameObject> _list;
-    private List<Color> _additionalVerticesColor;
+    private List<Color> _additionalVerticesColor, _randomColorsFromServer;
     private List<Vector3> _additionalVertices;
     private List<int>[][] _extraVerticesCounter;
     private List<Vector3>[][] _extraVertices;
@@ -45,6 +46,9 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
     private int _counter, _tile0, _tile1, _tile2, _tile3, a, b, c, d, _layerMask, _additionalVerticesIndexCounter;
     private float _x, _y, _z, _dist, _crossP1, _crossP2, _maxHeight, _minHeight;
     private RaycastHit _hit;
+
+    [SyncVar]
+    public float red, green, blue;
     //private Text prevText;
     // Use this for initialization
     void Start () {
@@ -104,6 +108,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
         _additionalVerticesIndexCounter = 0;
         _additionalTriangles = new List<List<int>>();
         _additionalVerticesColor = new List<Color>();
+        _randomColorsFromServer = new List<Color>();
         _indexIterationBuffer = new List<List<int>>();
         _multiCenteredGaussian = false;
         _multiCenteredSquareWave = false;
@@ -147,6 +152,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
             multiCentered = false;
             _singleCenteredSquaredWave = false;
             SingleCenteredSquaredWaveClusters();
+            //Call on client
             CreateAdditionalMesh();
         }
 
@@ -157,9 +163,36 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
             SingleCenteredGaussianClusters();
             CreateAdditionalMesh();
         }
+        if(Input.GetKeyDown(KeyCode.Space))
+        {
+            CmdStartDenclue();
+            thresholdPlane.transform.position += new Vector3(0, 0.2f, 0);
+        }
+    }
+    [Command]
+    public void CmdStartDenclue()
+    {
+        kMeans.ResetMe();
+        dbscan.ResetMe();
+        ResetMe();
+        thresholdPlane.SetActive(true);
+        IncreaseInfluence();
+        resizeMesh = true;
+
+        table.material = materials[0];
+
+        pseudoCode.SetActive(true);
+        prevText = pseudoCode.transform.GetChild(1).GetComponent<Text>();
+        prevText.color = Color.red;
+
+        if(!isLocalPlayer)
+        {
+            RpcStartDenclue();
+        }
     }
 
-    public void StartDenclue()
+    [ClientRpc]
+    public void RpcStartDenclue()
     {
         kMeans.ResetMe();
         dbscan.ResetMe();
@@ -713,6 +746,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
         _additionalVertices = new List<Vector3>();
         _additionalTriangles = new List<List<int>>();
         _additionalVerticesColor = new List<Color>();
+        _randomColorsFromServer = new List<Color>();
         _peaksPosition = new List<Vector3>();
         for (int i=20; i<clusterColors.Count; i++)
         {
@@ -912,6 +946,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
         Vector3 peakPos = new Vector3();
         colorCounter = 0;
         _peaksPosition = new List<Vector3>();
+        //remove colors from previous clustering
         if(clusterColors.Count > 20)
         {
             for(int c = clusterColors.Count - 1; c>=20; c--)
@@ -919,7 +954,17 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
                 clusterColors.Remove(clusterColors[c]);
             }
         }
+
+        //add newly generated colors from server, CLIENT ONLY!
+        if (!hasAuthority)
+        {
+            foreach (var color in _randomColorsFromServer)
+            {
+                clusterColors.Add(color);
+            }
+        }
         ResetMesh();
+
         List<int> mainList = new List<int>();
         for (int a = 0; a < 150; a++)
         {
@@ -932,7 +977,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
         {
             for(int j=0; j< 150; j++)
             {
-                if(_isPeak[i][j] && !_clustered[i][j] && (_verticesMaximumMatrix[i][j].y + 0.002f) > threshold )
+                if (_isPeak[i][j] && !_clustered[i][j] && (_verticesMaximumMatrix[i][j].y + 0.002f) > threshold)
                 {
                     //list for peaks' position
                     peakPos = (_tiledMapVertices[i][j][0] + _tiledMapVertices[i][j][1] + _tiledMapVertices[i][j][2] + _tiledMapVertices[i][j][3]) / 4;
@@ -942,16 +987,32 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
                     c = 1;
                     d = 1;
                     mainList = new List<int>();
-                    if (colorCounter < 20) _clusterColor = clusterColors[colorCounter];
-                    else
+                    if (hasAuthority)
                     {
-                        _clusterColor = new Color(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f));
-                        if (!clusterColors.Contains(_clusterColor)) clusterColors.Add(_clusterColor);
-                        while (!clusterColors.Contains(_clusterColor))
+                        if (colorCounter < 20) _clusterColor = clusterColors[colorCounter];
+                        else
                         {
                             _clusterColor = new Color(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f));
-                            clusterColors.Add(_clusterColor);
+                            if (!clusterColors.Contains(_clusterColor))
+                            {
+                                clusterColors.Add(_clusterColor);
+                                //set values to server, to update on each client
+                                CmdSetColorValuesToServer(_clusterColor.r, _clusterColor.g, _clusterColor.b);
+                                RpcAddRandomColorToClients(red, green, blue);
+                            }
+                            while (!clusterColors.Contains(_clusterColor))
+                            {
+                                _clusterColor = new Color(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f));
+                                clusterColors.Add(_clusterColor);
+                                //set values to server, to update on each client
+                                CmdSetColorValuesToServer(_clusterColor.r, _clusterColor.g, _clusterColor.b);
+                                RpcAddRandomColorToClients(red, green, blue);
+                            }
                         }
+                    }
+                    else
+                    {
+                        _clusterColor = clusterColors[colorCounter];
                     }
                     mainList.Add(_countersMatrix[i][j]);
 
@@ -1020,6 +1081,13 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
                 }
             }
         }
+    }
+
+    //Client call for re-running SingleCenteredSquaredWaveClusters
+    [ClientRpc]
+    private void RpcSingleCenteredSquaredWave()
+    {
+        SingleCenteredSquaredWaveClusters();
     }
     //path finder from tile to peak
     private bool PeakReached(int i, int j, List<int> list)
@@ -2130,6 +2198,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
     {
         _additionalVertices = new List<Vector3>();
         _additionalVerticesColor = new List<Color>();
+        _randomColorsFromServer = new List<Color>();
         _additionalTriangles = new List<List<int>>();
         _extraVerticesCounter = new List<int>[150][];
         _extraVertices = new List<Vector3>[150][];
@@ -3949,5 +4018,20 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
     private float NormalizeColor(float y)
     {
         return ((y - _minHeight) / (_maxHeight - _minHeight));
+    }
+
+    [Command]
+    public void CmdSetColorValuesToServer(float r, float g, float b)
+    {
+        red = r;
+        green = g;
+        blue = b;
+    }
+    [ClientRpc]
+    //Function for adding random colors from the server to each client, so the random colors are synchronized
+    public void RpcAddRandomColorToClients(float red, float green, float blue)
+    {
+        if (hasAuthority) return;
+        _randomColorsFromServer.Add(new Color(red, green, blue));
     }
 }

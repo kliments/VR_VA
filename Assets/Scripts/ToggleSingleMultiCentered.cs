@@ -34,6 +34,6 @@ public class ToggleSingleMultiCentered : NetworkBehaviour {
             denclue.multiCentered = false;
             sprite.sprite = singleCenSpr;
         }
-        denclue.StartDenclue();
+        denclue.CmdStartDenclue();
     }
 }

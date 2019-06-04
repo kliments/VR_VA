@@ -31,6 +31,6 @@ public class SquareGaussian : NetworkBehaviour {
             sprite.sprite = gaussian;
         }
         denclue.ResetMe();
-        denclue.StartDenclue();
+        denclue.CmdStartDenclue();
     }
 }

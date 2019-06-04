@@ -35,5 +35,21 @@ public class MoveCamera : MonoBehaviour {
         {
             transform.position -= transform.up * 0.1f;
         }
+        else if(Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            transform.RotateAround(transform.position, transform.up, 15f);
+        }
+        else if (Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            transform.RotateAround(transform.position, transform.up, -15f);
+        }
+        else if (Input.GetKeyDown(KeyCode.UpArrow))
+        {
+            transform.RotateAround(transform.position, transform.right, -15f);
+        }
+        else if (Input.GetKeyDown(KeyCode.DownArrow))
+        {
+            transform.RotateAround(transform.position, transform.right, 15f);
+        }
     }
 }

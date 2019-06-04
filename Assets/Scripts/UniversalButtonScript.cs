@@ -94,7 +94,7 @@ public class UniversalButtonScript : MonoBehaviour {
         if (startDenclue)
         {
             startDenclue = false;
-            denclueController.GetComponent<DenclueAlgorithm>().StartDenclue();
+            denclueController.GetComponent<DenclueAlgorithm>().CmdStartDenclue();
         }
         if(silhouetteCoef)
         {
@@ -380,7 +380,7 @@ public class UniversalButtonScript : MonoBehaviour {
             }
             else if(this.name == "DencluePlay")
             {
-                denclueController.GetComponent<DenclueAlgorithm>().StartDenclue();
+                denclueController.GetComponent<DenclueAlgorithm>().CmdStartDenclue();
             }
             else if (this.name == "SingleMultiCentered")
             {
