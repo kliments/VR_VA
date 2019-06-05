@@ -20,6 +20,15 @@ public class FixXandZPosition : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+        if(Input.GetKeyDown(KeyCode.Alpha8))
+        {
+            transform.position += new Vector3(0, 0.1f, 0);
+        }
+        if(Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            transform.position -= new Vector3(0, 0.1f, 0);
+        }
+
         if(isTaken && (decimal.Round((decimal)transform.position.y, 5) != (decimal)denclue.GetComponent<DenclueAlgorithm>().threshold))
         {
             newPos = transform.position;
