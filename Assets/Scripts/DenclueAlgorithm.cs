@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -6,7 +7,6 @@ using UnityEngine.UI;
 
 public class DenclueAlgorithm : ClusteringAlgorithm {
     public float[][] mapTilesInfluence;
-    public float threshold;
     public Vector3[] positions;
     public List<Vector3> peaks, _peaksPosition;
     public Material mat;
@@ -48,7 +48,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
     private RaycastHit _hit;
 
     [SyncVar]
-    public float red, green, blue;
+    public float red, green, blue, threshold;
     [SyncVar]
     public bool _multiCenteredGaussian, multiCentered, _multiCenteredSquareWave, _singleCenteredSquaredWave, _singleCenteredGaussian;
     //private Text prevText;
@@ -579,9 +579,6 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
                 }
             }
         }
-        Debug.Log("min height " + _minHeight);
-        Debug.Log("max height " + _maxHeight);
-
         ConvertMatrixToArray();
     }
 
@@ -942,6 +939,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
 
     private void SingleCenteredSquaredWaveClusters()
     {
+        threshold = thresholdPlane.transform.position.y;
         Vector3 peakPos = new Vector3();
         colorCounter = 0;
         _peaksPosition = new List<Vector3>();
@@ -1215,10 +1213,6 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
     //Function for coloring vertices of tiles and updates triangles if needed
     void ColorTiles(int k, int l, Color color)
     {
-        if(k==99 && l == 100)
-        {
-            Debug.Log("break");
-        }
         _additionalVerticesPreviousIndex[k][l] = 0;
         int indexCounter = -1;
         _extraVerticesCounter[k][l] = new List<int>();
@@ -1805,14 +1799,25 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
 
     private void SingleCenteredGaussianClusters()
     {
+        threshold = thresholdPlane.transform.position.y;
         Vector3 peakPos = new Vector3();
         _peaksPosition = new List<Vector3>();
         colorCounter = 0;
+        //remove colors from previous clustering
         if (clusterColors.Count > 20)
         {
             for (int c = clusterColors.Count - 1; c >= 20; c--)
             {
                 clusterColors.Remove(clusterColors[c]);
+            }
+        }
+
+        //add newly generated colors from server, CLIENT ONLY!
+        if (!hasAuthority)
+        {
+            foreach (var color in _randomColorsFromServer)
+            {
+                clusterColors.Add(color);
             }
         }
         ResetMesh();

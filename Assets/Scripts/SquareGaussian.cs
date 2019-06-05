@@ -15,10 +15,14 @@ public class SquareGaussian : NetworkBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		
+		if(Input.GetKeyDown(KeyCode.T))
+        {
+            CmdToggleSquareGaussian();
+        }
 	}
 
-    public void ToggleSquareGaussian()
+    [Command]
+    public void CmdToggleSquareGaussian()
     {
         if (denclue.gaussianCalculation == true)
         {
@@ -31,6 +35,26 @@ public class SquareGaussian : NetworkBehaviour {
             sprite.sprite = gaussian;
         }
         denclue.ResetMe();
+        //call same function on each client
+        RpcToggleSquareGaussian();
+        //Start Denclue on server -> follows up by clients
         denclue.CmdStartDenclue();
+    }
+
+    [ClientRpc]
+    public void RpcToggleSquareGaussian()
+    {
+        if (hasAuthority) return;
+        if (denclue.gaussianCalculation == true)
+        {
+            denclue.gaussianCalculation = false;
+            sprite.sprite = square;
+        }
+        else
+        {
+            denclue.gaussianCalculation = true;
+            sprite.sprite = gaussian;
+        }
+        denclue.ResetMe();
     }
 }

@@ -1,14 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
-public class FixXandZPosition : MonoBehaviour {
+public class FixXandZPosition : NetworkBehaviour {
     Vector3 oldPos, newPos;
     Quaternion rot;
     public bool isTaken;
     public DenclueAlgorithm denclue;
     public Text buttonText;
+
     // Use this for initialization
     void Start () {
         oldPos = transform.position;
@@ -53,6 +55,7 @@ public class FixXandZPosition : MonoBehaviour {
         newPos = transform.position;
         if(oldPos != newPos)
         {
+            if (!hasAuthority) return;
             denclue.threshold = transform.position.y;
             if (denclue.gaussianCalculation)
             {

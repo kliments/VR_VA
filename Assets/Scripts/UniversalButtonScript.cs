@@ -376,7 +376,7 @@ public class UniversalButtonScript : MonoBehaviour {
             }
             else if(this.name == "SquareGaussian")
             {
-                denclueController.GetComponent<SquareGaussian>().ToggleSquareGaussian();
+                denclueController.GetComponent<SquareGaussian>().CmdToggleSquareGaussian();
             }
             else if(this.name == "DencluePlay")
             {
