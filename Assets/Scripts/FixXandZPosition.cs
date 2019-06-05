@@ -55,7 +55,6 @@ public class FixXandZPosition : NetworkBehaviour {
         newPos = transform.position;
         if(oldPos != newPos)
         {
-            if (!hasAuthority) return;
             denclue.threshold = transform.position.y;
             if (denclue.gaussianCalculation)
             {

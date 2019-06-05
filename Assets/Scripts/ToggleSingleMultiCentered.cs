@@ -17,10 +17,14 @@ public class ToggleSingleMultiCentered : NetworkBehaviour {
     // Update is called once per frame
     void Update()
     {
-
+        if(Input.GetKeyDown(KeyCode.Y))
+        {
+            CmdToggle();
+        }
     }
 
-    public void Toggle()
+    [Command]
+    public void CmdToggle()
     {
         if (multiCentered)
         {
@@ -34,6 +38,27 @@ public class ToggleSingleMultiCentered : NetworkBehaviour {
             denclue.multiCentered = false;
             sprite.sprite = singleCenSpr;
         }
+        //Call same function on each client
+        RpcToggle();
+        //Start denclue on server -> followed up by clients
         denclue.CmdStartDenclue();
+    }
+
+    [ClientRpc]
+    public void RpcToggle()
+    {
+        if (hasAuthority) return;
+        if (multiCentered)
+        {
+            multiCentered = false;
+            denclue.multiCentered = true;
+            sprite.sprite = multiCenSpr;
+        }
+        else
+        {
+            multiCentered = true;
+            denclue.multiCentered = false;
+            sprite.sprite = singleCenSpr;
+        }
     }
 }

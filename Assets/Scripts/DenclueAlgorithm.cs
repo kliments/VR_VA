@@ -49,7 +49,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
 
     [SyncVar]
     public float red, green, blue, threshold;
-    [SyncVar]
+    //[SyncVar]
     public bool _multiCenteredGaussian, multiCentered, _multiCenteredSquareWave, _singleCenteredSquaredWave, _singleCenteredGaussian;
     //private Text prevText;
     // Use this for initialization
@@ -1844,17 +1844,6 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
                     c = 1;
                     d = 1;
 
-                    /*if (colorCounter < 20) _clusterColor = clusterColors[colorCounter];
-                    else
-                    {
-                        _clusterColor = new Color(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f));
-                        if (!clusterColors.Contains(_clusterColor)) clusterColors.Add(_clusterColor);
-                        while (!clusterColors.Contains(_clusterColor))
-                        {
-                            _clusterColor = new Color(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f));
-                            clusterColors.Add(_clusterColor);
-                        }
-                    }*/
                     if (hasAuthority)
                     {
                         if (colorCounter < 20) _clusterColor = clusterColors[colorCounter];
@@ -2102,6 +2091,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
     private void MultiCenteredGaussianClusters()
     {
         colorCounter = 0;
+        //remove colors from previous clustering
         if (clusterColors.Count > 20)
         {
             for (int c = clusterColors.Count - 1; c >= 20; c--)
@@ -2109,7 +2099,17 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
                 clusterColors.Remove(clusterColors[c]);
             }
         }
+
+        //add newly generated colors from server, CLIENT ONLY!
+        if (!hasAuthority)
+        {
+            foreach (var color in _randomColorsFromServer)
+            {
+                clusterColors.Add(color);
+            }
+        }
         ResetMesh();
+
         for (int a = 0; a < 150; a++)
         {
             for (int b = 0; b < 150; b++)
@@ -2132,11 +2132,32 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
 
                 if (AllVerticesAbove(_tiledMapVertices[i][j], threshold))
                 {
-                    if (colorCounter < 20) _clusterColor = clusterColors[colorCounter];
+                    if (hasAuthority)
+                    {
+                        if (colorCounter < 20) _clusterColor = clusterColors[colorCounter];
+                        else
+                        {
+                            _clusterColor = new Color(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f));
+                            if (!clusterColors.Contains(_clusterColor))
+                            {
+                                clusterColors.Add(_clusterColor);
+                                //set values to server, to update on each client
+                                CmdSetColorValuesToServer(_clusterColor.r, _clusterColor.g, _clusterColor.b);
+                                RpcAddRandomColorToClients(red, green, blue);
+                            }
+                            while (!clusterColors.Contains(_clusterColor))
+                            {
+                                _clusterColor = new Color(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f));
+                                clusterColors.Add(_clusterColor);
+                                //set values to server, to update on each client
+                                CmdSetColorValuesToServer(_clusterColor.r, _clusterColor.g, _clusterColor.b);
+                                RpcAddRandomColorToClients(red, green, blue);
+                            }
+                        }
+                    }
                     else
                     {
-                        _clusterColor = new Color(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f));
-                        clusterColors.Add(_clusterColor);
+                        _clusterColor = clusterColors[colorCounter];
                     }
                     _additionalVerticesColor[_tile0] = _clusterColor;
                     _additionalVerticesColor[_tile1] = _clusterColor;
@@ -2151,11 +2172,32 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
                          ThreeVerticesAbove(_tiledMapVertices[i][j][0], _tiledMapVertices[i][j][2], _tiledMapVertices[i][j][3], threshold) ||
                          ThreeVerticesAbove(_tiledMapVertices[i][j][1], _tiledMapVertices[i][j][2], _tiledMapVertices[i][j][3], threshold))
                 {
-                    if (colorCounter < 20) _clusterColor = clusterColors[colorCounter];
+                    if (hasAuthority)
+                    {
+                        if (colorCounter < 20) _clusterColor = clusterColors[colorCounter];
+                        else
+                        {
+                            _clusterColor = new Color(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f));
+                            if (!clusterColors.Contains(_clusterColor))
+                            {
+                                clusterColors.Add(_clusterColor);
+                                //set values to server, to update on each client
+                                CmdSetColorValuesToServer(_clusterColor.r, _clusterColor.g, _clusterColor.b);
+                                RpcAddRandomColorToClients(red, green, blue);
+                            }
+                            while (!clusterColors.Contains(_clusterColor))
+                            {
+                                _clusterColor = new Color(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f));
+                                clusterColors.Add(_clusterColor);
+                                //set values to server, to update on each client
+                                CmdSetColorValuesToServer(_clusterColor.r, _clusterColor.g, _clusterColor.b);
+                                RpcAddRandomColorToClients(red, green, blue);
+                            }
+                        }
+                    }
                     else
                     {
-                        _clusterColor = new Color(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f));
-                        clusterColors.Add(_clusterColor);
+                        _clusterColor = clusterColors[colorCounter];
                     }
                     IterateMultiCenterGaussianClusterAround(i, j);
                     colorCounter++;
@@ -2166,11 +2208,32 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
                          TwoVerticesAbove(_tiledMapVertices[i][j][0], _tiledMapVertices[i][j][2], threshold) ||
                          TwoVerticesAbove(_tiledMapVertices[i][j][1], _tiledMapVertices[i][j][3], threshold))
                 {
-                    if (colorCounter < 20) _clusterColor = clusterColors[colorCounter];
+                    if (hasAuthority)
+                    {
+                        if (colorCounter < 20) _clusterColor = clusterColors[colorCounter];
+                        else
+                        {
+                            _clusterColor = new Color(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f));
+                            if (!clusterColors.Contains(_clusterColor))
+                            {
+                                clusterColors.Add(_clusterColor);
+                                //set values to server, to update on each client
+                                CmdSetColorValuesToServer(_clusterColor.r, _clusterColor.g, _clusterColor.b);
+                                RpcAddRandomColorToClients(red, green, blue);
+                            }
+                            while (!clusterColors.Contains(_clusterColor))
+                            {
+                                _clusterColor = new Color(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f));
+                                clusterColors.Add(_clusterColor);
+                                //set values to server, to update on each client
+                                CmdSetColorValuesToServer(_clusterColor.r, _clusterColor.g, _clusterColor.b);
+                                RpcAddRandomColorToClients(red, green, blue);
+                            }
+                        }
+                    }
                     else
                     {
-                        _clusterColor = new Color(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f));
-                        clusterColors.Add(_clusterColor);
+                        _clusterColor = clusterColors[colorCounter];
                     }
                     IterateMultiCenterGaussianClusterAround(i, j);
                     colorCounter++;
@@ -2178,11 +2241,32 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
                 else if(_tiledMapVertices[i][j][0].y + 0.002f > threshold || _tiledMapVertices[i][j][1].y + 0.002f > threshold ||
                         _tiledMapVertices[i][j][2].y + 0.002f > threshold || _tiledMapVertices[i][j][3].y + 0.002f > threshold)
                 {
-                    if (colorCounter < 20) _clusterColor = clusterColors[colorCounter];
+                    if (hasAuthority)
+                    {
+                        if (colorCounter < 20) _clusterColor = clusterColors[colorCounter];
+                        else
+                        {
+                            _clusterColor = new Color(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f));
+                            if (!clusterColors.Contains(_clusterColor))
+                            {
+                                clusterColors.Add(_clusterColor);
+                                //set values to server, to update on each client
+                                CmdSetColorValuesToServer(_clusterColor.r, _clusterColor.g, _clusterColor.b);
+                                RpcAddRandomColorToClients(red, green, blue);
+                            }
+                            while (!clusterColors.Contains(_clusterColor))
+                            {
+                                _clusterColor = new Color(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f));
+                                clusterColors.Add(_clusterColor);
+                                //set values to server, to update on each client
+                                CmdSetColorValuesToServer(_clusterColor.r, _clusterColor.g, _clusterColor.b);
+                                RpcAddRandomColorToClients(red, green, blue);
+                            }
+                        }
+                    }
                     else
                     {
-                        _clusterColor = new Color(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f));
-                        clusterColors.Add(_clusterColor);
+                        _clusterColor = clusterColors[colorCounter];
                     }
                     IterateMultiCenterGaussianClusterAround(i, j);
                     colorCounter++;
@@ -3664,11 +3748,32 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
                 if (_clustered[i][j] || (_tiledMapVertices[i][j][0].y + 0.002f) < threshold) continue;
                 else
                 {
-                    if (colorCounter < 20) _clusterColor = clusterColors[colorCounter];
+                    if (hasAuthority)
+                    {
+                        if (colorCounter < 20) _clusterColor = clusterColors[colorCounter];
+                        else
+                        {
+                            _clusterColor = new Color(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f));
+                            if (!clusterColors.Contains(_clusterColor))
+                            {
+                                clusterColors.Add(_clusterColor);
+                                //set values to server, to update on each client
+                                CmdSetColorValuesToServer(_clusterColor.r, _clusterColor.g, _clusterColor.b);
+                                RpcAddRandomColorToClients(red, green, blue);
+                            }
+                            while (!clusterColors.Contains(_clusterColor))
+                            {
+                                _clusterColor = new Color(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f));
+                                clusterColors.Add(_clusterColor);
+                                //set values to server, to update on each client
+                                CmdSetColorValuesToServer(_clusterColor.r, _clusterColor.g, _clusterColor.b);
+                                RpcAddRandomColorToClients(red, green, blue);
+                            }
+                        }
+                    }
                     else
                     {
-                        _clusterColor = new Color(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f));
-                        clusterColors.Add(_clusterColor);
+                        _clusterColor = clusterColors[colorCounter];
                     }
                     _additionalVerticesColor[_tile0] = _clusterColor;
                     _additionalVerticesColor[_tile1] = _clusterColor;

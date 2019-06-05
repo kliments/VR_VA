@@ -384,7 +384,7 @@ public class UniversalButtonScript : MonoBehaviour {
             }
             else if (this.name == "SingleMultiCentered")
             {
-                denclueController.GetComponent<ToggleSingleMultiCentered>().Toggle();
+                denclueController.GetComponent<ToggleSingleMultiCentered>().CmdToggle();
             }
         }
         
