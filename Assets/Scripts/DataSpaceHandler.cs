@@ -306,6 +306,7 @@ public class DataSpaceHandler : GeneralVisualization
                 
                 dataPoint.AddComponent<PreviousStepProperties>();
                 dataPoint.AddComponent<DBScanProperties>();
+                dataPoint.GetComponent<DBScanProperties>().index = i;
                 dataPoint.GetComponent<TiledCubeVariables>().trackObj = trackObj;
             }
         }
@@ -347,6 +348,7 @@ public class DataSpaceHandler : GeneralVisualization
                 childCat1.Add(dataPoint);
                 dataPoint.AddComponent<PreviousStepProperties>();
                 dataPoint.AddComponent<DBScanProperties>();
+                dataPoint.GetComponent<DBScanProperties>().index = i;
                 dataPoint.GetComponent<TiledCubeVariables>().trackObj = trackObj;
                 count++;
             }

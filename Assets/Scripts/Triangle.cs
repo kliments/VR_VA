@@ -155,6 +155,7 @@ public class Triangle : GeneralVisualization {
                 TriangleMesh bar = triangle.GetComponent<TriangleMesh>();
                 triangle.AddComponent<PreviousStepProperties>();
                 triangle.AddComponent<DBScanProperties>();
+                triangle.GetComponent<DBScanProperties>().index = i;
                 triangle.GetComponent<MeshRenderer>().material = material;
 
                 bar.Init(dataPos, Positions);
@@ -197,6 +198,7 @@ public class Triangle : GeneralVisualization {
                 GameObject triangle = Instantiate(dummy, Positions, Quaternion.AngleAxis(0, Vector3.up), parent.transform);
                 triangle.AddComponent<PreviousStepProperties>();
                 triangle.AddComponent<DBScanProperties>();
+                triangle.GetComponent<DBScanProperties>().index = i;
                 TriangleMesh bar = triangle.GetComponent<TriangleMesh>();
 
                 Color color = new Color(float.Parse(attributes[4]), float.Parse(attributes[5]), float.Parse(attributes[6]), 1f);

@@ -255,6 +255,7 @@ public class Tetrahedron : GeneralVisualization
                 TetrahedronMesh bar = tetrahedron.GetComponent<TetrahedronMesh>();
                 tetrahedron.AddComponent<PreviousStepProperties>();
                 tetrahedron.AddComponent<DBScanProperties>();
+                tetrahedron.GetComponent<DBScanProperties>().index = i;
                 tetrahedron.GetComponent<MeshRenderer>().material = dataMappedMaterial;
 
                 
@@ -303,6 +304,7 @@ public class Tetrahedron : GeneralVisualization
                 TetrahedronMesh bar = tetrahedron.GetComponent<TetrahedronMesh>();
                 tetrahedron.AddComponent<PreviousStepProperties>();
                 tetrahedron.AddComponent<DBScanProperties>();
+                tetrahedron.GetComponent<DBScanProperties>().index = i;
                 Color color = new Color(float.Parse(attributes[4]), float.Parse(attributes[5]), float.Parse(attributes[6]), 1f);
 
                 bar.Init(dataPositions, Positions);

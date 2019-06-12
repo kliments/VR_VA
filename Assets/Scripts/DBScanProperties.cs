@@ -8,7 +8,7 @@ public class DBScanProperties : MonoBehaviour {
     public int UNCLASSIFIED = 0;
     public int NOISE = -1;
     public bool drawMeshAround, drawSphere, clustered;
-    public int clusterID;
+    public int clusterID, index;
     public float epsilon;
     //mesh to be drawn
     public Mesh sphereMesh;

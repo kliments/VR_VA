@@ -89,7 +89,7 @@ public class UniversalButtonScript : MonoBehaviour {
         {
             startDBScan = false;
             //dbScanController.GetComponent<DBScanAlgorithm>().StartDBSCAN();
-            dbScanController.GetComponent<DBScanAlgorithm>().StartDBSCAN();
+            dbScanController.GetComponent<DBScanAlgorithm>().CmdStartDBSCAN();
         }
         if (startDenclue)
         {
@@ -320,11 +320,11 @@ public class UniversalButtonScript : MonoBehaviour {
             }
             else if(this.name == "StepBackward")
             {
-                dbScanController.GetComponent<DBScanAlgorithm>().DBBackwards();
+                dbScanController.GetComponent<DBScanAlgorithm>().CmdDBBackwards();
             }
             else if(this.name == "DBScan Step Forward")
             {
-                dbScanController.GetComponent<DBScanAlgorithm>().StartDBSCAN();
+                dbScanController.GetComponent<DBScanAlgorithm>().CmdStartDBSCAN();
             }
             else if(this.name == "Play")
             {

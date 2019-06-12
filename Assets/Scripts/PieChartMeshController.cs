@@ -124,6 +124,7 @@ public class PieChartMeshController : GeneralVisualization
                 PieChartMesh bar = pieChart.GetComponent<PieChartMesh>();
                 pieChart.AddComponent<PreviousStepProperties>();
                 pieChart.AddComponent<DBScanProperties>();
+                pieChart.GetComponent<DBScanProperties>().index = i;
                 bar.Init(dataPos, 100, 0, 100, null, dataPosition);
                 bar.Draw(dataPos);
                 bar.transform.localScale -= new Vector3(0.985F, 0.985F, 0.985F);
@@ -163,6 +164,7 @@ public class PieChartMeshController : GeneralVisualization
                 GameObject pieChart = Instantiate(dummy, Positions, Quaternion.AngleAxis(0, Vector3.up), transform);
                 pieChart.AddComponent<PreviousStepProperties>();
                 pieChart.AddComponent<DBScanProperties>();
+                pieChart.GetComponent<DBScanProperties>().index = i;
                 PieChartMesh bar = pieChart.GetComponent<PieChartMesh>();
                 bar.Init(dataPositions, 100, 0, 100, null, Positions);
                 bar.Draw(dataPositions);

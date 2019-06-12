@@ -56,7 +56,7 @@ public class DBScanPlay : NetworkBehaviour {
 
         while (!allClustersFound)
         {
-            dbScanButton.StartDBSCAN();
+            dbScanButton.CmdStartDBSCAN();
             yield return new WaitForSeconds(1f);
         }
 

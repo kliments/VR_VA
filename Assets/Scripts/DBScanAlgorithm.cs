@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
 public class DBScanAlgorithm : ClusteringAlgorithm {
@@ -43,6 +44,8 @@ public class DBScanAlgorithm : ClusteringAlgorithm {
     public DBScanPlay playRoutine;
 
     private Text prevText1;
+    
+    private SyncListInt indexList = new SyncListInt();
     // Use this for initialization
     void Start() {
         counter = 0;
@@ -67,17 +70,30 @@ public class DBScanAlgorithm : ClusteringAlgorithm {
         if (nextStep)
         {
             nextStep = false;
-            StartDBSCAN();
+            CmdStartDBSCAN();
         }
         if(prevStep)
         {
             prevStep = false;
-            DBBackwards();
+            CmdDBBackwards();
         }
     }
 
-    public void StartDBSCAN()
+    private void OnIntChanged(SyncListInt.Operation op, int index)
     {
+
+    }
+
+    public override void OnStartClient()
+    {
+        indexList.Callback = OnIntChanged;
+    }
+
+    [Command]
+    public void CmdStartDBSCAN()
+    {
+        if (!isServer) return;
+
         //happens only once, in the beginning
         if (counter == 0)
         {
@@ -87,7 +103,7 @@ public class DBScanAlgorithm : ClusteringAlgorithm {
 
             AssignDataPoints();
             PaintAllWhite();
-            ShuffleDataPoints();
+            CmdShuffleDataPoints();
             counter++;
             steps.Add("firstStep");
         }
@@ -271,11 +287,213 @@ public class DBScanAlgorithm : ClusteringAlgorithm {
                 }
             }
         }
+        RpcStartDBSCAN();
     }
 
-    //Backward step of DBSCAN algorithm
-    public void DBBackwards()
+    [ClientRpc]
+    public void RpcStartDBSCAN()
     {
+        if (hasAuthority) return;
+        //happens only once, in the beginning
+        if (counter == 0)
+        {
+            resetKMeans.GetComponent<KMeansAlgorithm>().ResetMe();
+            resetDenclue.GetComponent<DenclueAlgorithm>().ResetMe();
+            silhouetteCoef.currentAlgorithm = this;
+            AssignDataPoints();
+            AssignRandomPointsFromServer();
+            PaintAllWhite();
+            //ShuffleDataPoints();
+            counter++;
+            steps.Add("firstStep");
+        }
+        else if (dataPoints.Count == 0 && neighbours.Count == 0)
+        {
+            Debug.Log("DBScan finished in " + NrOfClusters(dataVisuals.transform).ToString() + " steps!");
+            dbscanFinishedPlane.transform.GetChild(0).gameObject.GetComponent<TextMesh>().text = NrOfClusters(dataVisuals.transform).ToString() + " clusters found!";
+            dbscanFinishedPlane.SetActive(true);
+            allClustersFound = true;
+            steps.Add("finish");
+            int qualityClusterID = 0;
+            foreach (var cluster in clusters)
+            {
+                foreach (var point in cluster)
+                {
+                    point.GetComponent<ClusterQualityValues>().clusterID = qualityClusterID;
+                }
+                qualityClusterID++;
+            }
+            foreach (var point in noisePoints)
+            {
+                point.GetComponent<ClusterQualityValues>().clusterID = NOISE;
+            }
+
+            //paint pseudo code text red
+            prevText.color = Color.black;
+            prevText1.color = Color.black;
+            pseudoCodeText.transform.GetChild(5).GetComponent<Text>().color = Color.red;
+            prevText = pseudoCodeText.transform.GetChild(5).GetComponent<Text>();
+        }
+        else
+        {//check if there are any neighbours to expand, before trying to find another cluster
+            if (neighbours.Count == 0)
+            {
+                GameObject dataPoint = dataPoints[0];
+                if (dataPoint.gameObject.GetComponent<DBScanProperties>() == null)
+                {
+                    dataPoint.gameObject.AddComponent<DBScanProperties>();
+                }
+
+                //process points only once
+                if (dataPoint.gameObject.GetComponent<DBScanProperties>().clusterID == UNCLASSIFIED)
+                {
+                    List<GameObject> temp = new List<GameObject>();
+                    corePoints = RegionQuery(dataPoint, epsilon, euclDist);
+
+                    //paint pseudo code text red
+                    if (prevText != null) prevText.color = Color.black;
+                    if (prevText1 != null) prevText1.color = Color.black;
+
+                    pseudoCodeText.transform.GetChild(1).GetComponent<Text>().color = Color.red;
+                    prevText = pseudoCodeText.transform.GetChild(1).GetComponent<Text>();
+
+                    pseudoCodeText.transform.GetChild(2).GetComponent<Text>().color = Color.red;
+                    prevText1 = pseudoCodeText.transform.GetChild(2).GetComponent<Text>();
+
+                    if (corePoints.Count < minPts) //no core point
+                    {
+                        dataPoint.GetComponent<DBScanProperties>().clusterID = NOISE;
+                        dataPoint.GetComponent<DBScanProperties>().drawMeshAround = true;
+                        dataPoint.GetComponent<DBScanProperties>().epsilon = epsilon;
+                        if (dataPoint.transform.parent.name == "PieChartCtrl") PaintPieChart(dataPoint, Color.black);
+                        else dataPoint.GetComponent<MeshRenderer>().material.color = Color.black;
+                        noisePoints.Add(dataPoint);
+                        corePoints = new List<GameObject>();
+                        RemoveWireFrame(dataPoint);
+                        //necessary for previous steps
+                        steps.Add("noise");
+                    }
+
+                    else
+                    {
+                        dataPoint.GetComponent<DBScanProperties>().epsilon = epsilon;
+                        dataPoint.GetComponent<DBScanProperties>().clusterID = clusterID;
+                        dataPoint.GetComponent<DBScanProperties>().drawMeshAround = true;
+                        clusteredPoints++;
+                        steps.Add("ptHaveNbrs");
+
+                        temp = new List<GameObject>();
+                        for (int i = 0; i < corePoints.Count; i++)
+                        {
+                            if (corePoints[i].GetComponent<DBScanProperties>() == null)
+                            {
+                                corePoints[i].AddComponent<DBScanProperties>();
+                            }
+                            corePoints[i].GetComponent<DBScanProperties>().epsilon = epsilon;
+                            corePoints[i].GetComponent<DBScanProperties>().clusterID = clusterID;
+                            if (corePoints[i].transform.parent.name == "PieChartCtrl") PaintPieChart(corePoints[i], pointsColor[clusterID - 1]);
+                            else corePoints[i].GetComponent<MeshRenderer>().material.color = pointsColor[clusterID - 1];
+                            temp.Add(corePoints[i]);
+
+                            currentCluster.Add(corePoints[i]);
+                            dataPoints.Remove(corePoints[i]);
+                        }
+                        corePoints.Remove(dataPoint);
+                        neighbours.Add(corePoints);
+                        processedPoints.Insert(processedPoints.Count, copyList(corePoints));
+                    }
+                    temp = new List<GameObject>();
+                    temp.Add(dataPoint);
+                    processedPoints.Insert(processedPoints.Count, copyList(temp));
+                }
+                dataPoints.Remove(dataPoint);
+            }
+
+            //explore the neighbours' neighbours
+            else
+            {
+                List<GameObject> currentNeighbours = neighbours[0];
+                processedPoints.Insert(processedPoints.Count, copyList(currentNeighbours));
+                List<GameObject> temp = new List<GameObject>();
+                while (currentNeighbours.Count > 0)
+                {
+                    GameObject currentPoint = currentNeighbours[0];
+                    currentPoint.GetComponent<DBScanProperties>().epsilon = epsilon;
+                    currentPoint.GetComponent<DBScanProperties>().clusterID = clusterID;
+                    currentPoint.GetComponent<DBScanProperties>().drawMeshAround = true;
+                    clusteredPoints++;
+                    List<GameObject> result = RegionQuery(currentPoint, epsilon, euclDist);
+                    if (result.Count > 0)
+                    {
+                        foreach (GameObject obj in result)
+                        {
+                            if (obj.GetComponent<DBScanProperties>().clusterID == UNCLASSIFIED || obj.GetComponent<DBScanProperties>().clusterID == NOISE)
+                            {
+                                obj.GetComponent<DBScanProperties>().epsilon = epsilon;
+                                obj.GetComponent<DBScanProperties>().clusterID = clusterID;
+                                if (obj.transform.parent.name == "PieChartCtrl")
+                                {
+                                    PaintPieChart(obj, pointsColor[clusterID - 1]);
+                                }
+                                else obj.GetComponent<MeshRenderer>().material.color = pointsColor[clusterID - 1];
+                                temp.Add(obj);
+                                currentCluster.Add(obj);
+                                dataPoints.Remove(obj);
+                                //only for cubes
+                                if (obj.name.Contains("Cube"))
+                                {
+                                    AddWireFrame(obj);
+                                }
+                            }
+                        }
+                    }
+                    dataPoints.Remove(currentPoint);
+                    currentNeighbours.Remove(currentPoint);
+                }
+
+                //add only if there are any new neighbours
+                if (temp.Count > 0)
+                {
+                    neighbours.Add(temp);
+                    processedPoints.Insert(processedPoints.Count, copyList(temp));
+                    steps.Add("haveNbrs");
+
+                    //paint pseudo code text red
+                    prevText.color = Color.black;
+                    prevText1.color = Color.black;
+                    pseudoCodeText.transform.GetChild(3).GetComponent<Text>().color = Color.red;
+                    prevText = pseudoCodeText.transform.GetChild(3).GetComponent<Text>();
+
+                }
+                neighbours.RemoveAt(0);
+
+                if (neighbours.Count == 0)
+                {
+                    //paint pseudo code text red
+                    prevText.color = Color.black;
+                    prevText1.color = Color.black;
+                    pseudoCodeText.transform.GetChild(4).GetComponent<Text>().color = Color.red;
+                    prevText = pseudoCodeText.transform.GetChild(4).GetComponent<Text>();
+
+                    clusters.Add(currentCluster);
+                    currentCluster = new List<GameObject>();
+                    clusterID++;
+                    if (clusterID > 20)
+                    {
+                        Color color = Random.ColorHSV();
+                        pointsColor.Add(color);
+                    }
+                    steps.Add("noNbrs");
+                }
+            }
+        }
+    }
+
+    [Command]
+    //Backward step of DBSCAN algorithm
+    public void CmdDBBackwards()
+    {
+        if (!isServer) return;
         int currentStep = steps.Count - 1;
         if (steps.Count <= 0)
         {
@@ -399,13 +617,147 @@ public class DBScanAlgorithm : ClusteringAlgorithm {
             pseudoCodeText.transform.GetChild(5).GetComponent<Text>().color = Color.red;
             prevText = pseudoCodeText.transform.GetChild(5).GetComponent<Text>();
             steps.RemoveAt(currentStep);
-            DBBackwards();
+            CmdDBBackwards();
+        }
+        RpcDBBackwards();
+    }
+
+    [ClientRpc]
+    public void RpcDBBackwards()
+    {
+        if (hasAuthority) return;
+        int currentStep = steps.Count - 1;
+        if (steps.Count <= 0)
+        {
+            return;
+        }
+        if (steps[currentStep] == "firstStep")
+        {
+            ReturnOriginalColor();
+            counter--;
+            steps.RemoveAt(currentStep);
+        }
+        else if (steps[currentStep] == "noise")
+        {
+            GameObject current = processedPoints[processedPoints.Count - 1][0];
+            current.GetComponent<DBScanProperties>().clusterID = UNCLASSIFIED;
+            if (current.transform.parent.name == "PieChartCtrl")
+            {
+                PaintPieChart(current, Color.white);
+            }
+            else current.GetComponent<MeshRenderer>().material.color = Color.white;
+            dataPoints.Insert(0, current);
+            processedPoints.RemoveAt(processedPoints.Count - 1);
+            steps.RemoveAt(currentStep);
+
+            //paint pseudo code text red
+            prevText.color = Color.black;
+            prevText1.color = Color.black;
+
+            pseudoCodeText.transform.GetChild(1).GetComponent<Text>().color = Color.red;
+            prevText = pseudoCodeText.transform.GetChild(1).GetComponent<Text>();
+
+            pseudoCodeText.transform.GetChild(2).GetComponent<Text>().color = Color.red;
+            prevText1 = pseudoCodeText.transform.GetChild(2).GetComponent<Text>();
+        }
+        else if (steps[currentStep] == "ptHaveNbrs")
+        {
+            GameObject current = processedPoints[processedPoints.Count - 1][0];
+            current.GetComponent<DBScanProperties>().clusterID = UNCLASSIFIED;
+            current.GetComponent<DBScanProperties>().drawMeshAround = false;
+            current.GetComponent<DBScanProperties>().ResetPoint();
+            if (current.transform.parent.name == "PieChartCtrl") PaintPieChart(current, Color.white);
+            else current.GetComponent<MeshRenderer>().material.color = Color.white;
+            processedPoints.RemoveAt(processedPoints.Count - 1);
+            foreach (GameObject obj in processedPoints[processedPoints.Count - 1])
+            {
+                obj.GetComponent<DBScanProperties>().clusterID = UNCLASSIFIED;
+
+                if (obj.transform.parent.name == "PieChartCtrl") PaintPieChart(obj, Color.white);
+                else obj.GetComponent<MeshRenderer>().material.color = Color.white;
+                dataPoints.Insert(0, obj);
+            }
+            processedPoints.RemoveAt(processedPoints.Count - 1);
+            steps.RemoveAt(currentStep);
+            neighbours = new List<List<GameObject>>();
+
+            //paint pseudo code text red
+            pseudoCodeText.transform.GetChild(1).GetComponent<Text>().color = Color.red;
+            prevText = pseudoCodeText.transform.GetChild(1).GetComponent<Text>();
+
+            pseudoCodeText.transform.GetChild(2).GetComponent<Text>().color = Color.red;
+            prevText1 = pseudoCodeText.transform.GetChild(2).GetComponent<Text>();
+        }
+        else if (steps[currentStep] == "haveNbrs")
+        {
+            foreach (GameObject obj in processedPoints[processedPoints.Count - 1])
+            {
+                obj.GetComponent<DBScanProperties>().clusterID = UNCLASSIFIED;
+                if (obj.transform.parent.name == "PieChartCtrl") PaintPieChart(obj, Color.white);
+                else obj.GetComponent<MeshRenderer>().material.color = Color.white;
+            }
+            processedPoints.RemoveAt(processedPoints.Count - 1);
+            foreach (GameObject obj in processedPoints[processedPoints.Count - 1])
+            {
+                tempClusterID = obj.GetComponent<DBScanProperties>().clusterID;
+                obj.GetComponent<DBScanProperties>().ResetPoint();
+                obj.GetComponent<DBScanProperties>().clusterID = tempClusterID;
+                if (obj.transform.parent.name == "PieChartCtrl") PaintPieChart(obj, pointsColor[tempClusterID - 1]);
+                else obj.GetComponent<MeshRenderer>().material.color = pointsColor[tempClusterID - 1];
+            }
+            neighbours = new List<List<GameObject>>();
+            neighbours.Add(processedPoints[processedPoints.Count - 1]);
+            processedPoints.RemoveAt(processedPoints.Count - 1);
+            steps.RemoveAt(currentStep);
+
+            //paint pseudo code text red
+            prevText.color = Color.black;
+            prevText1.color = Color.black;
+            pseudoCodeText.transform.GetChild(3).GetComponent<Text>().color = Color.red;
+            prevText = pseudoCodeText.transform.GetChild(3).GetComponent<Text>();
+
+        }
+        else if (steps[currentStep] == "noNbrs")
+        {
+            foreach (GameObject obj in processedPoints[processedPoints.Count - 1])
+            {
+                tempClusterID = obj.GetComponent<DBScanProperties>().clusterID;
+                obj.GetComponent<DBScanProperties>().ResetPoint();
+                obj.GetComponent<DBScanProperties>().clusterID = tempClusterID;
+                if (obj.transform.parent.name == "PieChartCtrl") PaintPieChart(obj, pointsColor[tempClusterID - 1]);
+                else obj.GetComponent<MeshRenderer>().material.color = pointsColor[tempClusterID - 1];
+            }
+            neighbours = new List<List<GameObject>>();
+            neighbours.Add(processedPoints[processedPoints.Count - 1]);
+            processedPoints.RemoveAt(processedPoints.Count - 1);
+            steps.RemoveAt(currentStep);
+            clusterID--;
+            clusters.RemoveAt(clusters.Count - 1);
+            //paint pseudo code text red
+            prevText.color = Color.black;
+            prevText1.color = Color.black;
+            pseudoCodeText.transform.GetChild(4).GetComponent<Text>().color = Color.red;
+            prevText = pseudoCodeText.transform.GetChild(4).GetComponent<Text>();
+        }
+        else if (steps[currentStep] == "finish")
+        {
+            dbscanFinishedPlane.SetActive(false);
+            allClustersFound = false;
+            //paint pseudo code text red
+            prevText.color = Color.black;
+            prevText1.color = Color.black;
+            pseudoCodeText.transform.GetChild(5).GetComponent<Text>().color = Color.red;
+            prevText = pseudoCodeText.transform.GetChild(5).GetComponent<Text>();
+            steps.RemoveAt(currentStep);
+            CmdDBBackwards();
         }
     }
+
 
     //find all datapoints
     void AssignDataPoints()
     {
+        dataPoints = new List<GameObject>();
         foreach (Transform child in scatterplot)
         {
             //Finding the current visualization
@@ -502,9 +854,10 @@ public class DBScanAlgorithm : ClusteringAlgorithm {
         silhouetteCoef.ResetMe();
     }
 
-    private void ShuffleDataPoints()
+    [Command]
+    private void CmdShuffleDataPoints()
     {
-
+        indexList.Clear();
         System.Random rng = new System.Random();
         int n = dataPoints.Count;
         while (n > 1)
@@ -514,6 +867,26 @@ public class DBScanAlgorithm : ClusteringAlgorithm {
             GameObject value = dataPoints[k];
             dataPoints[k] = dataPoints[n];
             dataPoints[n] = value;
+        }
+
+        foreach(var point in dataPoints)
+        {
+            indexList.Add(point.GetComponent<DBScanProperties>().index);
+        }
+    }
+
+    private void AssignRandomPointsFromServer()
+    {
+        List<GameObject> tempList = new List<GameObject>();
+        foreach(var obj in dataPoints)
+        {
+            tempList.Add(obj);
+        }
+
+        dataPoints = new List<GameObject>();
+        for(int i=0; i<tempList.Count; i++)
+        {
+            dataPoints.Add(tempList[indexList[i]]);
         }
     }
 
