@@ -1,9 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
-public class KMeansAlgorithm : ClusteringAlgorithm {
+public class KMeansAlgorithm : ClusteringAlgorithm
+{
 
     public Transform scatterplot;
     public DBScanAlgorithm resetDBScan;
@@ -23,7 +25,7 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
 
     //average center position
     private Vector3[] avgCenter;
-    
+
     //for checking if the best cluster is found
     public bool bestClusterFound = false;
     private bool[] numberOfPoints, posOfSpheres;
@@ -88,23 +90,24 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
     //current cluster ID
     private int clusterID = 0;
     // Use this for initialization
-    void Start ()
+    void Start()
     {
         silhouetteCoef = (SilhouetteCoefficient)FindObjectOfType(typeof(SilhouetteCoefficient));
     }
-	
-	// Update is called once per frame
-	void Update () {
+
+    // Update is called once per frame
+    void Update()
+    {
         //will repeat if all the spheres are still not on the destination avgCenter
         if (!allInPlace)
         {
             allInPlace = true;
 
-            for(int i = 0; i < nrOfSpheres; i++)
+            for (int i = 0; i < nrOfSpheres; i++)
             {
                 spheres[i].transform.localPosition = Vector3.Lerp(spheres[i].transform.localPosition, avgCenter[i], Time.deltaTime * 5f);
-                
-                if(System.Math.Abs(spheres[i].transform.localPosition.x - avgCenter[i].x) < 0.0005f)
+
+                if (System.Math.Abs(spheres[i].transform.localPosition.x - avgCenter[i].x) < 0.0005f)
                 {
                     spheres[i].transform.localPosition = avgCenter[i];
                     hasArrived[i] = true;
@@ -133,10 +136,10 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
         //check whether best clustering is found and execute code inside if yes
         if (counter > 0 && !bestClusterFound)
         {
-            for(int k = 0; k < nrOfSpheres; k++)
+            for (int k = 0; k < nrOfSpheres; k++)
             {
                 //compare old position with new position
-                if(oldPos[k] == newPos[k])
+                if (oldPos[k] == newPos[k])
                 {
                     posOfSpheres[k] = true;
                 }
@@ -146,7 +149,7 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
                 }
 
                 //compare old number of data points belonging to spheres with new ones
-                if(oldTotal[k] == newTotal[k])
+                if (oldTotal[k] == newTotal[k])
                 {
                     numberOfPoints[k] = true;
                 }
@@ -156,16 +159,16 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
                 }
             }
 
-            if(AllAreTrue(numberOfPoints) && AllAreTrue(posOfSpheres))
+            if (AllAreTrue(numberOfPoints) && AllAreTrue(posOfSpheres))
             {
                 clusterID = 0;
                 Debug.Log("K-means clustering is finished in " + counter.ToString() + " steps!");
                 kMeansFinishedPlane.SetActive(true);
                 kMeansFinishedPlane.transform.GetChild(0).gameObject.GetComponent<TextMesh>().text = "Best clustering found in " + counter.ToString() + " steps!";
                 bestClusterFound = true;
-                foreach(var cluster in clusters)
+                foreach (var cluster in clusters)
                 {
-                    foreach(var point in cluster)
+                    foreach (var point in cluster)
                     {
                         point.GetComponent<ClusterQualityValues>().clusterID = clusterID;
                     }
@@ -178,20 +181,22 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
                 prevText = pseudoCodeText.transform.GetChild(4).GetComponent<Text>();
             }
         }
-        if(nextStep)
+        if (nextStep)
         {
             nextStep = false;
-            StartAlgorithm();
+            CmdStartAlgorithm();
         }
-        if(prevStep)
+        if (prevStep)
         {
             prevStep = false;
-            PreviousStep();
+            CmdPreviousStep();
         }
-	}
+    }
 
-    public void StartAlgorithm()
+    [Command]
+    public void CmdStartAlgorithm()
     {
+        if (!isServer) return;
         if (bestClusterFound) return;
         AssignDataToGameObjects();
 
@@ -203,7 +208,7 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
             silhouetteCoef.currentAlgorithm = this;
 
             SetSizeOfArrays(nrOfSpheres);
-            GenerateRandomSpheres();
+            CmdGenerateRandomSpheres();
 
             //paint pseudo code text red
             pseudoCodeText.transform.GetChild(1).GetComponent<Text>().color = Color.red;
@@ -229,7 +234,7 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
             }
             counter++;
 
-            foreach(Transform dataPoint in dataVisuals.transform)
+            foreach (Transform dataPoint in dataVisuals.transform)
             {
                 if (dataVisuals.name == "PieChartCtrl")
                 {
@@ -244,7 +249,111 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
                 }
                 clusteredPoints++;
             }
-            foreach(var text in clusterCompactnessTexts)
+            foreach (var text in clusterCompactnessTexts)
+            {
+                text.text = "";
+            }
+        }
+
+        //if the next step is to change the colors of the data points related to the closest sphere
+        else if (changeColors && allInPlace)
+        {
+            ChangePointsColors();
+            changeColors = false;
+            prevChangeColors = true;
+            repositionSpheres = true;
+            prevReposSpheres = false;
+            counter++;
+
+            //paint pseudo code text red
+            pseudoCodeText.transform.GetChild(2).GetComponent<Text>().color = Color.red;
+            prevText.color = Color.black;
+            prevText = pseudoCodeText.transform.GetChild(2).GetComponent<Text>();
+
+            //cluster compactness
+            if (currentTextCounter > 3) return;
+            tempText = clusterCompactnessTexts[currentTextCounter].text;
+            tempText = tempText + "Step " + (counter - 1).ToString() + ": " + ClusteringCompactness().ToString() + System.Environment.NewLine;
+            clusterCompactnessTexts[currentTextCounter].text = tempText;
+            if (counter != 0 && (counter - 1) % 20 == 0) currentTextCounter++;
+        }
+
+        //if the next step is to reposition the spheres in the center of the data points
+        else if (repositionSpheres)
+        {
+            movedSteps++;
+            RepositionTheSpheres();
+            changeColors = true;
+            prevChangeColors = false;
+            repositionSpheres = false;
+            prevReposSpheres = true;
+            allInPlace = false;
+            counter++;
+
+            //paint pseudo code text red
+            pseudoCodeText.transform.GetChild(3).GetComponent<Text>().color = Color.red;
+            prevText.color = Color.black;
+            prevText = pseudoCodeText.transform.GetChild(3).GetComponent<Text>();
+        }
+
+        RpcStartAlgorithm();
+    }
+
+    [ClientRpc]
+    void RpcStartAlgorithm()
+    {
+        if (hasAuthority) return;
+        if (bestClusterFound) return;
+        AssignDataToGameObjects();
+        //only generate spheres the first time;
+        if (counter == 0)
+        {
+            resetDBScan.GetComponent<DBScanAlgorithm>().ResetMe();
+            resetDenclue.GetComponent<DenclueAlgorithm>().ResetMe();
+            silhouetteCoef.currentAlgorithm = this;
+
+            SetSizeOfArrays(nrOfSpheres);
+            ReconfigureSpheresFromServer();
+            //paint pseudo code text red
+            pseudoCodeText.transform.GetChild(1).GetComponent<Text>().color = Color.red;
+            prevText = pseudoCodeText.transform.GetChild(1).GetComponent<Text>();
+            //spheres.AddRange(GameObject.FindGameObjectsWithTag("sphere"));
+            Vector3[] copy1 = new Vector3[nrOfSpheres];
+
+            for (int oP = 0; oP < nrOfSpheres; oP++)
+            {
+                oldPos[oP] = new Vector3(0, 0, 0);
+            }
+
+            for (int nP = 0; nP < nrOfSpheres; nP++)
+            {
+                newPos[nP] = spheres[nP].transform.localPosition;
+                copy1[nP] = newPos[nP];
+            }
+            stepPositions.Add(copy1);
+
+            for (int nT = 0; nT < nrOfSpheres; nT++)
+            {
+                newTotal[nT] = 0;
+            }
+            counter++;
+
+            foreach (Transform dataPoint in dataVisuals.transform)
+            {
+                if (dataVisuals.name == "PieChartCtrl")
+                {
+                    foreach (var mat in dataPoint.gameObject.GetComponent<MeshRenderer>().materials)
+                    {
+                        mat.color = Color.white;
+                    }
+                }
+                else
+                {
+                    dataPoint.gameObject.GetComponent<MeshRenderer>().material.color = Color.white;
+                }
+                clusteredPoints++;
+            }
+            foreach (var text in clusterCompactnessTexts)
             {
                 text.text = "";
             }
@@ -291,8 +400,28 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
             prevText = pseudoCodeText.transform.GetChild(3).GetComponent<Text>();
         }
     }
+    void ReconfigureSpheresFromServer()
+    {
+        GameObject[] sphereArray = GameObject.FindGameObjectsWithTag("sphere");
+        for (int i = 0; i < sphereArray.Length; i++)
+        {
+            sphereArray[i].GetComponent<MeshRenderer>().material.color = spheresColor[i];
+            spheresStartPositions.Add(sphereArray[i].transform.localPosition);
+            sphereArray[i].name = "sphere";
+            sphereArray[i].tag = "sphere";
+            sphereArray[i].transform.parent = scatterplot;
+            spheres.Add(sphereArray[i]);
+        }
+    }
 
-    public void PreviousStep()
+    [Command]
+    public void CmdPreviousStep()
+    {
+        if (!isServer) return;
+        RpcPreviousStep();
+    }
+    [ClientRpc]
+    public void RpcPreviousStep()
     {
         if (counter <= 1 || movedSteps < 0)
         {
@@ -313,7 +442,7 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
             prevText = pseudoCodeText.transform.GetChild(2).GetComponent<Text>();
         }
 
-        else if(prevReposSpheres)
+        else if (prevReposSpheres)
         {
             stepPositions.RemoveAt(movedSteps);
             movedSteps--;
@@ -335,7 +464,7 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
         {
             kMeansFinishedPlane.SetActive(false);
             bestClusterFound = false;
-            PreviousStep();
+            CmdPreviousStep();
         }
     }
 
@@ -376,12 +505,12 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
                 }
             }
 
-            if(changeColors)
+            if (changeColors)
             {
                 //because PieChart mesh has 3 submeshes
-                if(dataVisuals.name == "PieChartCtrl")
+                if (dataVisuals.name == "PieChartCtrl")
                 {
-                    foreach(var mat in child.gameObject.GetComponent<MeshRenderer>().materials)
+                    foreach (var mat in child.gameObject.GetComponent<MeshRenderer>().materials)
                     {
                         mat.SetColor("_Color", spheres[smallestDistanceIndex].GetComponent<Renderer>().material.color);
                     }
@@ -396,7 +525,7 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
                 child.gameObject.GetComponent<ClusterQualityValues>().clusterID = smallestDistanceIndex;
             }
 
-            else if(prevChangeColors)
+            else if (prevChangeColors)
             {
                 //if it has more than one color
                 if (child.gameObject.GetComponent<PreviousStepProperties>().colorList.Count >= 2)
@@ -426,21 +555,21 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
                 }
             }
         }
-        for(int i=0; i<newTotal.Length; i++)
+        for (int i = 0; i < newTotal.Length; i++)
         {
             allInPlace = false;
             if (oldTotal[i] != newTotal[i]) allInPlace = true;
         }
-        if(!allInPlace)
+        if (!allInPlace)
         {
-            for(int i=0; i<spheres.Count; i++)
+            for (int i = 0; i < spheres.Count; i++)
             {
                 oldPos[i] = spheres[i].transform.localPosition;
             }
         }
         silhouetteCoef.Calculate();
     }
-    
+
     private void RepositionTheSpheres()
     {
         //reset coordinates to 0
@@ -472,31 +601,31 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
                 yPos[c] = spheres[c].transform.localPosition.y;
                 zPos[c] = spheres[c].transform.localPosition.z;
             }
-            if(repositionSpheres)
+            if (repositionSpheres)
             {
                 avgCenter[c] = new Vector3(xPos[c], yPos[c], zPos[c]);
                 copy2[c] = avgCenter[c];
             }
-            else if(prevReposSpheres)
+            else if (prevReposSpheres)
             {
                 avgCenter[c] = stepPositions[movedSteps][c];
             }
             oldPos[c] = spheres[c].transform.localPosition;
         }
-        if(repositionSpheres)
+        if (repositionSpheres)
         {
             stepPositions.Add(copy2);
         }
         //set new positions of all spheres
         allInPlace = false;
     }
-    
+
 
     void SetSizeOfArrays(int i)
     {
         //clusters = new List<List<GameObject>>(i);
         clusters = new List<List<GameObject>>(new List<GameObject>[i]);
-        for(int a=0; a<clusters.Count; a++)
+        for (int a = 0; a < clusters.Count; a++)
         {
             clusters[a] = new List<GameObject>();
         }
@@ -517,8 +646,11 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
         stepPositions = new List<Vector3[]>();
     }
 
-    void GenerateRandomSpheres()
+    [Command]
+    void CmdGenerateRandomSpheres()
     {
+        if (!hasAuthority) return;
+
         for (int i = 0; i < nrOfSpheres; i++)
         {
             GameObject newSphere = Instantiate(sphere, scatterplot);
@@ -532,6 +664,9 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
             spheresStartPositions.Add(position);
             newSphere.GetComponent<MeshRenderer>().material.color = spheresColor[i];
             spheres.Add(newSphere);
+
+            //Spawn the object on server side
+            NetworkServer.Spawn(newSphere);
         }
     }
 
@@ -568,7 +703,7 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
 
     void SetToZeroValues()
     {
-        for(int sZ = 0; sZ < nrOfSpheres; sZ++)
+        for (int sZ = 0; sZ < nrOfSpheres; sZ++)
         {
             xPos[sZ] = 0;
             yPos[sZ] = 0;
@@ -587,7 +722,7 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
         clusterID = 0;
         clusteredPoints = 0;
         kMeansFinishedPlane.SetActive(false);
-        for(int s = 0; s < nrOfSpheres; s++)
+        for (int s = 0; s < nrOfSpheres; s++)
         {
             if (spheres == null || spheres.Count == 0)
             {
@@ -600,9 +735,9 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
                 Destroy(temp);
             }
         }
-        if(dataVisuals != null)
+        if (dataVisuals != null)
         {
-            if(dataVisuals.name == "PieChartCtrl")
+            if (dataVisuals.name == "PieChartCtrl")
             {
                 dataVisuals.GetComponent<PieChartMeshController>().ReturnOriginalColors();
             }
@@ -647,12 +782,12 @@ public class KMeansAlgorithm : ClusteringAlgorithm {
     {
         float compact = 0;
         int cluster = 0;
-        foreach(Transform point in dataVisuals.transform)
+        foreach (Transform point in dataVisuals.transform)
         {
             cluster = point.GetComponent<ClusterQualityValues>().clusterID;
             compact += Mathf.Sqrt(Vector3.Distance(point.position, spheres[cluster].transform.position));
         }
         int roundedInt = (int)(compact * 10000);
-        return (float) roundedInt/10000;
+        return (float)roundedInt / 10000;
     }
 }

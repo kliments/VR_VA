@@ -82,7 +82,7 @@ public class UniversalButtonScript : MonoBehaviour {
         {
             startKmeans = false;
             //NetworkScriptController.commandSender.KMeansAlgorithm();
-            kMeansController.GetComponent<KMeansAlgorithm>().StartAlgorithm();
+            kMeansController.GetComponent<KMeansAlgorithm>().CmdStartAlgorithm();
 
         }
         if(startDBScan)
@@ -261,13 +261,13 @@ public class UniversalButtonScript : MonoBehaviour {
             }
             else if(this.name == "Step Backward")
             {
-                kMeansController.GetComponent<KMeansAlgorithm>().PreviousStep();
+                kMeansController.GetComponent<KMeansAlgorithm>().CmdPreviousStep();
             }
             else if(this.name == "K-Means Step Forward")
             {
                 //kMeansController.GetComponent<KMeansAlgorithm>().StartAlgorithm();
                 //NetworkScriptController.commandSender.KMeansAlgorithm();
-                kMeansController.GetComponent<KMeansAlgorithm>().StartAlgorithm();
+                kMeansController.GetComponent<KMeansAlgorithm>().CmdStartAlgorithm();
             }
             else if(this.name == "Play")
             {
