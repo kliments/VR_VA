@@ -5,8 +5,6 @@ using UnityEngine.Networking;
 using UnityEngine.UI;
 
 public class DBScanAlgorithm : ClusteringAlgorithm {
-    public float epsilon;
-    public int minPts;
 
     public SilhouetteCoefficient silhouetteCoef;
     public Transform scatterplot;
@@ -32,10 +30,7 @@ public class DBScanAlgorithm : ClusteringAlgorithm {
     private List<GameObject> corePoints, currentCluster;
 
     public int clusterID, UNCLASSIFIED, tempClusterID;
-
-    //Eucledian distance if true, if not then Manhattan
-    public bool euclDist;
-
+    
     //list of steps, used for backward dbscan
     private List<string> steps;
     private List<List<GameObject>> processedPoints;
@@ -46,6 +41,15 @@ public class DBScanAlgorithm : ClusteringAlgorithm {
     private Text prevText1;
     
     private SyncListInt indexList = new SyncListInt();
+
+    [SyncVar]
+    public float epsilon;
+    [SyncVar]
+    public int minPts;
+
+    [SyncVar]
+    //Eucledian distance if true, if not then Manhattan
+    public bool euclDist;
     // Use this for initialization
     void Start() {
         counter = 0;
@@ -100,7 +104,7 @@ public class DBScanAlgorithm : ClusteringAlgorithm {
             resetKMeans.GetComponent<KMeansAlgorithm>().ResetMe();
             resetDenclue.GetComponent<DenclueAlgorithm>().ResetMe();
             silhouetteCoef.currentAlgorithm = this;
-
+            pseudoCodeText.SetActive(true);
             AssignDataPoints();
             PaintAllWhite();
             CmdShuffleDataPoints();
@@ -300,6 +304,7 @@ public class DBScanAlgorithm : ClusteringAlgorithm {
             resetKMeans.GetComponent<KMeansAlgorithm>().ResetMe();
             resetDenclue.GetComponent<DenclueAlgorithm>().ResetMe();
             silhouetteCoef.currentAlgorithm = this;
+            pseudoCodeText.SetActive(true);
             AssignDataPoints();
             AssignRandomPointsFromServer();
             PaintAllWhite();

@@ -52,9 +52,7 @@ public class KMeansAlgorithm : ClusteringAlgorithm
     private int counter = 0;
     private int movedSteps = 0;
 
-    //starting with 3 spheres, number gets increased/decreased if clicking + or -
-    public int nrOfSpheres;
-
+    
     //if true, then the next step will be to change the colors of data points
     private bool changeColors = true;
 
@@ -81,7 +79,7 @@ public class KMeansAlgorithm : ClusteringAlgorithm
     //Used for reset, in case the Play button was pressed
     public PlayScript play;
 
-    public bool nextStep, prevStep;
+    public bool nextStep, prevStep, previousStepClicked;
 
     public Text[] clusterCompactnessTexts;
     private string tempText;
@@ -89,6 +87,13 @@ public class KMeansAlgorithm : ClusteringAlgorithm
 
     //current cluster ID
     private int clusterID = 0;
+
+    //local variable for number of spheres that is updated on client
+    //starting with 3 spheres, number gets increased/decreased if clicking + or -
+
+    [SyncVar]
+    //Variable that gets updated on server
+    public int nrOfSpheres;
     // Use this for initialization
     void Start()
     {
@@ -125,9 +130,12 @@ public class KMeansAlgorithm : ClusteringAlgorithm
                 Debug.Log(ClusteringCompactness());
 
                 if (currentTextCounter > 3) return;
-                tempText = clusterCompactnessTexts[currentTextCounter].text;
-                tempText = tempText + "Step " + (counter - 1).ToString() + ": " + ClusteringCompactness().ToString() + System.Environment.NewLine;
-                clusterCompactnessTexts[currentTextCounter].text = tempText;
+                if(!previousStepClicked)
+                {
+                    tempText = clusterCompactnessTexts[currentTextCounter].text;
+                    tempText = tempText + "Step " + (counter - 1).ToString() + ": " + ClusteringCompactness().ToString() + System.Environment.NewLine;
+                    clusterCompactnessTexts[currentTextCounter].text = tempText;
+                }
                 if (counter != 0 && (counter - 1) % 20 == 0) currentTextCounter++;
                 silhouetteCoef.Calculate();
             }
@@ -198,15 +206,16 @@ public class KMeansAlgorithm : ClusteringAlgorithm
     {
         if (!isServer) return;
         if (bestClusterFound) return;
-        AssignDataToGameObjects();
 
+        AssignDataToGameObjects();
+        previousStepClicked = false;
         //only generate spheres the first time;
         if (counter == 0)
         {
             resetDBScan.GetComponent<DBScanAlgorithm>().ResetMe();
             resetDenclue.GetComponent<DenclueAlgorithm>().ResetMe();
             silhouetteCoef.currentAlgorithm = this;
-
+            pseudoCodeText.SetActive(true);
             SetSizeOfArrays(nrOfSpheres);
             CmdGenerateRandomSpheres();
 
@@ -272,9 +281,12 @@ public class KMeansAlgorithm : ClusteringAlgorithm
 
             //cluster compactness
             if (currentTextCounter > 3) return;
-            tempText = clusterCompactnessTexts[currentTextCounter].text;
-            tempText = tempText + "Step " + (counter - 1).ToString() + ": " + ClusteringCompactness().ToString() + System.Environment.NewLine;
-            clusterCompactnessTexts[currentTextCounter].text = tempText;
+            if (!previousStepClicked)
+            {
+                tempText = clusterCompactnessTexts[currentTextCounter].text;
+                tempText = tempText + "Step " + (counter - 1).ToString() + ": " + ClusteringCompactness().ToString() + System.Environment.NewLine;
+                clusterCompactnessTexts[currentTextCounter].text = tempText;
+            }
             if (counter != 0 && (counter - 1) % 20 == 0) currentTextCounter++;
         }
 
@@ -305,13 +317,14 @@ public class KMeansAlgorithm : ClusteringAlgorithm
         if (hasAuthority) return;
         if (bestClusterFound) return;
         AssignDataToGameObjects();
+        previousStepClicked = false;
         //only generate spheres the first time;
         if (counter == 0)
         {
             resetDBScan.GetComponent<DBScanAlgorithm>().ResetMe();
             resetDenclue.GetComponent<DenclueAlgorithm>().ResetMe();
             silhouetteCoef.currentAlgorithm = this;
-
+            pseudoCodeText.SetActive(true);
             SetSizeOfArrays(nrOfSpheres);
             ReconfigureSpheresFromServer();
             //paint pseudo code text red
@@ -375,10 +388,13 @@ public class KMeansAlgorithm : ClusteringAlgorithm
             prevText = pseudoCodeText.transform.GetChild(2).GetComponent<Text>();
 
             //cluster compactness
-            if (currentTextCounter > 3) return;
-            tempText = clusterCompactnessTexts[currentTextCounter].text;
-            tempText = tempText + "Step " + (counter - 1).ToString() + ": " + ClusteringCompactness().ToString() + System.Environment.NewLine;
-            clusterCompactnessTexts[currentTextCounter].text = tempText;
+
+            if (!previousStepClicked)
+            {
+                tempText = clusterCompactnessTexts[currentTextCounter].text;
+                tempText = tempText + "Step " + (counter - 1).ToString() + ": " + ClusteringCompactness().ToString() + System.Environment.NewLine;
+                clusterCompactnessTexts[currentTextCounter].text = tempText;
+            }
             if (counter != 0 && (counter - 1) % 20 == 0) currentTextCounter++;
         }
 
@@ -427,6 +443,7 @@ public class KMeansAlgorithm : ClusteringAlgorithm
         {
             return;
         }
+        previousStepClicked = true;
         if (prevChangeColors && allInPlace)
         {
             ChangePointsColors();

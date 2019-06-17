@@ -418,52 +418,52 @@ public class UniversalButtonScript : MonoBehaviour {
 
     void IncreaseNrSpheres()
     {
-        increaseDecreseObj.IncreaseNrSpheres();
+        increaseDecreseObj.CmdIncreaseNrSpheres();
     }
 
     void DecreaseNrSpheres()
     {
-        increaseDecreseObj.DecreaseNrSpheres();
+        increaseDecreseObj.CmdDecreaseNrSpheres();
     }
 
     void IncreaseEpsilon()
     {
-        increaseDecreseObj.IncreaseEpsilon();
+        increaseDecreseObj.CmdIncreaseEpsilon();
     }
 
     void DecreaseEpsilon()
     {
-        increaseDecreseObj.DecreaseEpsilon();
+        increaseDecreseObj.CmdDecreaseEpsilon();
     }
 
     void IncreaseMinPts()
     {
-        increaseDecreseObj.IncreaseMinPts();
+        increaseDecreseObj.CmdIncreaseMinPts();
     }
 
     void DecreaseMinPts()
     {
-        increaseDecreseObj.DecreaseMinPts();
+        increaseDecreseObj.CmdDecreaseMinPts();
     }
 
     void IncreaseInfluence()
     {
-        increaseDecreseObj.IncreaseInfluence();
+        increaseDecreseObj.CmdIncreaseInfluence();
     }
 
     void DecreaseInfluence()
     {
-        increaseDecreseObj.DecreaseInfluence();
+        increaseDecreseObj.CmdDecreaseInfluence();
     }
 
     void IncreaseThreshold()
     {
-        increaseDecreseObj.IncreaseThreshold();
+        increaseDecreseObj.CmdIncreaseThreshold();
     }
 
     void DecreaseThreshold()
     {
-        increaseDecreseObj.DecreaseThreshold();
+        increaseDecreseObj.CmdDecreaseThreshold();
     }
 
     public void CancelAllCalls()

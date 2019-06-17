@@ -196,6 +196,7 @@ public class VizChangerScript : NetworkBehaviour
                 tetrahedrons.GetComponent<Tetrahedron>().changeDatafile(currentDataset);
             }
         }
+        RpcChangeVisualization(index);
     }
 
     [ClientRpc]

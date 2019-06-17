@@ -8,8 +8,9 @@ public class ShowProperAlgorithmButtons : MonoBehaviour {
     public DBScanAlgorithm dbScan;
     public DenclueAlgorithm denclue;
     private BackButtonMenu backButton;
-	// Use this for initialization
-	void Start () {
+    private SwitchPseudoCodeText pseudoTextChanger;
+    // Use this for initialization
+    void Start () {
         responsiveMenu = gameObject;
         while(responsiveMenu.name != "ResponsiveMenu")
         {
@@ -28,16 +29,16 @@ public class ShowProperAlgorithmButtons : MonoBehaviour {
             else if (child.name == "DENCLUEParent") denclueParent = child.gameObject;
         }
         backButton = menusParent.GetComponent<BackButtonMenu>();
-	}
+        pseudoTextChanger = (SwitchPseudoCodeText)FindObjectOfType(typeof(SwitchPseudoCodeText));
+    }
 	
 	// Update is called once per frame
 	void Update () {
 		
 	}
-
+    
     public void ButtonPressed()
     {
-        algorithmsParent.SetActive(false);
         if (this.name == "K-Means")
         {
             kMeansParent.SetActive(true);
@@ -45,6 +46,7 @@ public class ShowProperAlgorithmButtons : MonoBehaviour {
             backButton.previousMenus.Add(kMeansParent);
             kMeans.pseudoCodeText.SetActive(true);
             dbScan.pseudoCodeText.SetActive(false);
+            pseudoTextChanger.SwitchText(0);
         }
         else if(this.name == "DBSCAN")
         {
@@ -53,12 +55,17 @@ public class ShowProperAlgorithmButtons : MonoBehaviour {
             backButton.previousMenus.Add(dbScanParent);
             kMeans.pseudoCodeText.SetActive(false);
             dbScan.pseudoCodeText.SetActive(true);
+            pseudoTextChanger.SwitchText(1);
         }
         else
         {
             denclueParent.SetActive(true);
             menusParent.GetComponent<CoverflowScript>().AssignValues(denclueParent);
             backButton.previousMenus.Add(denclueParent);
+            kMeans.pseudoCodeText.SetActive(false);
+            dbScan.pseudoCodeText.SetActive(false);
+            pseudoTextChanger.SwitchText(2);
         }
+        algorithmsParent.SetActive(false);
     }
 }

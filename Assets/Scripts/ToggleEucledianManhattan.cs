@@ -8,6 +8,8 @@ public class ToggleEucledianManhattan : NetworkBehaviour {
     public SpriteRenderer sprite;
     public Sprite euclideanSpr, mannhattanSpr;
     private DBScanAlgorithm distance;
+
+    [SyncVar]
     private bool eucledian;
 	// Use this for initialization
 	void Start () {

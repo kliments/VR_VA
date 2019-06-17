@@ -11,8 +11,6 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
     public List<Vector3> peaks, _peaksPosition;
     public Material mat;
     public bool gaussianCalculation, resizeMesh, returnPeaks;
-    //plus/minus neighbourhood cubes around the center cube in the matrix
-    public int halfLengthOfNeighbourhood;
     public GameObject thresholdPlane, label;
     public GaussianCoefficients gaussCoef;
     public KMeansAlgorithm kMeans;
@@ -49,7 +47,10 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
 
     [SyncVar]
     public float red, green, blue, threshold;
-    //[SyncVar]
+    [SyncVar]
+    //plus/minus neighbourhood cubes around the center cube in the matrix
+    public int halfLengthOfNeighbourhood;
+
     public bool _multiCenteredGaussian, multiCentered, _multiCenteredSquareWave, _singleCenteredSquaredWave, _singleCenteredGaussian;
     //private Text prevText;
     // Use this for initialization

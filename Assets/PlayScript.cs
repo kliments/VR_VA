@@ -55,7 +55,7 @@ public class PlayScript : NetworkBehaviour {
         while (!nextStepObj.bestClusterFound)
         {
             nextStepObj.CmdStartAlgorithm();
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(0.5f);
         }
     }
     
