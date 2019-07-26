@@ -40,6 +40,7 @@ public class VizChangerScript : NetworkBehaviour
     [Command]
     public void CmdChangeVisualization(int index)
     {
+        Debug.Log("Visualization changed on server!");
         currentVizIndex = index;
         ground.rigPosReset = true;
         ground.RemoveParenthoodFromRig();
@@ -202,7 +203,7 @@ public class VizChangerScript : NetworkBehaviour
     [ClientRpc]
     public void RpcChangeVisualization(int index)
     {
-        if (hasAuthority) return;
+        if (isServer || !hasAuthority) return;
         currentVizIndex = index;
         ground.rigPosReset = true;
         ground.RemoveParenthoodFromRig();

@@ -58,7 +58,7 @@ public class DataChangerScript : NetworkBehaviour {
     [Command]
     public void CmdLoadDataset(int index)
     {
-        Debug.Log("server called");
+        Debug.Log("Dataset Loaded on server!");
         currentDataIndex = index;
         ground.GetComponent<SetToGround>().rigPosReset = true;
         ground.GetComponent<SetToGround>().RemoveParenthoodFromRig();
@@ -108,7 +108,7 @@ public class DataChangerScript : NetworkBehaviour {
     public void RpcLoadDataset(int index)
     {
         if (isServer) return;
-
+        Debug.Log("Dataset Loaded on client!");
         currentDataIndex = index;
         ground.GetComponent<SetToGround>().rigPosReset = true;
         ground.GetComponent<SetToGround>().RemoveParenthoodFromRig();
