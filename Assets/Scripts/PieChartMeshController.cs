@@ -174,6 +174,7 @@ public class PieChartMeshController : GeneralVisualization
             }
         }
 
+        if (denclue == null) denclue = (DenclueAlgorithm)FindObjectOfType(typeof(DenclueAlgorithm));
         denclue.positions = new Vector3[dataPositions.Count];
         for (int p = 0; p < dataPositions.Count; p++)
         {

@@ -24,20 +24,10 @@ public class UniversalButtonScript : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        FindParents();
+        FindParentsAndObjects();
         meshRenderer = GetComponent<MeshRenderer>();
-        controller = (ResponsiveMenuScript)FindObjectOfType(typeof(ResponsiveMenuScript));
-        primaryMenu = GameObject.Find("MenusParent");
-        ptEvtLsnr = (PointerEventListener)FindObjectOfType(typeof(PointerEventListener));
-        menusParent = (BackButtonMenu)FindObjectOfType(typeof(BackButtonMenu));
-        swapScript = (SwapBetweenMenus)FindObjectOfType(typeof(SwapBetweenMenus));
-        ground = GameObject.Find("Ground");
         loadDataset = loadVis = startDenclue = false;
-        coef = (SilhouetteCoefficient)FindObjectOfType(typeof(SilhouetteCoefficient));
 
-        kMeansController = GameObject.Find("KMeansAlgorithmController");
-        dbScanController = GameObject.Find("DBScanAlgorithmController");
-        denclueController = GameObject.Find("DenclueAlgorithmController");
     }
 
     // Update is called once per frame
@@ -90,7 +80,7 @@ public class UniversalButtonScript : MonoBehaviour
     }
 
 
-    void FindParents()
+    void FindParentsAndObjects()
     {
         if (transform.parent.gameObject.name == "ControlsMenu" || transform.parent.gameObject.name == "KMeansControlsMenu")
         {
@@ -135,8 +125,19 @@ public class UniversalButtonScript : MonoBehaviour
                 denclueParent = child.gameObject;
             }
         }
-    }
 
+        controller = (ResponsiveMenuScript)FindObjectOfType(typeof(ResponsiveMenuScript));
+        primaryMenu = GameObject.Find("MenusParent");
+        ptEvtLsnr = (PointerEventListener)FindObjectOfType(typeof(PointerEventListener));
+        menusParent = (BackButtonMenu)FindObjectOfType(typeof(BackButtonMenu));
+        swapScript = (SwapBetweenMenus)FindObjectOfType(typeof(SwapBetweenMenus));
+        ground = GameObject.Find("Ground");
+        coef = (SilhouetteCoefficient)FindObjectOfType(typeof(SilhouetteCoefficient));
+        kMeansController = GameObject.Find("KMeansAlgorithmController(Clone)");
+        dbScanController = GameObject.Find("DBScanAlgorithmController(Clone)");
+        denclueController = GameObject.Find("DenclueAlgorithmController(Clone)");
+    }
+    
     public void Press()
     {
         RespectiveButtonRespectiveFunction();
@@ -223,7 +224,7 @@ public class UniversalButtonScript : MonoBehaviour
         //K-means buttons functionalities
         else if (transform.parent == kmeansParent.transform)
         {
-            if (kMeansController == null) kMeansController = GameObject.Find("KMeansAlgorithmController");
+            if (kMeansController == null) kMeansController = GameObject.Find("KMeansAlgorithmController(Clone)");
             if (this.name == "NrOfSpheres")
             {
                 //increaseDecreseObj = GetComponent<IncreaseDecrease>();
@@ -260,7 +261,7 @@ public class UniversalButtonScript : MonoBehaviour
         //DBSCAN buttons functionalities
         else if (transform.parent == dbscanParent.transform)
         {
-            if (dbScanController == null) dbScanController = GameObject.Find("DBScanAlgorithmController");
+            if (dbScanController == null) dbScanController = GameObject.Find("DBScanAlgorithmController(Clone)");
             menusParent.GetComponent<CoverflowScript>().AssignValues(dbscanParent);
             if (this.name == "epsilon")
             {
@@ -319,7 +320,7 @@ public class UniversalButtonScript : MonoBehaviour
         //DENCLUE buttons functionalities
         else if (transform.parent == denclueParent.transform)
         {
-            if (denclueController == null) denclueController = GameObject.Find("DenclueAlgorithmController");
+            if (denclueController == null) denclueController = GameObject.Find("DenclueAlgorithmController(Clone)");
             menusParent.GetComponent<CoverflowScript>().AssignValues(denclueParent);
             if (this.name == "influence")
             {

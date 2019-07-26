@@ -11,7 +11,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
     public List<Vector3> peaks, _peaksPosition;
     public Material mat;
     public bool gaussianCalculation, resizeMesh, returnPeaks;
-    public GameObject thresholdPlane, label;
+    public GameObject thresholdPlane, label, canvas, scatterplot;
     public GaussianCoefficients gaussCoef;
     public KMeansAlgorithm kMeans;
     public DBScanAlgorithm dbscan;
@@ -54,7 +54,9 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
     public bool _multiCenteredGaussian, multiCentered, _multiCenteredSquareWave, _singleCenteredSquaredWave, _singleCenteredGaussian;
     //private Text prevText;
     // Use this for initialization
-    void Start () {
+    void Start ()
+    {
+        FindAllObjects();
         _x = -0.25f;
         _y = 0;
         _z = -0.25f;
@@ -171,6 +173,37 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
             thresholdPlane.transform.position += new Vector3(0, 0.2f, 0);
         }
     }
+
+    void FindAllObjects()
+    {
+        transform.parent = GameObject.Find("EventSystem").transform;
+        canvas = GameObject.Find("Canvas");
+        thresholdPlane = GameObject.Find("ThresholdPlane");
+        thresholdPlane.GetComponent<FixXandZPosition>().denclue = this;
+        scatterplot = GameObject.Find("ScatterplotElements");
+        gaussCoef = (GaussianCoefficients)FindObjectOfType(typeof(GaussianCoefficients));
+        kMeans = (KMeansAlgorithm)FindObjectOfType(typeof(KMeansAlgorithm));
+        dbscan = (DBScanAlgorithm)FindObjectOfType(typeof(DBScanAlgorithm));
+        table = GameObject.Find("Table").GetComponent<MeshRenderer>();
+
+        foreach(Transform child in scatterplot.transform)
+        {
+            if(child.name == "denclueFinishedPlane")
+            {
+                label = child.gameObject;
+                break;
+            }
+        }
+        foreach(Transform child in canvas.transform)
+        {
+            if (child.name == "dencluePseudo")
+            {
+                pseudoCodeText = child.gameObject;
+                break;
+            }
+        }
+    }
+
     [Command]
     public void CmdStartDenclue()
     {
@@ -183,8 +216,8 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
 
         table.material = materials[0];
 
-        pseudoCode.SetActive(true);
-        prevText = pseudoCode.transform.GetChild(1).GetComponent<Text>();
+        pseudoCodeText.SetActive(true);
+        prevText = pseudoCodeText.transform.GetChild(1).GetComponent<Text>();
         prevText.color = Color.red;
 
         RpcStartDenclue();
@@ -203,8 +236,8 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
 
         table.material = materials[0];
 
-        pseudoCode.SetActive(true);
-        prevText = pseudoCode.transform.GetChild(1).GetComponent<Text>();
+        pseudoCodeText.SetActive(true);
+        prevText = pseudoCodeText.transform.GetChild(1).GetComponent<Text>();
         prevText.color = Color.red;
     }
     
@@ -752,7 +785,7 @@ public class DenclueAlgorithm : ClusteringAlgorithm {
         thresholdPlane.SetActive(false);
         label.SetActive(false);
 
-        pseudoCode.SetActive(false);
+        pseudoCodeText.SetActive(false);
         if (prevText != null) prevText.color = Color.black;
         table.material = materials[1];
     }

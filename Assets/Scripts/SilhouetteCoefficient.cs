@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class SilhouetteCoefficient : NetworkBehaviour {
     public bool calculate;
-    public Transform dataContainer, averageLine;
+    public Transform dataContainer, averageLine, canvas, silhouetteObjects;
     public ClusteringAlgorithm currentAlgorithm;
     public Text text;
     public Material mat;
@@ -22,7 +22,9 @@ public class SilhouetteCoefficient : NetworkBehaviour {
     private Mesh _mesh;
     private GameObject _obj;
     // Use this for initialization
-    void Start () {
+    void Start ()
+    {
+        FindAllObjects();
         _obj = new GameObject();
         _obj.transform.parent = transform;
         _obj.transform.localPosition = new Vector3(0,0,-0.007f);
@@ -39,6 +41,30 @@ public class SilhouetteCoefficient : NetworkBehaviour {
             Calculate();
         }
 	}
+
+    void FindAllObjects()
+    {
+        transform.parent = GameObject.Find("EventSystem").transform;
+        dataContainer = GameObject.Find("ScatterplotElements").transform;
+        silhouetteObjects = GameObject.Find("SilhouetteCoefficientFrame").transform;
+        canvas = GameObject.Find("Canvas").transform;
+        foreach (Transform child in silhouetteObjects)
+        {
+            if(child.name == "averageLine")
+            {
+                averageLine = child;
+                break;
+            }
+        }
+        foreach(Transform child in canvas)
+        {
+            if(child.name == "S")
+            {
+                text = child.GetComponent<Text>();
+                break;
+            }
+        }
+    }
 
     public void Calculate()
     {

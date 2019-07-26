@@ -7,11 +7,11 @@ using UnityEngine.UI;
 public class KMeansAlgorithm : ClusteringAlgorithm
 {
 
-    public Transform scatterplot;
+    public Transform scatterplot, clusterCompactnessValues;
     public DBScanAlgorithm resetDBScan;
     public DenclueAlgorithm resetDenclue;
     public GameObject sphere;
-    public GameObject kMeansFinishedPlane;
+    public GameObject kMeansFinishedPlane, canvas;
     public List<Color> spheresColor;
     public List<GameObject> spheres;
     public SilhouetteCoefficient silhouetteCoef;
@@ -97,7 +97,7 @@ public class KMeansAlgorithm : ClusteringAlgorithm
     // Use this for initialization
     void Start()
     {
-        silhouetteCoef = (SilhouetteCoefficient)FindObjectOfType(typeof(SilhouetteCoefficient));
+        FindAllObjects();
     }
 
     // Update is called once per frame
@@ -198,6 +198,41 @@ public class KMeansAlgorithm : ClusteringAlgorithm
         {
             prevStep = false;
             CmdPreviousStep();
+        }
+    }
+
+    void FindAllObjects()
+    {
+        transform.parent = GameObject.Find("EventSystem").transform;
+        silhouetteCoef = (SilhouetteCoefficient)FindObjectOfType(typeof(SilhouetteCoefficient));
+        scatterplot = GameObject.Find("ScatterplotElements").transform;
+        resetDBScan = (DBScanAlgorithm)FindObjectOfType(typeof(DBScanAlgorithm));
+        resetDenclue = (DenclueAlgorithm)FindObjectOfType(typeof(DenclueAlgorithm));
+        ground = GameObject.Find("Ground");
+        play = GetComponent<PlayScript>();
+        canvas = GameObject.Find("Canvas");
+        clusterCompactnessValues = GameObject.Find("clusteringCompactnessValues").transform;
+
+        foreach (Transform child in scatterplot)
+        {
+            if(child.name == "kMeansFinishedPlane")
+            {
+                kMeansFinishedPlane = child.gameObject;
+                break;
+            }
+        }
+        foreach(Transform child in canvas.transform)
+        {
+            if(child.name == "kMeansPseudo")
+            {
+                pseudoCodeText = child.gameObject;
+                break;
+            }
+        }
+
+        for(int i=1; i<5; i++)
+        {
+            clusterCompactnessTexts[i - 1] = clusterCompactnessValues.GetChild(i).GetComponent<Text>();
         }
     }
 

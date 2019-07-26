@@ -9,7 +9,9 @@ public class SwitchPseudoCodeText : NetworkBehaviour {
     public DenclueAlgorithm denclue;
 
     // Use this for initialization
-    void Start () {
+    void Start ()
+    {
+        transform.parent = GameObject.Find("EventSystem").transform;
         kMeans = (KMeansAlgorithm)FindObjectOfType(typeof(KMeansAlgorithm));
         dbScan = (DBScanAlgorithm)FindObjectOfType(typeof(DBScanAlgorithm));
         denclue = (DenclueAlgorithm)FindObjectOfType(typeof(DenclueAlgorithm));

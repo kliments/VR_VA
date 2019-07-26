@@ -11,8 +11,12 @@ public class IncreaseDecrease : NetworkBehaviour {
     public DenclueAlgorithm denclue;
     public Text text;
 	// Use this for initialization
-	void Start () {
-	}
+	void Start ()
+    {
+        kMeans = (KMeansAlgorithm)FindObjectOfType(typeof(KMeansAlgorithm));
+        dbScan = (DBScanAlgorithm)FindObjectOfType(typeof(DBScanAlgorithm));
+        denclue = (DenclueAlgorithm)FindObjectOfType(typeof(DenclueAlgorithm));
+    }
 	
 	// Update is called once per frame
 	void Update () {

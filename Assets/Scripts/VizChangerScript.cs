@@ -21,7 +21,9 @@ public class VizChangerScript : NetworkBehaviour
     [SyncVar]
     private int vizIndex;
     // Use this for initialization
-    void Start () {
+    void Start ()
+    {
+        transform.parent = GameObject.Find("EventSystem").transform;
         dataChanger = (DataChangerScript)FindObjectOfType(typeof(DataChangerScript));
         ground = (SetToGround)FindObjectOfType(typeof(SetToGround));
         resetKmeans = (KMeansAlgorithm)FindObjectOfType(typeof(KMeansAlgorithm));

@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class DBScanAlgorithm : ClusteringAlgorithm {
 
     public SilhouetteCoefficient silhouetteCoef;
-    public Transform scatterplot;
+    public Transform scatterplot, canvas;
     public KMeansAlgorithm resetKMeans;
     public DenclueAlgorithm resetDenclue;
 
@@ -51,7 +51,9 @@ public class DBScanAlgorithm : ClusteringAlgorithm {
     //Eucledian distance if true, if not then Manhattan
     public bool euclDist;
     // Use this for initialization
-    void Start() {
+    void Start()
+    {
+        FindAllObjects();
         counter = 0;
         clusterID = 1;
         UNCLASSIFIED = 0;
@@ -66,7 +68,6 @@ public class DBScanAlgorithm : ClusteringAlgorithm {
         processedPoints = new List<List<GameObject>>();
         clusters = new List<List<GameObject>>();
         currentCluster = new List<GameObject>();
-        silhouetteCoef = (SilhouetteCoefficient)FindObjectOfType(typeof(SilhouetteCoefficient));
     }
 
     // Update is called once per frame
@@ -80,6 +81,34 @@ public class DBScanAlgorithm : ClusteringAlgorithm {
         {
             prevStep = false;
             CmdDBBackwards();
+        }
+    }
+
+    void FindAllObjects()
+    {
+        transform.parent = GameObject.Find("EventSystem").transform;
+        silhouetteCoef = (SilhouetteCoefficient)FindObjectOfType(typeof(SilhouetteCoefficient));
+        scatterplot = GameObject.Find("ScatterplotElements").transform;
+        resetKMeans = (KMeansAlgorithm)FindObjectOfType(typeof(KMeansAlgorithm));
+        resetDenclue = (DenclueAlgorithm)FindObjectOfType(typeof(DenclueAlgorithm));
+        playRoutine = GetComponent<DBScanPlay>();
+        canvas = GameObject.Find("Canvas").transform;
+
+        foreach (Transform child in canvas.transform)
+        {
+            if (child.name == "dbscanPseudo")
+            {
+                pseudoCodeText = child.gameObject;
+                break;
+            }
+        }
+        foreach (Transform child in scatterplot)
+        {
+            if(child.name == "dbScanFinishedPlane")
+            {
+                dbscanFinishedPlane = child.gameObject;
+                break;
+            }
         }
     }
 
