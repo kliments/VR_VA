@@ -23,6 +23,7 @@ public class DataChangerScript : NetworkBehaviour {
     // Use this for initialization
     void Start() {
         ground = GameObject.Find("Ground");
+        transform.parent = GameObject.Find("EventSystem").transform;
 
         resetKmeans = (KMeansAlgorithm)FindObjectOfType(typeof(KMeansAlgorithm));
         resetDBScan = (DBScanAlgorithm)FindObjectOfType(typeof(DBScanAlgorithm));
@@ -35,11 +36,29 @@ public class DataChangerScript : NetworkBehaviour {
         {
             CmdLoadDataset(dataIndex);
         }
+
+        if(Input.GetKeyDown(KeyCode.M))
+        {
+            GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+            GameObject localPlayer = new GameObject();
+            NetworkIdentity networkIdentity = new NetworkIdentity();
+            foreach (var player in players)
+            {
+                networkIdentity = player.GetComponent<NetworkIdentity>();
+                if (!player.GetComponent<NetworkIdentity>().isLocalPlayer)
+                {
+                    localPlayer = player;
+                    break;
+                }
+            }
+            localPlayer.GetComponent<AssignAuthorityOverObject>().CmdAssignAuthority(netId, localPlayer.GetComponent<NetworkIdentity>());
+        }
     }
 
     [Command]
     public void CmdLoadDataset(int index)
     {
+        Debug.Log("server called");
         currentDataIndex = index;
         ground.GetComponent<SetToGround>().rigPosReset = true;
         ground.GetComponent<SetToGround>().RemoveParenthoodFromRig();
@@ -88,7 +107,7 @@ public class DataChangerScript : NetworkBehaviour {
     [ClientRpc]
     public void RpcLoadDataset(int index)
     {
-        if (hasAuthority) return;
+        if (isServer) return;
 
         currentDataIndex = index;
         ground.GetComponent<SetToGround>().rigPosReset = true;

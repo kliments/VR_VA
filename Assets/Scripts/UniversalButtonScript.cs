@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class UniversalButtonScript : MonoBehaviour {
-    public GameObject primaryMenu,primaryParent, datasetParent, vizParent, algorithmParent, kmeansParent, dbscanParent, denclueParent, ground, kMeansController,dbScanController, denclueController;
+public class UniversalButtonScript : MonoBehaviour
+{
+    public GameObject primaryMenu, primaryParent, datasetParent, vizParent, algorithmParent, kmeansParent, dbscanParent, denclueParent, ground, kMeansController, dbScanController, denclueController;
     public ResponsiveMenuScript controller;
     public float difference;
-    public DenclueAlgorithm denclue;
     public SilhouetteCoefficient coef;
     public int indexID;
 
@@ -22,7 +22,8 @@ public class UniversalButtonScript : MonoBehaviour {
     public bool loadDataset, loadVis, startKmeans, startDBScan, startDenclue, silhouetteCoef;
 
     // Use this for initialization
-	void Start () {
+    void Start()
+    {
         FindParents();
         meshRenderer = GetComponent<MeshRenderer>();
         controller = (ResponsiveMenuScript)FindObjectOfType(typeof(ResponsiveMenuScript));
@@ -31,7 +32,6 @@ public class UniversalButtonScript : MonoBehaviour {
         menusParent = (BackButtonMenu)FindObjectOfType(typeof(BackButtonMenu));
         swapScript = (SwapBetweenMenus)FindObjectOfType(typeof(SwapBetweenMenus));
         ground = GameObject.Find("Ground");
-        denclue = (DenclueAlgorithm)FindObjectOfType(typeof(DenclueAlgorithm));
         loadDataset = loadVis = startDenclue = false;
         coef = (SilhouetteCoefficient)FindObjectOfType(typeof(SilhouetteCoefficient));
 
@@ -39,56 +39,42 @@ public class UniversalButtonScript : MonoBehaviour {
         dbScanController = GameObject.Find("DBScanAlgorithmController");
         denclueController = GameObject.Find("DenclueAlgorithmController");
     }
-	
-	// Update is called once per frame
-	void Update ()
+
+    // Update is called once per frame
+    void Update()
     {
         if (loadDataset)
         {
             loadDataset = false;
-            /*if (transform.parent == datasetParent.transform && GetComponent<datasetChangerScript>().isSelected)
-            {
-                GetComponent<datasetChangerScript>().startTargetedAction();
-            }*/
-            index = 0;
-            foreach(Transform child in transform.parent)
-            {
-                if (child == transform) break;
-                index++;
-            }
-            /*NetworkScriptController.commandSender.index = index;
-            NetworkScriptController.commandSender.LoadDataset();*/
-            DataChangerScript.dataChanger.CmdLoadDataset(indexID);
-        }
-
-        if (loadVis)
-        {
-            loadVis = false;
-            /*if (transform.parent == vizParent.transform && GetComponent<VisualizationChangerScript>().isSelected)
-            {
-                GetComponent<VisualizationChangerScript>().startSelectedAction();
-            }*/
             index = 0;
             foreach (Transform child in transform.parent)
             {
                 if (child == transform) break;
                 index++;
             }
-            /*NetworkScriptController.commandSender.index = index;
-            NetworkScriptController.commandSender.LoadVisualization();*/
+            DataChangerScript.dataChanger.CmdLoadDataset(indexID);
+        }
+
+        if (loadVis)
+        {
+            loadVis = false;
+            index = 0;
+            foreach (Transform child in transform.parent)
+            {
+                if (child == transform) break;
+                index++;
+            }
             VizChangerScript.vizChanger.CmdChangeVisualization(indexID);
         }
-        if(startKmeans)
+        if (startKmeans)
         {
             startKmeans = false;
-            //NetworkScriptController.commandSender.KMeansAlgorithm();
             kMeansController.GetComponent<KMeansAlgorithm>().CmdStartAlgorithm();
 
         }
-        if(startDBScan)
+        if (startDBScan)
         {
             startDBScan = false;
-            //dbScanController.GetComponent<DBScanAlgorithm>().StartDBSCAN();
             dbScanController.GetComponent<DBScanAlgorithm>().CmdStartDBSCAN();
         }
         if (startDenclue)
@@ -96,13 +82,13 @@ public class UniversalButtonScript : MonoBehaviour {
             startDenclue = false;
             denclueController.GetComponent<DenclueAlgorithm>().CmdStartDenclue();
         }
-        if(silhouetteCoef)
+        if (silhouetteCoef)
         {
             silhouetteCoef = false;
             coef.Calculate();
         }
     }
-    
+
 
     void FindParents()
     {
@@ -118,29 +104,29 @@ public class UniversalButtonScript : MonoBehaviour {
                 responsiveMenu = responsiveMenu.parent;
             }
         }
-        foreach(Transform child in responsiveMenu)
+        foreach (Transform child in responsiveMenu)
         {
-            if(child.name == "PrimaryMenuParent")
+            if (child.name == "PrimaryMenuParent")
             {
                 primaryParent = child.gameObject;
             }
-            else if(child.name == "DatasetParent")
+            else if (child.name == "DatasetParent")
             {
                 datasetParent = child.gameObject;
             }
-            else if(child.name == "VisualizationsParent")
+            else if (child.name == "VisualizationsParent")
             {
                 vizParent = child.gameObject;
             }
-            else if(child.name == "AlgorithmsParent")
+            else if (child.name == "AlgorithmsParent")
             {
                 algorithmParent = child.gameObject;
             }
-            else if(child.name == "KMeansParent")
+            else if (child.name == "KMeansParent")
             {
                 kmeansParent = child.gameObject;
             }
-            else if(child.name == "DBSCANParent")
+            else if (child.name == "DBSCANParent")
             {
                 dbscanParent = child.gameObject;
             }
@@ -150,7 +136,7 @@ public class UniversalButtonScript : MonoBehaviour {
             }
         }
     }
-    
+
     public void Press()
     {
         RespectiveButtonRespectiveFunction();
@@ -162,7 +148,7 @@ public class UniversalButtonScript : MonoBehaviour {
         if (this.name == "Datasets")
         {
             GetComponent<ShowOrHideDatasets>().ButtonPressed();
-            if(menusParent.previousMenus[menusParent.previousMenus.Count-1] != datasetParent)
+            if (menusParent.previousMenus[menusParent.previousMenus.Count - 1] != datasetParent)
             {
                 menusParent.previousMenus.Add(datasetParent);
                 swapScript.dontShowControlsMenu = true;
@@ -211,8 +197,6 @@ public class UniversalButtonScript : MonoBehaviour {
                 if (child == transform) break;
                 index++;
             }
-            /*NetworkScriptController.commandSender.index = index;
-            NetworkScriptController.commandSender.LoadDataset();*/
             DataChangerScript.dataChanger.CmdLoadDataset(indexID);
             menusParent.GetComponent<BackButtonMenu>().GoBackInMenu();
             GetComponent<DatasetSelectedSpriteToggle>().ShowSprite();
@@ -226,23 +210,20 @@ public class UniversalButtonScript : MonoBehaviour {
                 if (child == transform) break;
                 index++;
             }
-            /*NetworkScriptController.commandSender.index = index;
-            NetworkScriptController.commandSender.LoadVisualization();*/
             VizChangerScript.vizChanger.CmdChangeVisualization(indexID);
 
             menusParent.GetComponent<BackButtonMenu>().GoBackInMenu();
             GetComponent<VisualizationSelectedSpriteToggle>().ShowSprite();
         }
         //show the proper algorithm buttons
-        else if(transform.parent == algorithmParent.transform)
+        else if (transform.parent == algorithmParent.transform)
         {
             GetComponent<ShowProperAlgorithmButtons>().ButtonPressed();
         }
         //K-means buttons functionalities
-        else if(transform.parent == kmeansParent.transform)
+        else if (transform.parent == kmeansParent.transform)
         {
-            //NetworkScriptController.commandSender.master = true;
-            //increase or decrease number of spheres
+            if (kMeansController == null) kMeansController = GameObject.Find("KMeansAlgorithmController");
             if (this.name == "NrOfSpheres")
             {
                 //increaseDecreseObj = GetComponent<IncreaseDecrease>();
@@ -259,17 +240,15 @@ public class UniversalButtonScript : MonoBehaviour {
                     if (!IsInvoking("DecreaseNrSpheres")) InvokeRepeating("DecreaseNrSpheres", 0, 0.5f);
                 }
             }
-            else if(this.name == "Step Backward")
+            else if (this.name == "Step Backward")
             {
                 kMeansController.GetComponent<KMeansAlgorithm>().CmdPreviousStep();
             }
-            else if(this.name == "K-Means Step Forward")
+            else if (this.name == "K-Means Step Forward")
             {
-                //kMeansController.GetComponent<KMeansAlgorithm>().StartAlgorithm();
-                //NetworkScriptController.commandSender.KMeansAlgorithm();
                 kMeansController.GetComponent<KMeansAlgorithm>().CmdStartAlgorithm();
             }
-            else if(this.name == "Play")
+            else if (this.name == "Play")
             {
                 kMeansController.GetComponent<PlayScript>().TogglePlayPause();
             }
@@ -279,8 +258,9 @@ public class UniversalButtonScript : MonoBehaviour {
             }
         }
         //DBSCAN buttons functionalities
-        else if(transform.parent == dbscanParent.transform)
+        else if (transform.parent == dbscanParent.transform)
         {
+            if (dbScanController == null) dbScanController = GameObject.Find("DBScanAlgorithmController");
             menusParent.GetComponent<CoverflowScript>().AssignValues(dbscanParent);
             if (this.name == "epsilon")
             {
@@ -297,7 +277,7 @@ public class UniversalButtonScript : MonoBehaviour {
                     if (!IsInvoking("DecreaseEpsilon")) InvokeRepeating("DecreaseEpsilon", 0, 0.5f);
                 }
             }
-            else if(this.name == "minPts")
+            else if (this.name == "minPts")
             {
                 increaseDecreseObj = dbScanController.GetComponents<IncreaseDecrease>()[1];
                 Vector2 pos = controller.device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
@@ -314,19 +294,19 @@ public class UniversalButtonScript : MonoBehaviour {
                     if (!IsInvoking("DecreaseMinPts")) InvokeRepeating("DecreaseMinPts", 0, 0.5f);
                 }
             }
-            else if(this.name == "EucledianManhattan")
+            else if (this.name == "EucledianManhattan")
             {
                 dbScanController.GetComponent<ToggleEucledianManhattan>().Toggle();
             }
-            else if(this.name == "StepBackward")
+            else if (this.name == "StepBackward")
             {
                 dbScanController.GetComponent<DBScanAlgorithm>().CmdDBBackwards();
             }
-            else if(this.name == "DBScan Step Forward")
+            else if (this.name == "DBScan Step Forward")
             {
                 dbScanController.GetComponent<DBScanAlgorithm>().CmdStartDBSCAN();
             }
-            else if(this.name == "Play")
+            else if (this.name == "Play")
             {
                 dbScanController.GetComponent<DBScanPlay>().TogglePlayPause();
             }
@@ -337,10 +317,11 @@ public class UniversalButtonScript : MonoBehaviour {
         }
 
         //DENCLUE buttons functionalities
-        else if(transform.parent == denclueParent.transform)
+        else if (transform.parent == denclueParent.transform)
         {
+            if (denclueController == null) denclueController = GameObject.Find("DenclueAlgorithmController");
             menusParent.GetComponent<CoverflowScript>().AssignValues(denclueParent);
-            if(this.name == "influence")
+            if (this.name == "influence")
             {
                 increaseDecreseObj = denclueController.GetComponents<IncreaseDecrease>()[0];
                 Vector2 pos = controller.device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
@@ -357,7 +338,7 @@ public class UniversalButtonScript : MonoBehaviour {
                     if (!IsInvoking("DecreaseInfluence")) InvokeRepeating("DecreaseInfluence", 0, 0.5f);
                 }
             }
-            else if(this.name == "threshold")
+            else if (this.name == "threshold")
             {
                 increaseDecreseObj = denclueController.GetComponents<IncreaseDecrease>()[1];
                 Vector2 pos = controller.device.GetAxis(Valve.VR.EVRButtonId.k_EButton_Axis0);
@@ -374,11 +355,11 @@ public class UniversalButtonScript : MonoBehaviour {
                     if (!IsInvoking("DecreaseThreshold")) InvokeRepeating("DecreaseThreshold", 0, 0.5f);
                 }
             }
-            else if(this.name == "SquareGaussian")
+            else if (this.name == "SquareGaussian")
             {
                 denclueController.GetComponent<SquareGaussian>().CmdToggleSquareGaussian();
             }
-            else if(this.name == "DencluePlay")
+            else if (this.name == "DencluePlay")
             {
                 denclueController.GetComponent<DenclueAlgorithm>().CmdStartDenclue();
             }
@@ -387,20 +368,20 @@ public class UniversalButtonScript : MonoBehaviour {
                 denclueController.GetComponent<ToggleSingleMultiCentered>().CmdToggle();
             }
         }
-        
+
 
         //Controls Menu functionalities
         else if (transform.parent.gameObject.name == "ControlsMenu" || transform.parent.gameObject.name == "KMeansControlsMenu")
         {
-            if(this.name == "Move")
+            if (this.name == "Move")
             {
                 ptEvtLsnr.setMoveMode();
             }
-            else if(this.name == "Scale")
+            else if (this.name == "Scale")
             {
                 ptEvtLsnr.setScalingMode();
             }
-            else if(this.name == "Rotate")
+            else if (this.name == "Rotate")
             {
                 ptEvtLsnr.setRotationMode();
             }
@@ -408,12 +389,12 @@ public class UniversalButtonScript : MonoBehaviour {
             {
                 ptEvtLsnr.setSelectDataMode();
             }
-            else if(this.name == "GoToGround")
+            else if (this.name == "GoToGround")
             {
                 ground.GetComponent<SetToGround>().rigPosReset = true;
             }
         }
-        
+
     }
 
     void IncreaseNrSpheres()
@@ -470,5 +451,4 @@ public class UniversalButtonScript : MonoBehaviour {
     {
         CancelInvoke();
     }
-
 }
