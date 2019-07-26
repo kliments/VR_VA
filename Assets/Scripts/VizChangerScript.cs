@@ -53,7 +53,8 @@ public class VizChangerScript : NetworkBehaviour
         if (pies == null) pies = FindObject(scatterplot, "PieChartCtrl");
         if (triangles == null) triangles = FindObject(scatterplot, "Triangle");
         if (tetrahedrons == null) tetrahedrons = FindObject(scatterplot, "Tetrahedron");
-
+		
+		if(dataChanger == null) dataChanger = (DataChangerScript)FindObjectOfType(typeof(DataChangerScript));
         currentDataset = dataChanger.datasets[dataChanger.currentDataIndex];
         
         //load cubes
@@ -217,6 +218,7 @@ public class VizChangerScript : NetworkBehaviour
         if (triangles == null) triangles = FindObject(scatterplot, "Triangle");
         if (tetrahedrons == null) tetrahedrons = FindObject(scatterplot, "Tetrahedron");
 
+		if(dataChanger == null) dataChanger = (DataChangerScript)FindObjectOfType(typeof(DataChangerScript));
         currentDataset = dataChanger.datasets[dataChanger.currentDataIndex];
 
         //load cubes
