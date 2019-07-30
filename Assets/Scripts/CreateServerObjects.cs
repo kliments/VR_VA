@@ -41,7 +41,7 @@ public class CreateServerObjects : NetworkBehaviour
 
         GameObject denclueContr = Instantiate(denclueController);
         denclueContr.transform.parent = eventSystem.transform;
-        NetworkServer.Spawn(denclueController);
+        NetworkServer.Spawn(denclueContr);
 
         GameObject silhouetteCoef = Instantiate(silhouetteCoefficient);
         silhouetteCoef.transform.parent = eventSystem.transform;

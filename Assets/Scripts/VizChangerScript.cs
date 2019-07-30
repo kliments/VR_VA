@@ -35,22 +35,40 @@ public class VizChangerScript : NetworkBehaviour
 	void Update () {
 		if(Input.GetKeyDown(KeyCode.P))
         {
-            CmdChangeVisualization(vizIndex);
+            CmdChangeVisualization(Random.Range(0,4));
         }
-	}
+        if (Input.GetKeyDown(KeyCode.M))
+        {
+            GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+            GameObject localPlayer = new GameObject();
+            NetworkIdentity networkIdentity = new NetworkIdentity();
+            foreach (var player in players)
+            {
+                networkIdentity = player.GetComponent<NetworkIdentity>();
+                if (!player.GetComponent<NetworkIdentity>().isLocalPlayer)
+                {
+                    localPlayer = player;
+                    break;
+                }
+            }
+            localPlayer.GetComponent<AssignAuthorityOverObject>().CmdAssignAuthority(netId, localPlayer.GetComponent<NetworkIdentity>());
+        }
+    }
 
     [Command]
     public void CmdChangeVisualization(int index)
     {
         Debug.Log("Visualization changed on server!");
         currentVizIndex = index;
+        vizIndex = index;
         ground.rigPosReset = true;
         ground.RemoveParenthoodFromRig();
 
         resetKmeans.ResetMe();
         resetDBScan.ResetMe();
         resetDenclue.ResetMe();
-        
+
+        if (scatterplot == null) scatterplot = GameObject.Find("ScatterplotElements");
         if (cubes == null) cubes = FindObject(scatterplot, "DataSpace");
         if (pies == null) pies = FindObject(scatterplot, "PieChartCtrl");
         if (triangles == null) triangles = FindObject(scatterplot, "Triangle");
@@ -200,7 +218,7 @@ public class VizChangerScript : NetworkBehaviour
                 tetrahedrons.GetComponent<Tetrahedron>().changeDatafile(currentDataset);
             }
         }
-        RpcChangeVisualization(index);
+        RpcChangeVisualization(vizIndex);
     }
 
     [ClientRpc]
@@ -215,6 +233,7 @@ public class VizChangerScript : NetworkBehaviour
         resetDBScan.ResetMe();
         resetDenclue.ResetMe();
 
+        if (scatterplot == null) scatterplot = GameObject.Find("ScatterplotElements");
         if (cubes == null) cubes = FindObject(scatterplot, "DataSpace");
         if (pies == null) pies = FindObject(scatterplot, "PieChartCtrl");
         if (triangles == null) triangles = FindObject(scatterplot, "Triangle");

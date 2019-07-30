@@ -37,7 +37,7 @@ public class DataChangerScript : NetworkBehaviour {
             CmdLoadDataset(dataIndex);
         }
 
-        if(Input.GetKeyDown(KeyCode.M))
+        if(Input.GetKeyDown(KeyCode.N))
         {
             GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
             GameObject localPlayer = new GameObject();
