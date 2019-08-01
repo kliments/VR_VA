@@ -30,12 +30,14 @@ public class ToggleSingleMultiCentered : NetworkBehaviour {
         {
             multiCentered = false;
             denclue.multiCentered = true;
+            if (sprite == null) sprite = GameObject.Find("SingleMultiCentered").transform.GetChild(0).GetComponent<SpriteRenderer>();
             sprite.sprite = multiCenSpr;
         }
         else
         {
             multiCentered = true;
             denclue.multiCentered = false;
+            if (sprite == null) sprite = GameObject.Find("SingleMultiCentered").transform.GetChild(0).GetComponent<SpriteRenderer>();
             sprite.sprite = singleCenSpr;
         }
         //Call same function on each client
@@ -47,17 +49,19 @@ public class ToggleSingleMultiCentered : NetworkBehaviour {
     [ClientRpc]
     public void RpcToggle()
     {
-        if (hasAuthority) return;
+        if (isServer || !isLocalPlayer) return;
         if (multiCentered)
         {
             multiCentered = false;
             denclue.multiCentered = true;
+            if (sprite == null) sprite = GameObject.Find("SingleMultiCentered").transform.GetChild(0).GetComponent<SpriteRenderer>();
             sprite.sprite = multiCenSpr;
         }
         else
         {
             multiCentered = true;
             denclue.multiCentered = false;
+            if (sprite == null) sprite = GameObject.Find("SingleMultiCentered").transform.GetChild(0).GetComponent<SpriteRenderer>();
             sprite.sprite = singleCenSpr;
         }
     }

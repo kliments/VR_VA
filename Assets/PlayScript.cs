@@ -21,13 +21,16 @@ public class PlayScript : NetworkBehaviour {
 
 	}
 
-    public void TogglePlayPause()
+    [Command]
+    public void CmdTogglePlayPause()
     {
+        if (!isServer) return;
         if(!nextStepPause)
         {
             StartRoutine();
             nextStepPause = true;
             //change label
+            if (sprite == null) sprite = GameObject.Find("Play").transform.GetChild(0).GetComponent<SpriteRenderer>();
             sprite.sprite = pauseSprite;
         }
         else
@@ -35,6 +38,30 @@ public class PlayScript : NetworkBehaviour {
             StopRoutine();
             nextStepPause = false;
             //change label
+            if (sprite == null) sprite = GameObject.Find("Play").transform.GetChild(0).GetComponent<SpriteRenderer>();
+            sprite.sprite = playSprite;
+        }
+        RpcTogglePlayPause();
+    }
+
+    [ClientRpc]
+    void RpcTogglePlayPause()
+    {
+        if (isServer || !isLocalPlayer) return;
+        if (!nextStepPause)
+        {
+            StartRoutine();
+            nextStepPause = true;
+            //change label
+            if (sprite == null) sprite = GameObject.Find("Play").transform.GetChild(0).GetComponent<SpriteRenderer>();
+            sprite.sprite = pauseSprite;
+        }
+        else
+        {
+            StopRoutine();
+            nextStepPause = false;
+            //change label
+            if (sprite == null) sprite = GameObject.Find("Play").transform.GetChild(0).GetComponent<SpriteRenderer>();
             sprite.sprite = playSprite;
         }
     }

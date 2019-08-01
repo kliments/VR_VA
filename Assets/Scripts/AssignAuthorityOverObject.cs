@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 public class AssignAuthorityOverObject : NetworkBehaviour {
-    public enum Rights {data, viz, kMeans, dbScan, denclue};
+    public enum Rights {DataPermission, VizPermission, KMeansPermission, dbScanPermission, dencluePermission};
 
     public Rights rights = new Rights();
     RaycastHit hit;
@@ -13,7 +13,7 @@ public class AssignAuthorityOverObject : NetworkBehaviour {
     // Use this for initialization
     void Start () {
         FindAllObjects();
-        rights = Rights.data;
+        rights = Rights.DataPermission;
 	}
 	
 	// Update is called once per frame
@@ -30,19 +30,19 @@ public class AssignAuthorityOverObject : NetworkBehaviour {
                     {
                         switch(rights)
                         {
-                            case Rights.data:
+                            case Rights.DataPermission:
                                 hit.collider.GetComponent<AssignAuthorityOverObject>().CmdAssignAuthority(dataChanger.GetComponent<NetworkIdentity>().netId, hit.collider.GetComponent<NetworkIdentity>());
                                 break;
-                            case Rights.viz:
+                            case Rights.VizPermission:
                                 hit.collider.GetComponent<AssignAuthorityOverObject>().CmdAssignAuthority(vizChanger.GetComponent<NetworkIdentity>().netId, hit.collider.GetComponent<NetworkIdentity>());
                                 break;
-                            case Rights.dbScan:
+                            case Rights.dbScanPermission:
                                 hit.collider.GetComponent<AssignAuthorityOverObject>().CmdAssignAuthority(dbScanContr.GetComponent<NetworkIdentity>().netId, hit.collider.GetComponent<NetworkIdentity>());
                                 break;
-                            case Rights.denclue:
+                            case Rights.dencluePermission:
                                 hit.collider.GetComponent<AssignAuthorityOverObject>().CmdAssignAuthority(denclueContr.GetComponent<NetworkIdentity>().netId, hit.collider.GetComponent<NetworkIdentity>());
                                 break;
-                            case Rights.kMeans:
+                            case Rights.KMeansPermission:
                                 hit.collider.GetComponent<AssignAuthorityOverObject>().CmdAssignAuthority(kMeansContr.GetComponent<NetworkIdentity>().netId, hit.collider.GetComponent<NetworkIdentity>());
                                 break;
                         }

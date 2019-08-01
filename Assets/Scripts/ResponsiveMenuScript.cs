@@ -13,7 +13,6 @@ public class ResponsiveMenuScript : MonoBehaviour {
     private GameObject _currentButton;
     private Vector3 _inactivePos, _activePos, _inactiveScale, _activeScale, _actualPos;
     private Vector2 _oldPos, _newPos;
-    private int _frameCounter;
     // Use this for initialization
     void Start () {
         _slide = true;
@@ -24,7 +23,6 @@ public class ResponsiveMenuScript : MonoBehaviour {
         _activeScale = new Vector3(1, 1, 1);
         _actualPos = new Vector3();
         AssignValues();
-        _frameCounter = 0;
     }
 	
 	// Update is called once per frame
@@ -103,7 +101,6 @@ public class ResponsiveMenuScript : MonoBehaviour {
         if(device.GetTouchUp(SteamVR_Controller.ButtonMask.Touchpad))
         {
             _slide = true;
-            _frameCounter = 0;
             _oldPos = new Vector2(0, 0);
             _newPos = new Vector2(0, 0);
             _currentButton.GetComponent<UniversalButtonScript>().CancelAllCalls();

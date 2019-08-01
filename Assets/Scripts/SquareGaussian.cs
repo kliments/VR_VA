@@ -27,11 +27,13 @@ public class SquareGaussian : NetworkBehaviour {
         if (denclue.gaussianCalculation == true)
         {
             denclue.gaussianCalculation = false;
+            if (sprite == null) sprite = GameObject.Find("SquareGaussian").transform.GetChild(0).GetComponent<SpriteRenderer>();
             sprite.sprite = square;
         }
         else
         {
             denclue.gaussianCalculation = true;
+            if (sprite == null) sprite = GameObject.Find("SquareGaussian").transform.GetChild(0).GetComponent<SpriteRenderer>();
             sprite.sprite = gaussian;
         }
         denclue.ResetMe();
@@ -44,15 +46,17 @@ public class SquareGaussian : NetworkBehaviour {
     [ClientRpc]
     public void RpcToggleSquareGaussian()
     {
-        if (hasAuthority) return;
+        if (isServer || !isLocalPlayer) return;
         if (denclue.gaussianCalculation == true)
         {
             denclue.gaussianCalculation = false;
+            if (sprite == null) sprite = GameObject.Find("SquareGaussian").transform.GetChild(0).GetComponent<SpriteRenderer>();
             sprite.sprite = square;
         }
         else
         {
             denclue.gaussianCalculation = true;
+            if (sprite == null) sprite = GameObject.Find("SquareGaussian").transform.GetChild(0).GetComponent<SpriteRenderer>();
             sprite.sprite = gaussian;
         }
         denclue.ResetMe();

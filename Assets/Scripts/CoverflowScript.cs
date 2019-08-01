@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class CoverflowScript : MonoBehaviour {
-    public GameObject menuToRotate, currentButton, responsiveMenuScript;
+    public GameObject menuToRotate, currentButton;
     private GameObject ptr;
     private Vector3 ptrOldPos, ptrNewPos;
 	// Use this for initialization

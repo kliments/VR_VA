@@ -22,20 +22,47 @@ public class ToggleEucledianManhattan : NetworkBehaviour {
 		
 	}
 
-    public void Toggle()
+    [Command]
+    public void CmdToggle()
     {
+        if (!isServer) return;
         //reset DBSCAN algorithm
         distance.ResetMe();
         if (eucledian)
         {
             eucledian = false;
             distance.euclDist = true;
+            if (sprite == null) sprite = GameObject.Find("EucledianManhattan").transform.GetChild(0).GetComponent<SpriteRenderer>();
             sprite.sprite = euclideanSpr;
         }
         else
         {
             eucledian = true;
             distance.euclDist = false;
+            if (sprite == null) sprite = GameObject.Find("EucledianManhattan").transform.GetChild(0).GetComponent<SpriteRenderer>();
+            sprite.sprite = mannhattanSpr;
+        }
+        RpcToggle();
+    }
+
+    [ClientRpc]
+    void RpcToggle()
+    {
+        if (isServer || !isLocalPlayer) return;
+        //reset DBSCAN algorithm
+        distance.ResetMe();
+        if (eucledian)
+        {
+            eucledian = false;
+            distance.euclDist = true;
+            if (sprite == null) sprite = GameObject.Find("EucledianManhattan").transform.GetChild(0).GetComponent<SpriteRenderer>();
+            sprite.sprite = euclideanSpr;
+        }
+        else
+        {
+            eucledian = true;
+            distance.euclDist = false;
+            if (sprite == null) sprite = GameObject.Find("EucledianManhattan").transform.GetChild(0).GetComponent<SpriteRenderer>();
             sprite.sprite = mannhattanSpr;
         }
     }

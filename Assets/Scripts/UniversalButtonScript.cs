@@ -251,7 +251,7 @@ public class UniversalButtonScript : MonoBehaviour
             }
             else if (this.name == "Play")
             {
-                kMeansController.GetComponent<PlayScript>().TogglePlayPause();
+                kMeansController.GetComponent<PlayScript>().CmdTogglePlayPause();
             }
             else if (this.name == "SilhouetteCoef")
             {
@@ -297,7 +297,7 @@ public class UniversalButtonScript : MonoBehaviour
             }
             else if (this.name == "EucledianManhattan")
             {
-                dbScanController.GetComponent<ToggleEucledianManhattan>().Toggle();
+                dbScanController.GetComponent<ToggleEucledianManhattan>().CmdToggle();
             }
             else if (this.name == "StepBackward")
             {
@@ -309,7 +309,7 @@ public class UniversalButtonScript : MonoBehaviour
             }
             else if (this.name == "Play")
             {
-                dbScanController.GetComponent<DBScanPlay>().TogglePlayPause();
+                dbScanController.GetComponent<DBScanPlay>().CmdTogglePlayPause();
             }
             else if (this.name == "SilhouetteCoef")
             {

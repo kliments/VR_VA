@@ -29,11 +29,12 @@ public class GeneralCoverflowProperties : MonoBehaviour {
         AssignAccordinglyButtons();
         originalRotation = transform.rotation;
 
-        foreach (Transform child in gameObject.transform)
+        foreach (Transform child in transform)
         {
             if (child.name == "HighlightedButton")
             {
                 highlight = child.gameObject;
+                break;
             }
         }
     }

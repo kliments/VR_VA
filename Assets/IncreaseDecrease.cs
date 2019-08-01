@@ -32,6 +32,10 @@ public class IncreaseDecrease : NetworkBehaviour {
         {
             kMeans.nrOfSpheres++;
         }
+        if(text == null)
+        {
+
+        }
         text.text = "K: " + kMeans.nrOfSpheres.ToString();
         kMeans.pseudoCodeText.SetActive(true);
         RpcResetNrSpheres();
@@ -54,7 +58,7 @@ public class IncreaseDecrease : NetworkBehaviour {
     [ClientRpc]
     public void RpcResetNrSpheres()
     {
-        if (hasAuthority) return;
+        if (isServer || !isLocalPlayer) return;
         kMeans.ResetMe(); text.text = "K: " + kMeans.nrOfSpheres.ToString();
         kMeans.pseudoCodeText.SetActive(true);
     }
@@ -92,7 +96,7 @@ public class IncreaseDecrease : NetworkBehaviour {
     [ClientRpc]
     public void RpcResetEpsilon()
     {
-        if (hasAuthority) return;
+        if (isServer || !isLocalPlayer) return;
         dbScan.ResetMe();
         text.text = "eps: " + dbScan.epsilon.ToString();
         dbScan.pseudoCodeText.SetActive(true);
@@ -129,7 +133,7 @@ public class IncreaseDecrease : NetworkBehaviour {
     [ClientRpc]
     public void RpcResetMinPts()
     {
-        if (hasAuthority) return;
+        if (isServer || !isLocalPlayer) return;
         dbScan.ResetMe();
         text.text = "minPts: " + dbScan.minPts.ToString();
         dbScan.pseudoCodeText.SetActive(true);
@@ -143,7 +147,6 @@ public class IncreaseDecrease : NetworkBehaviour {
         if(denclue.halfLengthOfNeighbourhood < 10)
         {
             denclue.halfLengthOfNeighbourhood++;
-            denclue.CmdStartDenclue();
         }
         text.text = "ε: " + denclue.halfLengthOfNeighbourhood.ToString();
         RpcResetInfluence();
@@ -157,7 +160,6 @@ public class IncreaseDecrease : NetworkBehaviour {
         {
             denclue.ResetMe();
             denclue.halfLengthOfNeighbourhood--;
-            denclue.CmdStartDenclue();
         }
         text.text = "ε: " + denclue.halfLengthOfNeighbourhood.ToString();
         RpcResetInfluence();
@@ -166,7 +168,7 @@ public class IncreaseDecrease : NetworkBehaviour {
     [ClientRpc]
     public void RpcResetInfluence()
     {
-        if (hasAuthority) return;
+        if (isServer || !isLocalPlayer) return;
         denclue.ResetMe();
         text.text = "ε: " + denclue.halfLengthOfNeighbourhood.ToString();
     }
@@ -204,7 +206,7 @@ public class IncreaseDecrease : NetworkBehaviour {
     [ClientRpc]
     public void RpcResetThreshold()
     {
-        if (hasAuthority) return;
+        if (isServer || !isLocalPlayer) return;
         text.text = "ξ: " + decimal.Round((decimal)denclue.threshold, 2).ToString();
     }
 }
