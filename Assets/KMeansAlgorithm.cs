@@ -49,7 +49,6 @@ public class KMeansAlgorithm : ClusteringAlgorithm
     //new and old total number of colored datapoints for comparing if k-means has finished
     private int[] newTotal, oldTotal;
 
-    private int counter = 0;
     private int movedSteps = 0;
 
     
@@ -94,6 +93,10 @@ public class KMeansAlgorithm : ClusteringAlgorithm
     [SyncVar]
     //Variable that gets updated on server
     public int nrOfSpheres;
+
+    [SyncVar]
+    private int counter = 0;
+
     // Use this for initialization
     void Start()
     {
@@ -127,8 +130,6 @@ public class KMeansAlgorithm : ClusteringAlgorithm
             allInPlace = AllAreTrue(hasArrived);
             if (allInPlace && !bestClusterFound)
             {
-                Debug.Log(ClusteringCompactness());
-
                 if (currentTextCounter > 3) return;
                 if(!previousStepClicked)
                 {
@@ -189,7 +190,7 @@ public class KMeansAlgorithm : ClusteringAlgorithm
                 prevText = pseudoCodeText.transform.GetChild(4).GetComponent<Text>();
             }
         }
-        if (nextStep)
+        if (nextStep || Input.GetKeyDown(KeyCode.K))
         {
             nextStep = false;
             CmdStartAlgorithm();
@@ -349,7 +350,7 @@ public class KMeansAlgorithm : ClusteringAlgorithm
     [ClientRpc]
     void RpcStartAlgorithm()
     {
-        if (hasAuthority) return;
+        if (!hasAuthority) return;
         if (bestClusterFound) return;
         AssignDataToGameObjects();
         previousStepClicked = false;
@@ -701,7 +702,7 @@ public class KMeansAlgorithm : ClusteringAlgorithm
     [Command]
     void CmdGenerateRandomSpheres()
     {
-        if (!hasAuthority) return;
+        if (!isServer) return;
 
         for (int i = 0; i < nrOfSpheres; i++)
         {

@@ -36,23 +36,6 @@ public class DataChangerScript : NetworkBehaviour {
         {
             CmdLoadDataset(dataIndex);
         }
-
-        if(Input.GetKeyDown(KeyCode.N))
-        {
-            GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
-            GameObject localPlayer = new GameObject();
-            NetworkIdentity networkIdentity = new NetworkIdentity();
-            foreach (var player in players)
-            {
-                networkIdentity = player.GetComponent<NetworkIdentity>();
-                if (!player.GetComponent<NetworkIdentity>().isLocalPlayer)
-                {
-                    localPlayer = player;
-                    break;
-                }
-            }
-            localPlayer.GetComponent<AssignAuthorityOverObject>().CmdAssignAuthority(netId, localPlayer.GetComponent<NetworkIdentity>());
-        }
     }
 
     [Command]

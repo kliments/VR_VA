@@ -170,10 +170,11 @@ public class DataSpaceHandler : GeneralVisualization
 
         //prepare data
         //
-        /*if (counterData == 0)
+        if (counterData == 0)
         {
-            data = FindObjectOfType<ResponsiveMenuDatasetsGenerator>().datasets[0];
-        }*/
+            DataChangerScript dataChanger = (DataChangerScript)FindObjectOfType(typeof(DataChangerScript));
+            data = dataChanger.datasets[0];
+        }
         string[] lines = data.text.Split('\n');
         string[] attr = lines[0].Split(',');
         int rows = lines.Length;
@@ -230,21 +231,6 @@ public class DataSpaceHandler : GeneralVisualization
                 }
                 count++;
             }
-          
-
-            /*//adding specific color accodring to each class
-            Color[] colorArray = new Color[classes.Count];
-            float r,g,b;
-            for (int k=0; k<classes.Count;k++)
-            {
-                r = UnityEngine.
-                
-            .Range(0.0f, 1.0f);
-                g = UnityEngine.Random.Range(0.0f, 1.0f);
-                b = UnityEngine.Random.Range(0.0f, 1.0f);
-                colorArray[k] = new Color(r,g,b);
-            }*/
-
 
             normData = normalization(dataset);
             alglib.covm(normData, out covarianceMatrix);
@@ -339,9 +325,6 @@ public class DataSpaceHandler : GeneralVisualization
                 Color[] colors = new Color[vertices.Length];
                 for (int t = 0; t < vertices.Length; t++)
                 {
-                    /*colors[t] = new Color(float.Parse(attributes[4], System.Globalization.CultureInfo.InvariantCulture),
-                        float.Parse(attributes[5], System.Globalization.CultureInfo.InvariantCulture),
-                        float.Parse(attributes[6], System.Globalization.CultureInfo.InvariantCulture));*/
                     colors[t] = new Color(0.2f, 0.6f, 0.4f);
                 }
                 mesh.colors = colors;
@@ -362,10 +345,6 @@ public class DataSpaceHandler : GeneralVisualization
         denclue.gaussCoef = GetComponent<GaussianCoefficients>();
         denclue.ResetMe();
         denclue.gameObject.SetActive(true);
-
-        //        createTiledCube(childCat1);
-
-        //Debug.Log(count);
     }
 
     // Update is called once per frame
@@ -375,19 +354,16 @@ public class DataSpaceHandler : GeneralVisualization
     }
 
     //Create a cube with all objects of that type and subdivide if needed
-    private GameObject createTiledCube(List<GameObject> objects)
+    /*private GameObject createTiledCube(List<GameObject> objects)
     {
         GameObject ret = null;
 
         //calculate max objects per cube (unity vertices limit)
         int vertexCount = dataObject.GetComponent<MeshFilter>().sharedMesh.vertexCount * objects.Count;
-        //Debug.Log("Total Vertices:" + vertexCount);
 
         //Unity limitation. we need to split the object list
         if (vertexCount > System.UInt16.MaxValue)
         {
-            //
-            //Debug.Log("Tiling cubes. Needed subcubes:"+ System.Math.Ceiling((double)vertexCount/ System.UInt16.MaxValue));
             GameObject tiledCube = new GameObject("tiledCube");
             tiledCube.tag = "DestroyTiledCube";
             tiledCube.transform.parent = gameObject.transform;
@@ -418,10 +394,10 @@ public class DataSpaceHandler : GeneralVisualization
         }
 
         return ret;
-    }
+    }*/
 
     //create a single colored cube object out of the children
-    private GameObject createCubeObject(List<GameObject> objects, GameObject parent)
+    /*private GameObject createCubeObject(List<GameObject> objects, GameObject parent)
     {
         //"realobject"
         GameObject cube = new GameObject("Cube");
@@ -441,10 +417,10 @@ public class DataSpaceHandler : GeneralVisualization
         cube.transform.localPosition = new Vector3(0, 0, 0);
         cube.transform.localScale = new Vector3(1, 1, 1);
         return cube;
-    }
+    }*/
 
 
-    private void mergeChildren(GameObject parent, List<GameObject> objects, MeshFilter target)
+    /*private void mergeChildren(GameObject parent, List<GameObject> objects, MeshFilter target)
     {
         CombineInstance[] combine = new CombineInstance[objects.Count];
         //        System.Random rnd = new System.Random();
@@ -460,94 +436,8 @@ public class DataSpaceHandler : GeneralVisualization
         }
 
         target.mesh.CombineMeshes(combine);
-    }
-
-    /// <summary>
-    /// Set the selection by specifying a bounding box. TODO change to plane / sphere coliders
-    /// </summary>
-    /// <param name="minX"></param>
-    /// <param name="minY"></param>
-    /// <param name="minZ"></param>
-    /// <param name="maxX"></param>
-    /// <param name="maxY"></param>
-    /// <param name="maxZ"></param>
-    public void setSelection(float minX, float minY, float minZ, float maxX, float maxY, float maxZ)
-    {
-        SelectionMinX = minX;
-        SelectionMaxX = maxX;
-
-        SelectionMinY = minY;
-        SelectionMaxY = maxY;
-
-        SelectionMinZ = minZ;
-        SelectionMaxZ = maxZ;
-    }
-
-
-    /// <summary>
-    /// Set the selection by specifying a bounding box. TODO change to plane / sphere coliders
-    /// </summary>
-    /// <param name="minX"></param>
-    /// <param name="minY"></param>
-    /// <param name="minZ"></param>
-    /// <param name="maxX"></param>
-    /// <param name="maxY"></param>
-    /// <param name="maxZ"></param>
-    public void setSelectionSphere(Vector3 center, float radius)
-    {
-        dataMappedMaterial.SetFloat("_SelectionSphereRadiusSquared", radius * radius);
-        dataMappedMaterial.SetVector("_SelectionSphereCenter", center);
-
-        dataMappedTransparent.SetFloat("_SelectionSphereRadiusSquared", radius * radius);
-        dataMappedTransparent.SetVector("_SelectionSphereCenter", center);
-
-
-        //return;
-
-        //update selected statistics TODO all that follows is not performant
-        int count = 0;
-        float squaredRad = radius * radius;
-
-        Dictionary<string, int> selectedClasses = new Dictionary<string, int>();
-
-
-        for (int i = 0; i < dataPositions.Count; i++)
-        {
-            Vector3 pos = dataPositions[i];
-            Vector3 diff = pos - center;
-            float squaredDistance = diff.x * diff.x + diff.y * diff.y + diff.z * diff.z;
-            if (squaredDistance < squaredRad)
-            {
-                count++;
-                string dataClass = classes[i];
-                //insert class count
-                if (!selectedClasses.ContainsKey(dataClass))
-                {
-                    selectedClasses[dataClass] = 1;
-                }
-                else
-                {
-                    int oldCount = selectedClasses[dataClass];
-                    selectedClasses[dataClass] = ++oldCount;
-                }
-            }
-        }
-
-        //set text
-        if (countingTextList != null)
-        {
-            countingTextList.text = "Total: " + count + "\n\n";
-
-            //workarounds because unity uses an ancient version of c#
-            List<KeyValuePair<string, int>> sortedClasses = new List<KeyValuePair<string, int>>(selectedClasses);
-            sortedClasses.Sort(new ListStringIntComparer());
-            foreach (KeyValuePair<string, int> entry in sortedClasses)
-            {
-                countingTextList.text += entry.Key + ": " + entry.Value + "\n";
-            }
-        }
-
-    }
+    }*/
+    
 
     public void changeDatafile(TextAsset newData)
     {
